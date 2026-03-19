@@ -1,3 +1,5 @@
 # Generated files
 *.html
 *.pdf
+.mcp.json
+.claude.json
