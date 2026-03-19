@@ -112,12 +112,13 @@ My Vault/
 
 ### Notion — Knowledge Base
 
-Structured database for AI resources. Content flows in, Claude processes it, action items flow out.
+Structured database for resources across all topics. Content flows in, Claude processes it, action items flow out.
 
 - Pipeline: Inbox → To Review → Processed → Action Items → Archived
-- Auto-tagged by source & topic
+- Auto-typed (Article, Video, Podcast, Book, Tool, Instagram, Threads, Twitter, Other)
+- Auto-tagged by topic with 87-tag taxonomy across 18 topics
 - Claude-generated summaries & insights
-- Relevance scoring (High/Med/Low)
+- Action Required flag for items with specific actionable takeaways
 - Action items pushed to Todoist
 - Fed by Readwise, Raindrop, iOS Shortcuts
 
@@ -135,9 +136,10 @@ Structured database for AI resources. Content flows in, Claude processes it, act
 
 **Process (Claude via MCP):**
 - Triage Notion inbox
+- Auto-detect type and assign 1-3 topics
+- Auto-tag from 87-tag taxonomy scoped to topics
 - Auto-summarize & extract insights
-- Tag by topic & rate relevance
-- Connect to related resources
+- Flag actionable items for Todoist task creation
 
 **Action:**
 - Create Todoist tasks from insights
@@ -149,15 +151,15 @@ Structured database for AI resources. Content flows in, Claude processes it, act
 
 | Field | Type | Purpose |
 |-------|------|---------|
-| Title | text | Resource name |
-| Source | select | Reddit, YouTube, Article, Newsletter, Twitter, etc. |
+| Title | title | Resource name |
 | URL | url | Original link |
 | Status | select | Inbox → To Review → Processed → Action Items → Archived |
-| Tags | multi-select | Prompting, agents, MCP, workflows, coding, etc. |
-| Summary | text | Claude-generated summary |
-| Key Insights | text | Claude-extracted takeaways |
-| Relevance | select | High, Medium, Low |
-| Action Required | checkbox | Needs follow-up task |
+| Type | select | Article, Video, Podcast, Book, Tool, Instagram, Threads, Twitter, Other |
+| Topics | multi_select | 18 topics: AI, Crypto, Finance, Career, Leadership, Tech, Health, Fitness, Fashion, Travel, Food, Relationships, Productivity, Learning, Mindset, Culture, Sports, Music |
+| Tags | multi_select | 87 granular tags scoped to topics (auto-assigned by /triage) |
+| Summary | rich_text | Claude-generated summary (max 2000 chars) |
+| Key Insights | rich_text | Claude-extracted takeaways (max 2000 chars) |
+| Action Required | checkbox | Needs follow-up Todoist task |
 | Related Task | url | Link to Todoist task if created |
 | Date Captured | date | When it was saved |
 | Date Reviewed | date | When Claude processed it |
