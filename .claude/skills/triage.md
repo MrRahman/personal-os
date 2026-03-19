@@ -124,7 +124,7 @@ After user confirms:
 - `Date Reviewed` — today's date (YYYY-MM-DD)
 
 **Create Todoist tasks** — For each item where **Action Required = true**:
-- Create a task in the "AI Learning" project
+- Create a task in the "Personal" project with the `learning` label
 - Task title: descriptive action (e.g., "Try [tool name]", "Read [article] in depth", "Implement [technique]")
 - Include the Notion item URL in the task description
 - Set priority based on urgency (default p3)
@@ -142,7 +142,7 @@ Display final results:
 - Remaining in inbox: X
 
 ### Tasks Created
-- [ ] Task name (AI Learning)
+- [ ] Task name (Personal)
 - ...
 ```
 
@@ -150,5 +150,5 @@ Display final results:
 - Date format: YYYY-MM-DD
 - If URL fetch fails for an item, note it and process based on title/existing content
 - Notion database: "AI Knowledge Base" (see CLAUDE.md for database ID)
-- Todoist project: "AI Learning"
+- Todoist project: "Personal"
 - Reference CLAUDE.md for conventions

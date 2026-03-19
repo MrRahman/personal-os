@@ -31,7 +31,7 @@ All skills must preflight-check MCP connections before running. Report what's un
 | Otter.ai | stdio MCP (Python) | Meeting transcripts |
 
 ## Todoist Projects
-- Work, Personal (shared), AI Learning, Inbox
+- Personal, Us (shared with wife), Work, Inbox
 
 ## Notion Databases
 - AI Knowledge Base (ID: 32873b7c-bcd4-816c-8f24-e2585c9668ea) — inbox for AI resources, articles, tools

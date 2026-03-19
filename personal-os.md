@@ -168,26 +168,23 @@ Structured database for resources across all topics. Content flows in, Claude pr
 
 ## 05 — Todoist Structure
 
-One tool for all tasks. Shared projects with wife for personal.
+One tool for all tasks. Labels for organization, priorities for daily planning.
 
 ```
-Work
-  ├── [Initiative/team projects]
-  └── Meeting Follow-ups
+Personal (individual tasks)
+  Labels: learning, to-buy, health, finance, social, creative, errands
 
-Personal (shared with wife)
-  ├── Household
-  ├── Groceries & Shopping
-  ├── Finance & Admin
-  └── Travel & Events
+Us (shared with wife)
+  Labels: house, finances, family, travel, groceries
 
-AI Learning
-  ├── Things to Try
-  ├── Skills to Build
-  └── Tools to Evaluate
+Work (by focus area)
+  Labels: M&A: Treasury, M&A: Prime, M&A: Other, GE/Market Activation,
+          AI Transformation, Other, follow-up
 
 Inbox (unsorted — Claude triages daily)
 ```
+
+Priority system: P1 (must do today), P2 (this week), P3 (when you can), P4 (someday).
 
 ---
 
