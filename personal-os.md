@@ -1,0 +1,220 @@
+# Personal Operating System — System Architecture
+
+> A unified productivity system with Claude as the central brain — connecting tasks, calendar, notes, knowledge, and communication into automated daily workflows.
+
+**Version:** 1.0
+**Date:** March 2026
+**Status:** Planning → Build
+
+---
+
+## 01 — System Overview
+
+Claude serves as the central intelligence layer, connecting five core services and multiple input channels into a single automated operating system.
+
+### Core Services
+
+| Service | Role | Details |
+|---------|------|---------|
+| **Todoist** | Tasks | All tasks — personal, work, shared with wife |
+| **Google Calendar** | Time | Work (srahman@ripple.com) + personal calendars |
+| **Obsidian** | Second Brain | Meeting notes, daily notes, connected thinking |
+| **Notion** | Knowledge Base | AI resource pipeline (structured database) |
+| **Readwise Reader** | Capture + Read | Articles, YouTube, newsletters, highlights |
+
+### Direct Inputs (MCP Connected)
+
+| Input | Connection | What It Captures |
+|-------|-----------|-----------------|
+| **Gmail** | MCP (connected) | Action items from email |
+| **Slack** | MCP (connected) | Mentions, DMs, threads |
+| **iMessage** | Custom MCP (to build) | Action items from messages via chat.db |
+
+### Capture Sources (via Readwise, Raindrop, iOS Shortcuts)
+
+Reddit · YouTube · Instagram · Threads · WhatsApp / Signal
+
+---
+
+## 02 — Daily Workflows
+
+### Morning Planning
+
+Claude reviews your calendar, tasks, and inbox to propose a time-blocked daily plan.
+
+1. Pull today's meetings from Google Calendar (work + personal)
+2. Review open Todoist tasks by priority and due date
+3. Scan Gmail & Slack for urgent items
+4. Check Notion KB for due action items
+5. Propose time-blocked plan with tasks in free slots
+6. Create calendar blocks for deep work (optional)
+
+**Inputs:** Google Calendar, Todoist, Gmail, Slack, Notion
+**Output:** Daily plan (text) + optional calendar blocks
+
+### Evening Reflection
+
+Compare what was planned vs what happened. Roll over incomplete work.
+
+1. Compare planned tasks vs completed
+2. Review calendar — what actually happened
+3. Identify patterns and blockers
+4. Move incomplete tasks to tomorrow in Todoist
+5. Generate brief reflection summary
+6. Log to Obsidian as daily note
+
+**Inputs:** Google Calendar, Todoist, morning plan
+**Output:** Reflection summary in Obsidian + updated Todoist
+
+### Weekly Review
+
+Zoom out. Summarize the week, review knowledge, set next week's priorities.
+
+1. Summarize completed vs incomplete work
+2. Analyze time allocation across categories
+3. Review AI knowledge base captures from the week
+4. Promote KB items to action items in Todoist
+5. Propose next week's priorities
+6. Create tasks in Todoist for the week
+
+**Inputs:** Google Calendar, Todoist, Notion KB, Obsidian daily notes
+**Output:** Weekly review in Obsidian + Todoist tasks for next week
+
+---
+
+## 03 — Second Brain
+
+### Obsidian — Thinking & Notes
+
+Your private space for unstructured thinking, meeting capture, and connecting ideas.
+
+- Meeting notes with templates
+- Daily notes for capture & reflection
+- Bidirectional links between ideas
+- Images, PDFs, documents embedded
+- Graph view to see connections
+- Claude reads/writes directly (local markdown files)
+
+**Vault Structure:**
+```
+My Vault/
+├── Daily/              # Daily notes (auto-created)
+├── Meetings/           # Meeting notes
+├── Reflections/        # Evening reflections
+├── Weekly Reviews/     # Weekly summaries
+├── Projects/           # Project-specific notes
+├── Ideas/              # Loose thoughts & connections
+└── Templates/          # Note templates
+    ├── Daily Note.md
+    ├── Meeting Note.md
+    └── Weekly Review.md
+```
+
+### Notion — Knowledge Base
+
+Structured database for AI resources. Content flows in, Claude processes it, action items flow out.
+
+- Pipeline: Inbox → To Review → Processed → Action Items → Archived
+- Auto-tagged by source & topic
+- Claude-generated summaries & insights
+- Relevance scoring (High/Med/Low)
+- Action items pushed to Todoist
+- Fed by Readwise, Raindrop, iOS Shortcuts
+
+---
+
+## 04 — AI Resource Pipeline
+
+### Flow: Capture → Process → Action
+
+**Capture:**
+- Readwise Reader — articles, YouTube, newsletters, PDFs
+- Raindrop.io — Reddit, Instagram, Threads, quick saves
+- iOS Shortcuts — WhatsApp, Signal, texts
+- Gmail forwards — email content
+
+**Process (Claude via MCP):**
+- Triage Notion inbox
+- Auto-summarize & extract insights
+- Tag by topic & rate relevance
+- Connect to related resources
+
+**Action:**
+- Create Todoist tasks from insights
+- Surface in weekly review
+- Build skills & workflows
+- Archive processed items
+
+### Notion Database Schema
+
+| Field | Type | Purpose |
+|-------|------|---------|
+| Title | text | Resource name |
+| Source | select | Reddit, YouTube, Article, Newsletter, Twitter, etc. |
+| URL | url | Original link |
+| Status | select | Inbox → To Review → Processed → Action Items → Archived |
+| Tags | multi-select | Prompting, agents, MCP, workflows, coding, etc. |
+| Summary | text | Claude-generated summary |
+| Key Insights | text | Claude-extracted takeaways |
+| Relevance | select | High, Medium, Low |
+| Action Required | checkbox | Needs follow-up task |
+| Related Task | url | Link to Todoist task if created |
+| Date Captured | date | When it was saved |
+| Date Reviewed | date | When Claude processed it |
+
+---
+
+## 05 — Todoist Structure
+
+One tool for all tasks. Shared projects with wife for personal.
+
+```
+Work
+  ├── [Initiative/team projects]
+  └── Meeting Follow-ups
+
+Personal (shared with wife)
+  ├── Household
+  ├── Groceries & Shopping
+  ├── Finance & Admin
+  └── Travel & Events
+
+AI Learning
+  ├── Things to Try
+  ├── Skills to Build
+  └── Tools to Evaluate
+
+Inbox (unsorted — Claude triages daily)
+```
+
+---
+
+## 06 — MCP Connections
+
+| Service | Status | Details |
+|---------|--------|---------|
+| Google Calendar (work) | **Connected** | srahman@ripple.com — full read/write |
+| Google Calendar (personal) | **Setup Needed** | Add personal Google account |
+| Gmail | **Connected** | Search, read messages and threads |
+| Slack | **Connected** | Search, read channels, threads, DMs |
+| Todoist | **Setup Needed** | Official MCP — ai.todoist.net/mcp |
+| Obsidian | **Setup Needed** | Local vault + MCP server for search/index |
+| Notion | **Setup Needed** | Official MCP — mcp.notion.com |
+| Readwise Reader | **Setup Needed** | @readwise/readwise-mcp |
+| iMessage | **Custom Build** | Reads ~/Library/Messages/chat.db |
+
+---
+
+## 07 — Build Plan
+
+| # | Component | What It Does | Effort |
+|---|-----------|-------------|--------|
+| 1 | Connect MCP Servers | Todoist, Obsidian, Notion, Readwise, personal calendar | ~30 min |
+| 2 | Set Up Obsidian Vault | Folder structure, templates, plugins | ~20 min |
+| 3 | Create Notion Knowledge Base | Database with pipeline schema, Readwise export | ~20 min |
+| 4 | Build Morning Planner Skill | Daily planning from tasks + calendar | Custom build |
+| 5 | Build Evening Reflection Skill | Review day, roll over tasks, write to Obsidian | Custom build |
+| 6 | Build Weekly Review Skill | Summarize week, plan next | Custom build |
+| 7 | Build KB Triage Skill | Process Notion inbox, summarize, tag, create tasks | Custom build |
+| 8 | Build iMessage MCP Server | Extract action items from messages | Custom build |
+| 9 | Create iOS Shortcuts | Capture from WhatsApp/Signal → Todoist/Notion | ~15 min |
