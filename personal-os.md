@@ -219,4 +219,4 @@ Priority system: P1 (must do today), P2 (this week), P3 (when you can), P4 (some
 | 8 | Build KB Triage Skill | Process Notion inbox, summarize, tag, create tasks | **Done** — /triage with type detection + 87-tag taxonomy |
 | 9 | Build KB Capture Pipeline | Readwise → Notion auto-capture | **Done** — /capture + /kb skills built |
 | 10 | Build iMessage MCP Server | Extract action items from messages | **Done** — connected via Full Disk Access |
-| 11 | Create iOS Shortcuts | Capture from WhatsApp/Signal → Todoist/Notion | **Not started** |
+| 11 | Create iOS Shortcuts | Capture from WhatsApp/Signal → Todoist/Notion | **Done** — setup guide at docs/ios-shortcuts-setup.md |
