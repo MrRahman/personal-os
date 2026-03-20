@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Personal OS V1 — Features</title>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --label: #1D1D1F;
+    --secondary: #86868B;
+    --tertiary: #AEAEB2;
+    --separator: #D2D2D7;
+    --bg: #FBFBFD;
+    --card: #FFFFFF;
+    --grouped: #F5F5F7;
+    --blue: #007AFF;
+    --indigo: #5856D6;
+    --purple: #AF52DE;
+    --orange: #FF9500;
+    --green: #34C759;
+    --teal: #30B0C7;
+    --pink: #FF2D55;
+    --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --mono: 'SF Mono', SFMono-Regular, ui-monospace, Menlo, monospace;
+  }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--label);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 80px 32px;
+  }
+
+  /* ── Hero ── */
+  .hero {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  .hero .badge {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--blue);
+    background: rgba(0, 122, 255, 0.08);
+    padding: 6px 14px;
+    border-radius: 100px;
+    margin-bottom: 16px;
+  }
+  .hero h1 {
+    font-size: 56px;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.07;
+    margin-bottom: 8px;
+  }
+  .hero p {
+    font-size: 21px;
+    color: var(--secondary);
+  }
+
+  /* ── Stats bar ── */
+  .stats {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    padding: 32px 0;
+    margin-bottom: 64px;
+    border-top: 1px solid var(--separator);
+    border-bottom: 1px solid var(--separator);
+  }
+  .stat {
+    text-align: center;
+  }
+  .stat-value {
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .stat-label {
+    font-size: 12px;
+    color: var(--secondary);
+    margin-top: 2px;
+  }
+
+  /* ── Category sections ── */
+  .category {
+    margin-bottom: 56px;
+  }
+  .category-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .category-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .category-name {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--secondary);
+  }
+
+  /* ── Feature cards ── */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .feature-grid.two-col {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 620px;
+  }
+
+  .feature-card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    display: flex;
+    flex-direction: column;
+  }
+  .feature-name {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin-bottom: 6px;
+  }
+  .feature-desc {
+    font-size: 14px;
+    color: var(--secondary);
+    line-height: 1.45;
+    flex: 1;
+  }
+  .feature-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+  .feature-command {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--indigo);
+    background: rgba(88, 86, 214, 0.07);
+    padding: 4px 10px;
+    border-radius: 6px;
+  }
+  .feature-tag {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--tertiary);
+    background: var(--grouped);
+    padding: 4px 8px;
+    border-radius: 6px;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    text-align: center;
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--separator);
+    font-size: 13px;
+    color: var(--tertiary);
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="badge">V1 &middot; March 2026</div>
+    <h1>Personal OS</h1>
+    <p>Features</p>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-value" style="color: var(--indigo);">7</div>
+      <div class="stat-label">Skills</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" style="color: var(--blue);">10</div>
+      <div class="stat-label">Integrations</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" style="color: var(--purple);">87</div>
+      <div class="stat-label">Auto-Tags</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" style="color: var(--orange);">4</div>
+      <div class="stat-label">Templates</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" style="color: var(--green);">2</div>
+      <div class="stat-label">iOS Shortcuts</div>
+    </div>
+  </div>
+
+  <!-- ═══ DAILY OPERATIONS ═══ -->
+  <div class="category">
+    <div class="category-header">
+      <div class="category-dot" style="background: var(--blue);"></div>
+      <div class="category-name">Daily Operations</div>
+    </div>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-name">Morning Planning</div>
+        <div class="feature-desc">Pull calendar, tasks, email, Slack, and iMessage into a time-blocked daily plan. Auto-create meeting notes.</div>
+        <div class="feature-meta">
+          <span class="feature-command">/morning-plan</span>
+          <span class="feature-tag">6 sources</span>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-name">Evening Reflection</div>
+        <div class="feature-desc">Compare plan vs reality. Reschedule incomplete tasks. Sync Otter transcripts. Log reflection to Obsidian.</div>
+        <div class="feature-meta">
+          <span class="feature-command">/reflect</span>
+          <span class="feature-tag">auto-reschedule</span>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-name">Weekly Review</div>
+        <div class="feature-desc">Analyze the week&rsquo;s completion rates, time allocation, KB captures, and Readwise gaps. Set next week&rsquo;s priorities.</div>
+        <div class="feature-meta">
+          <span class="feature-command">/weekly-review</span>
+          <span class="feature-tag">gap analysis</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ KNOWLEDGE MANAGEMENT ═══ -->
+  <div class="category">
+    <div class="category-header">
+      <div class="category-dot" style="background: var(--purple);"></div>
+      <div class="category-name">Knowledge Management</div>
+    </div>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-name">KB Triage &amp; Tagging</div>
+        <div class="feature-desc">Process Notion inbox. Auto-detect content type, assign topics from 18 categories, tag with 87-tag taxonomy, summarize, and extract insights.</div>
+        <div class="feature-meta">
+          <span class="feature-command">/triage</span>
+          <span class="feature-tag">87 tags &middot; 18 topics</span>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-name">Readwise Capture</div>
+        <div class="feature-desc">Pull archived and shortlisted Readwise articles into Notion KB with highlights. One-way sync with deduplication.</div>
+        <div class="feature-meta">
+          <span class="feature-command">/capture</span>
+          <span class="feature-tag">Readwise &rarr; Notion</span>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-name">Knowledge Search</div>
+        <div class="feature-desc">Search across Notion KB and Readwise by topic, tag, type, status, free text, or date range.</div>
+        <div class="feature-meta">
+          <span class="feature-command">/kb</span>
+          <span class="feature-tag">cross-service</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ MEETING INTELLIGENCE ═══ -->
+  <div class="category">
+    <div class="category-header">
+      <div class="category-dot" style="background: var(--teal);"></div>
+      <div class="category-name">Meeting Intelligence</div>
+    </div>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-name">Transcript Sync</div>
+        <div class="feature-desc">Match Otter.ai transcripts to calendar events. Extract summaries, action items, and key decisions. Store in Obsidian.</div>
+        <div class="feature-meta">
+          <span class="feature-command">/sync-meetings</span>
+          <span class="feature-tag">Otter &rarr; Obsidian</span>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-name">People Profiles</div>
+        <div class="feature-desc">Auto-create and update contact profiles with meeting history, key topics discussed, and relationship context.</div>
+        <div class="feature-meta">
+          <span class="feature-tag">auto-generated</span>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-name">Meeting Notes</div>
+        <div class="feature-desc">Pre-populated meeting notes from calendar events with attendees, context, and linked transcript highlights.</div>
+        <div class="feature-meta">
+          <span class="feature-tag">template-driven</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TASK & TIME ═══ -->
+  <div class="category">
+    <div class="category-header">
+      <div class="category-dot" style="background: var(--orange);"></div>
+      <div class="category-name">Task &amp; Time</div>
+    </div>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-name">4-Project Structure</div>
+        <div class="feature-desc">Inbox, Personal, Work, and Us (shared with wife). Clear ownership for every task.</div>
+        <div class="feature-meta">
+          <span class="feature-tag">Todoist</span>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-name">19 Smart Labels</div>
+        <div class="feature-desc">Granular labels across Personal (7), Work (7), and Shared (5) for precise filtering and context.</div>
+        <div class="feature-meta">
+          <span class="feature-tag">auto-assigned</span>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-name">Priority Planning</div>
+        <div class="feature-desc">P1 (must do today) through P4 (someday). Morning plan triages Inbox and surfaces tasks by priority.</div>
+        <div class="feature-meta">
+          <span class="feature-tag">4 levels</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SECOND BRAIN ═══ -->
+  <div class="category">
+    <div class="category-header">
+      <div class="category-dot" style="background: var(--green);"></div>
+      <div class="category-name">Second Brain</div>
+    </div>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-name">Daily Notes</div>
+        <div class="feature-desc">Structured daily notes with plan, completed tasks, incomplete items, and evening reflection.</div>
+        <div class="feature-meta">
+          <span class="feature-tag">Obsidian</span>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-name">Weekly Reviews</div>
+        <div class="feature-desc">Comprehensive weekly summaries with stats, accomplishments, patterns, blockers, and next week&rsquo;s priorities.</div>
+        <div class="feature-meta">
+          <span class="feature-tag">Obsidian</span>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-name">4 Templates</div>
+        <div class="feature-desc">Daily Note, Meeting Note, Person, and Weekly Review. Consistent structure across all notes.</div>
+        <div class="feature-meta">
+          <span class="feature-tag">Obsidian</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ MOBILE CAPTURE ═══ -->
+  <div class="category">
+    <div class="category-header">
+      <div class="category-dot" style="background: var(--pink);"></div>
+      <div class="category-name">Mobile Capture</div>
+    </div>
+    <div class="feature-grid two-col">
+      <div class="feature-card">
+        <div class="feature-name">Quick Task</div>
+        <div class="feature-desc">iOS Share Sheet shortcut. Capture action items from WhatsApp, Signal, Safari, Instagram directly to Todoist Inbox.</div>
+        <div class="feature-meta">
+          <span class="feature-tag">iOS Shortcut</span>
+          <span class="feature-tag">Todoist API</span>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-name">Save to KB</div>
+        <div class="feature-desc">iOS Share Sheet shortcut. Save articles, links, and content to Notion Knowledge Base as Inbox items.</div>
+        <div class="feature-meta">
+          <span class="feature-tag">iOS Shortcut</span>
+          <span class="feature-tag">Notion API</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">Personal OS V1 &middot; All 11 components complete &middot; March 2026</div>
+
+</div>
+</body>
+</html>

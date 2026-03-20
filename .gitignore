@@ -1,5 +1,6 @@
 # Generated files
 *.html
+!diagrams/*.html
 *.pdf
 .mcp.json
 .claude.json
