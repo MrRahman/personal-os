@@ -41,6 +41,7 @@ All skills must preflight-check MCP connections before running. Report what's un
 PersonalOS/
 ├── Daily/          # Daily notes (YYYY-MM-DD.md)
 ├── Meetings/       # Meeting notes (auto-generated from Otter transcripts)
+│   └── Transcripts/ # Full Otter transcripts linked from meeting notes
 ├── People/         # Contact profiles with meeting history and context
 ├── Reflections/    # (unused, reflections go in Daily notes)
 ├── Weekly Reviews/ # YYYY-WXX.md

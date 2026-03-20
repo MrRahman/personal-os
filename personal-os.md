@@ -192,28 +192,31 @@ Priority system: P1 (must do today), P2 (this week), P3 (when you can), P4 (some
 
 | Service | Status | Details |
 |---------|--------|---------|
-| Google Calendar (work) | **Connected** | srahman@ripple.com — full read/write |
-| Google Calendar (personal) | **Setup Needed** | Add personal Google account |
-| Gmail | **Connected** | Search, read messages and threads |
-| Slack | **Connected** | Search, read channels, threads, DMs |
-| Todoist | **Setup Needed** | Official MCP — ai.todoist.net/mcp |
-| Obsidian | **Setup Needed** | Local vault + MCP server for search/index |
-| Notion | **Setup Needed** | Official MCP — mcp.notion.com |
-| Readwise Reader | **Setup Needed** | @readwise/readwise-mcp |
-| iMessage | **Custom Build** | Reads ~/Library/Messages/chat.db |
+| Google Calendar (work) | **Connected** | srahman@ripple.com — full read/write (owner) |
+| Google Calendar (personal) | **Connected (Limited)** | 1srahman@gmail.com — freeBusyReader only, needs full access |
+| Gmail | **Connected** | srahman@ripple.com — search, read messages and threads |
+| Slack | **Connected** | Ripple workspace — search, read channels, threads, DMs |
+| Todoist | **Connected** | HTTP MCP — 4 projects: Inbox, Personal, Work, Us + 19 labels |
+| Obsidian | **Connected** | Local filesystem — Claude reads/writes ~/Documents/PersonalOS directly |
+| Notion | **Connected** | HTTP MCP — bot user in Sulaiman's workspace, AI Knowledge Base DB |
+| Readwise Reader | **Connected** | mcp-remote via OAuth — highlights + Reader documents |
+| iMessage | **Auth Failed** | Cannot open chat.db — needs Full Disk Access for Claude Code |
+| Otter.ai | **Auth Failed** | 401 Not logged in — session expired, needs re-auth |
 
 ---
 
 ## 07 — Build Plan
 
-| # | Component | What It Does | Effort |
+| # | Component | What It Does | Status |
 |---|-----------|-------------|--------|
-| 1 | Connect MCP Servers | Todoist, Obsidian, Notion, Readwise, personal calendar | ~30 min |
-| 2 | Set Up Obsidian Vault | Folder structure, templates, plugins | ~20 min |
-| 3 | Create Notion Knowledge Base | Database with pipeline schema, Readwise export | ~20 min |
-| 4 | Build Morning Planner Skill | Daily planning from tasks + calendar | Custom build |
-| 5 | Build Evening Reflection Skill | Review day, roll over tasks, write to Obsidian | Custom build |
-| 6 | Build Weekly Review Skill | Summarize week, plan next | Custom build |
-| 7 | Build KB Triage Skill | Process Notion inbox, summarize, tag, create tasks | Custom build |
-| 8 | Build iMessage MCP Server | Extract action items from messages | Custom build |
-| 9 | Create iOS Shortcuts | Capture from WhatsApp/Signal → Todoist/Notion | ~15 min |
+| 1 | Connect MCP Servers | Todoist, Obsidian, Notion, Readwise, personal calendar | **8/10 connected** — iMessage, Otter need fixes |
+| 2 | Set Up Obsidian Vault | Folder structure, templates, plugins | **Done** |
+| 3 | Create Notion Knowledge Base | Database with pipeline schema | **Done** — DB created, /triage skill built |
+| 4 | Set Up Todoist Structure | Projects, labels, task migration | **Done** — 4 projects, 19 labels |
+| 5 | Build Morning Planner Skill | Daily planning from tasks + calendar | **Done** — /morning-plan with interactive meeting notes |
+| 6 | Build Evening Reflection Skill | Review day, roll over tasks, write to Obsidian | **Not started** |
+| 7 | Build Weekly Review Skill | Summarize week, plan next | **Not started** |
+| 8 | Build KB Triage Skill | Process Notion inbox, summarize, tag, create tasks | **Done** — /triage with type detection + 87-tag taxonomy |
+| 9 | Build KB Capture Pipeline | Readwise → Notion auto-capture | **Blocked** — needs Readwise auth fix |
+| 10 | Build iMessage MCP Server | Extract action items from messages | **Built** — needs Full Disk Access fix |
+| 11 | Create iOS Shortcuts | Capture from WhatsApp/Signal → Todoist/Notion | **Not started** |

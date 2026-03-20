@@ -57,26 +57,17 @@ For incomplete tasks that are priority 1 or 2:
 
 For priority 3+ incomplete tasks, just list them — don't auto-reschedule.
 
-### 5. Process Meeting Transcripts (if Otter available)
+### 5. Sync Meeting Transcripts
 
-For each Otter transcript from today:
+Invoke `/sync-meetings` for today's date. This handles:
+- Pulling Otter transcripts and matching them to existing meeting notes
+- Filling in summaries, action items, key points, and highlights
+- Storing full transcripts in `Meetings/Transcripts/`
+- Updating People notes with meeting history
 
-**a. Create Meeting Note:** Write `~/Documents/PersonalOS/Meetings/YYYY-MM-DD-meeting-title.md` using the Meeting Note template. Fill in:
-- Summary: 3-5 sentence summary of the meeting
-- Key Points: main discussion topics and decisions
-- Action Items: extract any action items or commitments mentioned
-- Transcript Highlights: 2-3 notable quotes or key exchanges
-- Set `otter_id` in frontmatter for future reference
+If Otter is unavailable (detected in preflight), skip this step with a note: "Otter unavailable — skipping meeting transcript sync. Run `/sync-meetings` later when available."
 
-**b. Update People Notes:** For each attendee mentioned in the transcript:
-- Check if `~/Documents/PersonalOS/People/First-Last.md` exists
-- If not, create it using the Person template with whatever info is available
-- If it exists, append to the Meeting History section: `- YYYY-MM-DD: [[Meetings/YYYY-MM-DD-meeting-title|Meeting Title]] — one-line context`
-- Update `last_interaction` in frontmatter
-
-**c. Cross-reference:** Add `[[People/First-Last]]` links in the meeting note's attendees field so Obsidian builds the graph.
-
-If Otter is unavailable, skip this step with a note.
+If `/sync-meetings` finds no transcripts, note: "No transcripts found for today."
 
 ### 6. Generate Reflection
 
