@@ -19,6 +19,8 @@ Test access to these services:
 | Todoist | List tasks | Yes |
 | Obsidian vault | Read `~/Documents/PersonalOS/` | Yes |
 | Otter.ai | `otter_list_transcripts` (limit 1) | No |
+| iMessage | `list_conversations` (limit 1) | No |
+| Readwise | `reader_list_documents` (limit 1) | No |
 
 Report availability. Calendar, Todoist, and Obsidian are important for a full reflection. Otter is optional but enables meeting summaries.
 
@@ -35,6 +37,14 @@ Run in parallel:
 **Morning Plan:** Read `~/Documents/PersonalOS/Daily/YYYY-MM-DD.md` (using today's date). If it exists and has a Plan section, extract the planned items. If it doesn't exist, note that no morning plan was found.
 
 **Otter Transcripts (if available):** Use `otter_list_transcripts` with today's date filter to find meeting transcripts from today. For each transcript, use `otter_get_transcript` to fetch the full text.
+
+**iMessage (if available):** Use `extract_action_items(hours=16)` to scan today's messages for requests or commitments you may not have acted on. Awareness only — present what's found, do not auto-create tasks.
+
+**Readwise (if available):** Run in parallel:
+- `reader_list_documents(location="archive", limit=5)`
+- `reader_list_documents(location="shortlist", limit=5)`
+
+Count items not yet tagged with `synced-to-notion`. Awareness only — note in the reflection output.
 
 ### 3. Compare (Plan vs Actual)
 

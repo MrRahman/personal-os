@@ -82,6 +82,20 @@ Only use tags from this list. Do not create new tags. If content doesn't fit, as
 
 **f. Extract insights** — Pull out 2-4 key insights or takeaways. These should be specific and actionable, not generic. Keep under 2000 characters.
 
+Before writing Key Insights, check if the field already has content (populated by `/capture` with the user's Readwise highlights). If content exists, **append** Claude's insights below the existing text under a `**Claude's insights:**` header rather than overwriting. This preserves the user's own highlights. Example:
+
+```
+**Your highlights:**
+- existing highlight 1
+- existing highlight 2
+
+**Claude's insights:**
+- Claude-generated insight 1
+- Claude-generated insight 2
+```
+
+Respect the 2000 character total limit — if existing highlights are long, summarize Claude's insights more concisely.
+
 **g. Determine Action Required** — Set to true when the content contains a specific, actionable takeaway:
 - A tool to try or evaluate
 - A technique to implement in current work

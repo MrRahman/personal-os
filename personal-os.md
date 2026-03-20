@@ -200,8 +200,8 @@ Priority system: P1 (must do today), P2 (this week), P3 (when you can), P4 (some
 | Obsidian | **Connected** | Local filesystem — Claude reads/writes ~/Documents/PersonalOS directly |
 | Notion | **Connected** | HTTP MCP — bot user in Sulaiman's workspace, AI Knowledge Base DB |
 | Readwise Reader | **Connected** | mcp-remote via OAuth — highlights + Reader documents |
-| iMessage | **Auth Failed** | Cannot open chat.db — needs Full Disk Access for Claude Code |
-| Otter.ai | **Auth Failed** | 401 Not logged in — session expired, needs re-auth |
+| iMessage | **Connected** | stdio MCP — reads ~/Library/Messages/chat.db via Full Disk Access |
+| Otter.ai | **Connected** | stdio MCP via Python wrapper — transcripts, search |
 
 ---
 
@@ -209,14 +209,14 @@ Priority system: P1 (must do today), P2 (this week), P3 (when you can), P4 (some
 
 | # | Component | What It Does | Status |
 |---|-----------|-------------|--------|
-| 1 | Connect MCP Servers | Todoist, Obsidian, Notion, Readwise, personal calendar | **8/10 connected** — iMessage, Otter need fixes |
+| 1 | Connect MCP Servers | Todoist, Obsidian, Notion, Readwise, personal calendar | **10/10 connected** |
 | 2 | Set Up Obsidian Vault | Folder structure, templates, plugins | **Done** |
 | 3 | Create Notion Knowledge Base | Database with pipeline schema | **Done** — DB created, /triage skill built |
 | 4 | Set Up Todoist Structure | Projects, labels, task migration | **Done** — 4 projects, 19 labels |
 | 5 | Build Morning Planner Skill | Daily planning from tasks + calendar | **Done** — /morning-plan with interactive meeting notes |
-| 6 | Build Evening Reflection Skill | Review day, roll over tasks, write to Obsidian | **Not started** |
-| 7 | Build Weekly Review Skill | Summarize week, plan next | **Not started** |
+| 6 | Build Evening Reflection Skill | Review day, roll over tasks, write to Obsidian | **Done** — /reflect with plan comparison + Otter sync |
+| 7 | Build Weekly Review Skill | Summarize week, plan next | **Done** — /weekly-review with Readwise gap analysis |
 | 8 | Build KB Triage Skill | Process Notion inbox, summarize, tag, create tasks | **Done** — /triage with type detection + 87-tag taxonomy |
-| 9 | Build KB Capture Pipeline | Readwise → Notion auto-capture | **Blocked** — needs Readwise auth fix |
-| 10 | Build iMessage MCP Server | Extract action items from messages | **Built** — needs Full Disk Access fix |
+| 9 | Build KB Capture Pipeline | Readwise → Notion auto-capture | **Done** — /capture + /kb skills built |
+| 10 | Build iMessage MCP Server | Extract action items from messages | **Done** — connected via Full Disk Access |
 | 11 | Create iOS Shortcuts | Capture from WhatsApp/Signal → Todoist/Notion | **Not started** |

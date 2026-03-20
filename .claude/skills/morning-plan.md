@@ -24,6 +24,8 @@ Test access to each service. For each, make one lightweight call:
 | Notion | `search_objects` (limit 1) | No |
 | Otter.ai | `otter_list_transcripts` (limit 1) | No |
 | Obsidian vault | Read `~/Documents/PersonalOS/Templates/Meeting Note.md` | No |
+| Readwise | `reader_list_documents` (limit 1) | No |
+| iMessage | `list_conversations` (limit 1) | No |
 
 Report which services are available. If Calendar or Todoist fail, warn the user that the plan will be incomplete. If Obsidian vault is unreachable, skip the meeting notes step (Step 5) with a warning. Continue with whatever works.
 
@@ -45,6 +47,14 @@ Also fetch any tasks due in the next 3 days for awareness.
 **Notion:** Use Notion MCP to query the "AI Knowledge Base" database (see CLAUDE.md for database ID) for items where Status = "Inbox" or Action Required = true.
 
 **Otter (if available):** Use `otter_list_transcripts` to check for any transcripts from yesterday that haven't been processed into Obsidian Meeting notes yet. Flag them as needing `/reflect` processing.
+
+**iMessage (if available):** Use `extract_action_items(hours=24)` to scan the last 24 hours of messages for potential requests, commitments, or action items. This is awareness only — present what's found, do not auto-create tasks.
+
+**Readwise (if available):** Run in parallel:
+- `reader_list_documents(location="archive", limit=5)`
+- `reader_list_documents(location="shortlist", limit=5)`
+
+Count items not yet tagged with `synced-to-notion` (i.e., not yet captured to KB). This is awareness only — do not auto-import.
 
 ### 3. Analyze
 
@@ -86,6 +96,8 @@ Display a clean, scannable plan:
 - [flagged emails with subject + sender]
 - [slack messages needing response]
 - [notion KB items in inbox]
+- iMessage: X potential action items (from [contact]: "preview...")
+- Readwise: X items not yet in KB. Run `/capture` to sync.
 
 ## Coming Up (Next 3 Days)
 - [upcoming deadlines and events worth knowing about]

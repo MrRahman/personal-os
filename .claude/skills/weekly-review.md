@@ -18,6 +18,7 @@ Test access to:
 | Google Calendar | `gcal_list_events` | Yes |
 | Todoist | List tasks | Yes |
 | Notion | `search_objects` | No |
+| Readwise | `reader_list_documents` (limit 1) | No |
 | Obsidian vault | Read `~/Documents/PersonalOS/` | Yes |
 
 Report availability. Continue with what works, noting any gaps.
@@ -72,6 +73,19 @@ List knowledge base items captured this week, grouped by relevance:
 - **Low:** Filed for reference
 
 For High relevance items that don't have associated Todoist tasks yet, propose creating tasks.
+
+**Readwise gap analysis (if Readwise available):** Check for uncaptured items by running:
+- `reader_list_documents(location="archive", updated_after=start_of_week)`
+- `reader_list_documents(location="shortlist", updated_after=start_of_week)`
+
+Cross-reference against Notion KB entries by URL (same dedup logic as `/capture` — normalize URLs, strip utm_* params). Report:
+
+```
+Readwise this week: You archived X items and shortlisted Y items.
+In KB: Z already captured. W not yet captured.
+```
+
+If uncaptured items exist, offer: "Run `/capture` to import remaining items?"
 
 ### 6. Propose Next-Week Priorities
 
