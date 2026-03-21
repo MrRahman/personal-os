@@ -2,5 +2,6 @@
 *.html
 !diagrams/*.html
 *.pdf
+!diagrams/*.pdf
 .mcp.json
 .claude.json
