@@ -34,7 +34,8 @@ All skills must preflight-check MCP connections before running. Report what's un
 - Personal, Us (shared with wife), Work, Inbox
 
 ## Notion Databases
-- AI Knowledge Base (ID: 32873b7c-bcd4-816c-8f24-e2585c9668ea) — inbox for AI resources, articles, tools
+- AI Knowledge Base (Database ID: 32873b7c-bcd4-816c-8f24-e2585c9668ea, Data Source ID: 32873b7c-bcd4-8167-a01c-000b91db06d7) — inbox for AI resources, articles, tools
+- Use the **Data Source ID** when calling `API-query-data-source`; use **Database ID** for `API-retrieve-a-database`
 
 ## Obsidian Vault Structure
 ```
