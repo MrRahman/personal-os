@@ -701,9 +701,8 @@
 
     <ul class="cover-toc">
       <li><span class="n">1</span>Architecture</li>
-      <li><span class="n">2</span>Running Your Day</li>
-      <li><span class="n">3</span>Workflow</li>
-      <li><span class="n">4</span>Features</li>
+      <li><span class="n">2</span>Workflow</li>
+      <li><span class="n">3</span>Features</li>
     </ul>
   </div>
 </div>
@@ -782,135 +781,11 @@
     </div>
   </div>
 
-  <div class="sheet-footer">Personal OS V1 &middot; System Architecture &middot; Page 2</div>
+  <div class="sheet-footer">Personal OS V1 &middot; Architecture &middot; Page 2</div>
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════
-     PAGE 3 · RUNNING YOUR DAY
-     ═══════════════════════════════════════════════════════════ -->
-<div class="sheet">
-  <div class="sec-head" style="margin-bottom: 24px;">
-    <div class="sec-badge">Your Day</div>
-    <h2>Running Your Day</h2>
-    <p>A single command for each moment &mdash; morning to evening, all week long</p>
-  </div>
-
-  <div class="timeline">
-    <!-- Morning -->
-    <div class="tl-item">
-      <div class="tl-time">8 AM</div>
-      <div class="tl-dot" style="background: var(--blue);"></div>
-      <div class="tl-card">
-        <div class="tl-title">Start your day <span class="tl-cmd">/morning-plan</span></div>
-        <div class="tl-body">Claude pulls today's calendar, overdue tasks, unread emails, Slack mentions, iMessage action items, and your Notion inbox into a single prioritized plan. You see what matters, what can wait, and where your free time is. For each meeting, it pre-creates an Obsidian note with attendee context from past interactions.</div>
-        <div class="tl-sources">
-          <span class="tl-src">Calendar</span>
-          <span class="tl-src">Todoist</span>
-          <span class="tl-src">Gmail</span>
-          <span class="tl-src">Slack</span>
-          <span class="tl-src">iMessage</span>
-          <span class="tl-src">Notion</span>
-          <span class="tl-src">Readwise</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Mid-morning -->
-    <div class="tl-item">
-      <div class="tl-time">10 AM</div>
-      <div class="tl-dot" style="background: var(--purple);"></div>
-      <div class="tl-card">
-        <div class="tl-title">Capture what you read <span class="tl-cmd">/capture</span></div>
-        <div class="tl-body">Articles you've archived or shortlisted in Readwise flow into your Notion Knowledge Base. Highlights are preserved. Duplicates are caught automatically. Run this whenever your reading queue builds up.</div>
-        <div class="tl-sources">
-          <span class="tl-src">Readwise</span>
-          <span class="tl-src">Notion KB</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Midday -->
-    <div class="tl-item">
-      <div class="tl-time">12 PM</div>
-      <div class="tl-dot" style="background: var(--green);"></div>
-      <div class="tl-card">
-        <div class="tl-title">Process your inbox <span class="tl-cmd">/triage</span></div>
-        <div class="tl-body">New KB items get classified: content type detected, 1&ndash;3 topics assigned from 18 categories, 1&ndash;5 tags selected from 87 options, a 2&ndash;3 sentence summary written, and key insights extracted. Actionable items become Todoist tasks automatically.</div>
-        <div class="tl-sources">
-          <span class="tl-src">Notion KB</span>
-          <span class="tl-src">Todoist</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Afternoon -->
-    <div class="tl-item">
-      <div class="tl-time">3 PM</div>
-      <div class="tl-dot" style="background: var(--teal);"></div>
-      <div class="tl-card">
-        <div class="tl-title">Recall anything <span class="tl-cmd">/kb</span></div>
-        <div class="tl-body">Search your knowledge base by topic, tag, type, status, or free text. Results combine Notion structured data with Readwise highlight search &mdash; find that article about MCP servers you read last week, or surface everything tagged &ldquo;agents.&rdquo;</div>
-        <div class="tl-sources">
-          <span class="tl-src">Notion KB</span>
-          <span class="tl-src">Readwise</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- After meetings -->
-    <div class="tl-item">
-      <div class="tl-time">5 PM</div>
-      <div class="tl-dot" style="background: var(--orange);"></div>
-      <div class="tl-card">
-        <div class="tl-title">Sync your meetings <span class="tl-cmd">/sync-meetings</span></div>
-        <div class="tl-body">Otter transcripts are matched to your calendar events by time, title, and attendees. Summaries, action items, and key decisions are extracted and written into your Obsidian meeting notes. People profiles are updated automatically.</div>
-        <div class="tl-sources">
-          <span class="tl-src">Otter.ai</span>
-          <span class="tl-src">Calendar</span>
-          <span class="tl-src">Obsidian</span>
-          <span class="tl-src">Todoist</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Evening -->
-    <div class="tl-item">
-      <div class="tl-time">6 PM</div>
-      <div class="tl-dot" style="background: var(--indigo);"></div>
-      <div class="tl-card">
-        <div class="tl-title">Close your day <span class="tl-cmd">/reflect</span></div>
-        <div class="tl-body">Claude compares your morning plan against what actually happened. Completed tasks are logged, incomplete P1/P2 tasks get rescheduled, and a 5&ndash;8 sentence reflection captures wins, gaps, and patterns. Everything is written to your Obsidian daily note.</div>
-        <div class="tl-sources">
-          <span class="tl-src">Calendar</span>
-          <span class="tl-src">Todoist</span>
-          <span class="tl-src">Obsidian</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Friday -->
-    <div class="tl-item">
-      <div class="tl-time">FRI</div>
-      <div class="tl-dot" style="background: var(--pink);"></div>
-      <div class="tl-card">
-        <div class="tl-title">Review your week <span class="tl-cmd">/weekly-review</span></div>
-        <div class="tl-body">Analyzes all daily reflections, completion rates, time allocation, KB captures, and Readwise gaps. Flags chronic blockers (tasks that rolled 3+ days) and proposes next week's priorities. Creates a comprehensive weekly note in Obsidian.</div>
-        <div class="tl-sources">
-          <span class="tl-src">Obsidian</span>
-          <span class="tl-src">Todoist</span>
-          <span class="tl-src">Calendar</span>
-          <span class="tl-src">Notion KB</span>
-          <span class="tl-src">Readwise</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="sheet-footer">Personal OS V1 &middot; Running Your Day &middot; Page 3</div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════
-     PAGE 4 · WORKFLOW
+     PAGE 3 · WORKFLOW
      ═══════════════════════════════════════════════════════════ -->
 <div class="sheet">
   <div class="sec-head">
@@ -1018,7 +893,7 @@
     </div>
   </div>
 
-  <div class="sheet-footer">Personal OS V1 &middot; Workflow &middot; Page 4</div>
+  <div class="sheet-footer">Personal OS V1 &middot; Workflow &middot; Page 3</div>
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -1084,7 +959,7 @@
     </div>
   </div>
 
-  <div class="sheet-footer">Personal OS V1 &middot; All 11 components &middot; Page 5</div>
+  <div class="sheet-footer">Personal OS V1 &middot; All 11 components &middot; Page 4</div>
 </div>
 
 </body>
