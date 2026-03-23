@@ -7,6 +7,8 @@ description: Process Notion Knowledge Base inbox items — summarize, tag, detec
 
 Process items in the Notion "AI Knowledge Base" inbox — summarize content, extract insights, auto-tag with the full taxonomy, detect content type, assign topics, and create Todoist tasks for actionable items.
 
+> **Note:** This runs automatically as part of `/morning-plan`. Use this skill standalone for on-demand triage.
+
 ## Instructions
 
 ### 1. Preflight Check

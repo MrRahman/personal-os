@@ -44,9 +44,11 @@ PersonalOS/
 ├── Meetings/       # Meeting notes (auto-generated from Otter transcripts)
 │   └── Transcripts/ # Full Otter transcripts linked from meeting notes
 ├── People/         # Contact profiles with meeting history and context
+├── Resources/      # KB items — one note per article/video/tool from Readwise→Notion pipeline
+├── Topics/         # Map of Content notes — one per topic (AI, Crypto, etc.), auto-populated
 ├── Reflections/    # (unused, reflections go in Daily notes)
 ├── Weekly Reviews/ # YYYY-WXX.md
 ├── Projects/       # Project-specific notes
 ├── Ideas/          # Capture pad
-└── Templates/      # Daily Note, Meeting Note, Weekly Review, Person
+└── Templates/      # Daily Note, Meeting Note, Weekly Review, Person, Resource, Topic
 ```

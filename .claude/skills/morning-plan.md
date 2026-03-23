@@ -27,9 +27,88 @@ Test access to each service. For each, make one lightweight call:
 | Readwise | `reader_list_documents` (limit 1) | No |
 | iMessage | `list_conversations` (limit 1) | No |
 
-Report which services are available. If Calendar or Todoist fail, warn the user that the plan will be incomplete. If Obsidian vault is unreachable, skip the meeting notes step (Step 5) with a warning. Continue with whatever works.
+Report which services are available. If Calendar or Todoist fail, warn the user that the plan will be incomplete. If Obsidian vault is unreachable, skip the meeting notes step (Step 6) with a warning. Continue with whatever works.
 
-### 2. Gather Data
+### 2. KB Sync (Capture + Triage)
+
+Automatically capture new Readwise items and triage the Notion KB inbox. This runs silently — only pause for user confirmation on Todoist task creation (in Step 5).
+
+**Phase A — Capture (Readwise → Notion):**
+
+Skip if Readwise or Notion are unavailable. Otherwise:
+
+1. Fetch `reader_list_documents(location="new", updated_after=7_days_ago, limit=50, response_fields=["url","title","author","category","tags","summary","reading_progress","published_date","saved_at","source_url"])`
+2. For each item not already tagged `synced-to-notion`, fetch highlights: `reader_get_document_highlights(document_id)`. Batch in parallel.
+3. Deduplicate against Notion KB by URL: prefer `source_url`, strip `utm_*`, `ref`, `source`, `fbclid`, `gclid` params, remove trailing slashes. Query Notion KB for matching URLs.
+4. For new items: create Notion pages (Status="Inbox") using the same field mapping as `/capture` Step 6 (title, URL, type, date, summary, highlights as Key Insights).
+5. Tag each captured Readwise item with `synced-to-notion`.
+
+Track: `captured_count` (number of new items imported).
+
+**Phase B — Triage (process Notion inbox + create Obsidian PKM notes):**
+
+Skip if Notion is unavailable. Otherwise:
+
+1. Query Notion KB for Status="Inbox" using `{ "property": "Status", "select": { "equals": "Inbox" } }` (Status is a **select** field). Limit to 10 items.
+2. For each item:
+   - **Fetch content** via WebFetch if the item has a URL. If fetch fails, proceed with title + existing summary.
+   - **Detect Type:** Article, Video, Podcast, Book, Tool, Instagram, Threads, Twitter, Other
+   - **Assign Topics** (1-3): AI, Crypto, Finance, Career, Leadership, Tech, Health, Fitness, Fashion, Travel, Food, Relationships, Productivity, Learning, Mindset, Culture, Sports, Music
+   - **Auto-tag** (1-5) from the taxonomy in `/triage` Step 3d
+   - **Summarize** (2-3 sentences, under 2000 chars)
+   - **Extract insights** (2-4 key takeaways). If Key Insights field already has content from highlights, append under `**Claude's insights:**` header.
+   - **Determine Action Required**: true for tools to try, techniques to implement, workflows to build, concepts to study. False for general interest.
+3. Update each Notion item: Type, Topics, Tags, Summary, Key Insights, Action Required, Status ("Processed" or "Action Items"), Date Reviewed (today).
+4. **Create Obsidian Resource note** for each triaged item at `~/Documents/PersonalOS/Resources/YYYY-MM-DD-slug.md`:
+
+```markdown
+---
+date: {{date_captured}}
+type: resource
+content_type: {{type}}
+source_url: {{url}}
+notion_id: {{notion_page_id}}
+topics:
+  - {{topic1}}
+tags:
+  - {{tag1}}
+---
+
+# {{title}}
+
+#topic/Topic1 #Topic1/tag1 #type/content_type
+
+## Summary
+{{summary}}
+
+## Key Insights
+{{key_insights}}
+
+## My Notes
+<!-- Your own thoughts, connections, applications -->
+
+## Connections
+<!-- Links to related People, Meetings, Projects, other Resources -->
+
+## Source
+[Original]({{url}})
+```
+
+Use the same slugification rules as meeting notes. The date prefix is the Date Captured from Notion.
+
+5. **Update Topic MOC notes** — For each topic assigned, check if `~/Documents/PersonalOS/Topics/TopicName.md` exists. If not, create it from the Topic template. Append the new resource to the `## Resources` section:
+
+```markdown
+- [[Resources/YYYY-MM-DD-slug|Title]] — one-line summary #Tag1 #Tag2
+```
+
+Most recent first.
+
+6. Collect action items (items where Action Required = true) for presentation in Step 5. Do **not** create Todoist tasks yet.
+
+Track: `triaged_count`, `action_items` (list), `resource_notes_created` (count).
+
+### 3. Gather Data
 
 Run these in parallel:
 
@@ -44,19 +123,13 @@ Also fetch any tasks due in the next 3 days for awareness.
 
 **Slack:** Use `slack_search_public_and_private` to find mentions and DMs from the last 12 hours. Limit to 10 results.
 
-**Notion:** Use `API-query-data-source` with the Data Source ID from CLAUDE.md. Filter for Status = "Inbox" using `{ "property": "Status", "select": { "equals": "Inbox" } }` (Status is a **select** field, not a status field). Also count items where Action Required = true.
+**Notion:** Use `API-query-data-source` with the Data Source ID from CLAUDE.md to count items where Status = "Action Items" (items with pending Todoist tasks from triage). Use `{ "property": "Status", "select": { "equals": "Action Items" } }` (Status is a **select** field).
 
 **Otter (if available):** Use `otter_list_transcripts` to check for any transcripts from yesterday that haven't been processed into Obsidian Meeting notes yet. Flag them as needing `/reflect` processing.
 
 **iMessage (if available):** Use `extract_action_items(hours=24)` to scan the last 24 hours of messages for potential requests, commitments, or action items. This is awareness only — present what's found, do not auto-create tasks.
 
-**Readwise (if available):** Run in parallel:
-- `reader_list_documents(location="archive", limit=5)`
-- `reader_list_documents(location="shortlist", limit=5)`
-
-Count items not yet tagged with `synced-to-notion` (i.e., not yet captured to KB). This is awareness only — do not auto-import.
-
-### 3. Analyze
+### 4. Analyze
 
 From the gathered data:
 
@@ -69,7 +142,7 @@ From the gathered data:
 
 **Flags:** Identify anything needing immediate attention — urgent emails, direct Slack messages with questions, overdue P1 tasks.
 
-### 4. Present
+### 5. Present
 
 Display a clean, scannable plan:
 
@@ -95,9 +168,14 @@ Display a clean, scannable plan:
 ## Inbox & Notifications
 - [flagged emails with subject + sender]
 - [slack messages needing response]
-- [notion KB items in inbox]
 - iMessage: X potential action items (from [contact]: "preview...")
-- Readwise: X items not yet in KB. Run `/capture` to sync.
+
+## KB Sync
+- Captured: X new items from Reader
+- Triaged: Y items (Z actionable)
+- Resource notes created: X in ~/Documents/PersonalOS/Resources/
+- [list of actionable items with proposed Todoist tasks]
+- Create tasks? (y/n for each, or "create all")
 
 ## Coming Up (Next 3 Days)
 - [upcoming deadlines and events worth knowing about]
@@ -105,7 +183,7 @@ Display a clean, scannable plan:
 
 Use 12-hour time format for display (e.g., 9:00 AM). Keep descriptions concise — one line per item.
 
-### 5. Meeting Notes
+### 6. Meeting Notes
 
 If Obsidian vault is available, walk through today's meetings and offer to create meeting notes. Skip all-day events, declined events, and cancelled events.
 
@@ -220,11 +298,23 @@ Synthesize into a 2-3 sentence Context block like:
 
 If no prior context exists, write: "No prior meeting notes found for these attendees."
 
-### 6. Confirm & Save
+### 7. Confirm & Save
 
 After presenting the plan and creating any meeting notes, ask the user:
 
-1. **"Write to Obsidian?"** — If yes, create or update `~/Documents/PersonalOS/Daily/YYYY-MM-DD.md`. Fill in the Plan section (Meetings, Must Do, Should Do, Proposed Schedule) while preserving any existing content in other sections. In the Meetings section, include wikilinks to any meeting notes created in Step 5:
+1. **"Create KB tasks?"** — If the KB Sync step found actionable items, confirm which Todoist tasks to create. Create confirmed tasks in the "Personal" project with the `learning` label (default p3, due next week). Include the Notion item URL in the task description. Update each Notion item's `Related Task` field with the Todoist task URL.
+
+2. **"Write to Obsidian?"** — If yes, create or update `~/Documents/PersonalOS/Daily/YYYY-MM-DD.md`. Fill in the Plan section (Meetings, Must Do, Should Do, KB Highlights, Proposed Schedule) while preserving any existing content in other sections.
+
+In the KB Highlights section, include wikilinks to Resource notes created in Step 2:
+
+```markdown
+### KB Highlights
+- [[Resources/2026-03-23-article-slug|Article Title]] — one-line summary #topic/AI
+- [[Resources/2026-03-23-tool-slug|Tool Name]] — one-line summary #topic/Tech
+```
+
+In the Meetings section, include wikilinks to any meeting notes created in Step 6:
 
 ```markdown
 ### Meetings
@@ -234,7 +324,7 @@ After presenting the plan and creating any meeting notes, ask the user:
 
 Only link meetings where notes were created — skipped meetings are not linked.
 
-2. **"Block focus time?"** — If yes, offer to create calendar events in free slots for deep work using `gcal_create_event`. Use 30-minute minimum blocks. Name them "Focus: [suggested task]".
+3. **"Block focus time?"** — If yes, offer to create calendar events in free slots for deep work using `gcal_create_event`. Use 30-minute minimum blocks. Name them "Focus: [suggested task]".
 
 ## Notes
 - All times in America/Los_Angeles
