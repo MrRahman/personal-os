@@ -75,17 +75,18 @@ List knowledge base items captured this week, grouped by relevance:
 For High relevance items that don't have associated Todoist tasks yet, propose creating tasks.
 
 **Readwise gap analysis (if Readwise available):** Check for uncaptured items by running:
-- `reader_list_documents(location="archive", updated_after=start_of_week)`
-- `reader_list_documents(location="shortlist", updated_after=start_of_week)`
+- `reader_list_documents(location="new", updated_after=start_of_week)`
 
 Cross-reference against Notion KB entries by URL (same dedup logic as `/capture` — normalize URLs, strip utm_* params). Report:
 
 ```
-Readwise this week: You archived X items and shortlisted Y items.
+Readwise this week: X items in Reader inbox.
 In KB: Z already captured. W not yet captured.
 ```
 
 If uncaptured items exist, offer: "Run `/capture` to import remaining items?"
+
+**Obsidian Resources (if available):** Scan `~/Documents/PersonalOS/Resources/` for notes created this week (by filename date prefix). Group by topic for the KB Highlights section.
 
 ### 6. Propose Next-Week Priorities
 

@@ -40,11 +40,7 @@ Run in parallel:
 
 **iMessage (if available):** Use `extract_action_items(hours=16)` to scan today's messages for requests or commitments you may not have acted on. Awareness only — present what's found, do not auto-create tasks.
 
-**Readwise (if available):** Run in parallel:
-- `reader_list_documents(location="archive", limit=5)`
-- `reader_list_documents(location="shortlist", limit=5)`
-
-Count items not yet tagged with `synced-to-notion`. Awareness only — note in the reflection output.
+**Readwise (if available):** Run `reader_list_documents(location="new", limit=5)`. Count items not yet tagged with `synced-to-notion`. Awareness only — note in the reflection output. These will be auto-captured by tomorrow's `/morning-plan`.
 
 ### 3. Compare (Plan vs Actual)
 

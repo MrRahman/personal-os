@@ -44,7 +44,7 @@ Also fetch any tasks due in the next 3 days for awareness.
 
 **Slack:** Use `slack_search_public_and_private` to find mentions and DMs from the last 12 hours. Limit to 10 results.
 
-**Notion:** Use Notion MCP to query the "AI Knowledge Base" database (see CLAUDE.md for database ID) for items where Status = "Inbox" or Action Required = true.
+**Notion:** Use `API-query-data-source` with the Data Source ID from CLAUDE.md. Filter for Status = "Inbox" using `{ "property": "Status", "select": { "equals": "Inbox" } }` (Status is a **select** field, not a status field). Also count items where Action Required = true.
 
 **Otter (if available):** Use `otter_list_transcripts` to check for any transcripts from yesterday that haven't been processed into Obsidian Meeting notes yet. Flag them as needing `/reflect` processing.
 

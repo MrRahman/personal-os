@@ -1,11 +1,13 @@
 ---
 name: capture
-description: Pull archived and shortlisted Readwise Reader items into the Notion Knowledge Base with highlights, then tag them as synced
+description: Pull Readwise Reader inbox items into the Notion Knowledge Base with highlights, then tag them as synced. Runs automatically in /morning-plan — use standalone for on-demand capture.
 ---
 
 # KB Capture — Readwise → Notion
 
-Pull reading content from Readwise Reader into the Notion Knowledge Base. Only imports items the user has actively engaged with (archived or shortlisted). Preserves highlights as Key Insights for `/triage` to enhance later.
+Pull reading content from Readwise Reader into the Notion Knowledge Base. Imports items from the user's Reader inbox (saved via share sheet, browser extension, etc.). The `synced-to-notion` tag prevents re-import, making this idempotent. Preserves highlights as Key Insights for `/triage` to enhance later.
+
+> **Note:** This runs automatically as part of `/morning-plan`. Use this skill standalone for mid-day or on-demand capture.
 
 ## Instructions
 
@@ -28,14 +30,13 @@ Convert to ISO datetime for `updated_after`. Example: 7 days ago → `2026-03-13
 
 ### 3. Fetch Candidates
 
-Run two calls in parallel:
+Fetch items from the Reader inbox:
 
-- `reader_list_documents(location="archive", updated_after=since, limit=50, response_fields=["url","title","author","category","tags","summary","reading_progress","published_date","saved_at","source_url"])`
-- `reader_list_documents(location="shortlist", updated_after=since, limit=50, response_fields=["url","title","author","category","tags","summary","reading_progress","published_date","saved_at","source_url"])`
+`reader_list_documents(location="new", updated_after=since, limit=50, response_fields=["url","title","author","category","tags","summary","reading_progress","published_date","saved_at","source_url"])`
 
-If either returns 50 items (the cap), note: "Showing 50 of potentially more items from [location]. Run again to capture more."
+If the call returns 50 items (the cap), note: "Showing 50 of potentially more items. Run again to capture more."
 
-If both return 0 items: "No new items to capture. Save articles to Readwise and archive or shortlist them when you're ready." Stop here.
+If it returns 0 items: "No new items in your Reader inbox. Save articles via share sheet and they'll appear here." Stop here.
 
 Then fetch highlights for each candidate: `reader_get_document_highlights(document_id)`. Batch these calls in parallel.
 
@@ -53,12 +54,12 @@ Query the Notion KB database (see CLAUDE.md for database ID) with a URL filter f
 ```
 ## Readwise → KB Capture
 
-Found X items (Y archived, Z shortlisted). W already in Notion (skipped).
+Found X items from Reader inbox. W already in Notion (skipped).
 
-| # | Title | Type | Source | Highlights | Import? |
-|---|-------|------|--------|------------|---------|
-| 1 | Article Title | Article | archive | 3 | Yes |
-| 2 | Video Title | Video | shortlist | 0 | Yes |
+| # | Title | Type | Highlights | Import? |
+|---|-------|------|------------|---------|
+| 1 | Article Title | Article | 3 | Yes |
+| 2 | Video Title | Video | 0 | Yes |
 
 Import all, or adjust? (e.g., "skip 2, 4")
 ```
