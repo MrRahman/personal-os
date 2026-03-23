@@ -156,18 +156,32 @@ For each person mentioned across all processed transcripts:
   - Add the meeting to `## Meeting History`
   - Leave other fields empty for manual fill
 
-### 7. Todoist (optional, user-confirmed)
+### 7. Slack Cross-Check (optional, if Slack available)
 
-Collect all action items where the owner is the user (Sulaiman / me / I) across all processed transcripts.
+Before presenting action items, cross-reference them against recent Slack activity to avoid creating tasks for things already resolved:
+
+For each action item owned by the user:
+1. Search Slack using `slack_search_public_and_private` with keywords from the action item + attendee names, filtered to `after:TARGET_DATE`
+2. If a matching Slack message indicates the action was completed (e.g., "sent", "done", "shared", "updated"), mark it as **resolved** and note the Slack evidence
+3. If Slack shows additional context (e.g., someone responded with more info), append that context to the action item description
+
+Present resolved items separately: "These action items appear resolved based on Slack activity: [list with evidence]"
+
+Skip this step if Slack is unavailable.
+
+### 8. Todoist (optional, user-confirmed)
+
+Collect all **unresolved** action items where the owner is the user (Sulaiman / me / I) across all processed transcripts.
 
 If there are any:
 - Present the list: "You have X action items from today's meetings. Create Todoist tasks? (y/n)"
+- Clearly mark any items that were flagged as potentially resolved by Slack cross-check
 - If confirmed, create tasks in the **Work** project with:
   - `follow-up` label
   - Due date from the action item if mentioned, otherwise tomorrow
   - Description: "From [[Meetings/YYYY-MM-DD-slug|Meeting Title]]"
 
-### 8. Summary Display
+### 9. Summary Display
 
 Show a compact summary:
 
