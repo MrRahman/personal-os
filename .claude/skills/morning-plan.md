@@ -59,7 +59,7 @@ Skip if Notion is unavailable. Otherwise:
    - **Extract insights** (2-4 key takeaways). If Key Insights field already has content from highlights, append under `**Claude's insights:**` header.
    - **Determine Action Required**: true for tools to try, techniques to implement, workflows to build, concepts to study. False for general interest.
 3. Update each Notion item: Type, Topics, Tags, Summary, Key Insights, Action Required, Status ("Processed" or "Action Items"), Date Reviewed (today).
-4. **Create Obsidian Resource note** for each triaged item at `~/Documents/PersonalOS/Resources/YYYY-MM-DD-slug.md`:
+4. **Create Obsidian Resource note** for each triaged item at `~/Documents/PersonalOS/Resources/slug.md` (title-only slug, no date prefix — date is in frontmatter):
 
 ```markdown
 ---
@@ -94,7 +94,7 @@ tags:
 [Original]({{url}})
 ```
 
-Use the same slugification rules as meeting notes. The date prefix is the Date Captured from Notion.
+Use the same slugification rules as meeting notes (lowercase, hyphens, strip special chars) but **without a date prefix** — the date is stored in frontmatter, not the filename.
 
 5. **Update Topic MOC notes** — For each topic assigned, check if `~/Documents/PersonalOS/Topics/TopicName.md` exists. If not, create it from the Topic template. Append the new resource to the `## Resources` section:
 
