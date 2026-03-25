@@ -65,15 +65,20 @@ For priority 3+ incomplete tasks, just list them — don't auto-reschedule.
 
 ### 5. Sync Meeting Transcripts
 
-Invoke `/sync-meetings` for today's date. This handles:
-- Pulling Otter transcripts and matching them to existing meeting notes
-- Filling in summaries, action items, key points, and highlights
-- Storing full transcripts in `Meetings/Transcripts/`
-- Updating People notes with meeting history
+**ALWAYS run sync-meetings as part of reflect.** Do not skip this step or defer it to a separate session. Inline the full `/sync-meetings` logic for today's date:
 
-If Otter is unavailable (detected in preflight), skip this step with a note: "Otter unavailable — skipping meeting transcript sync. Run `/sync-meetings` later when available."
+1. Fetch all Otter transcripts for today (`otter_list_transcripts` with today's date filter)
+2. Match each transcript to existing meeting notes (by title + time + attendees)
+3. For each match: fetch the full transcript (`otter_get_transcript`), extract summary/key points/action items/follow-ups/highlights, write the transcript file to `Meetings/Transcripts/`, and update the meeting note
+4. Update People notes with meeting history
+5. Run the Slack cross-check (Step 7 of sync-meetings) before presenting action items
+6. Present action items for Todoist task creation (user confirms)
 
-If `/sync-meetings` finds no transcripts, note: "No transcripts found for today."
+**Process all transcripts regardless of length.** If context is large, process them sequentially rather than skipping. The user should never have to run `/sync-meetings` separately after `/reflect`.
+
+If Otter is unavailable (detected in preflight), skip with a note: "Otter unavailable — skipping meeting transcript sync."
+
+If no transcripts found: "No transcripts found for today."
 
 ### 6. Generate Reflection
 
