@@ -135,6 +135,11 @@ Also fetch any tasks due in the next 3 days for awareness.
 
 **iMessage (if available):** Use `extract_action_items(hours=24)` to scan the last 24 hours of messages for potential requests, commitments, or action items. This is awareness only — present what's found, do not auto-create tasks.
 
+**Projects:** Read all files in `~/Documents/PersonalOS/Projects/`. For each with `status: active`:
+- Extract `target_date` — flag if within 7 days
+- Check if today's meetings relate to this project (match title/attendees)
+- Note any open questions or recent status changes
+
 ### 4. Analyze
 
 From the gathered data:
@@ -146,7 +151,11 @@ From the gathered data:
 - **Should Do:** P2-P3 tasks + items due in next 3 days
 - **Could Do:** Lower priority items, KB inbox items
 
-**Flags:** Identify anything needing immediate attention — urgent emails, direct Slack messages with questions, overdue P1 tasks.
+**Active Projects:** For each active project, show target date proximity and today's related meetings.
+
+**Flags:** Identify anything needing immediate attention — urgent emails, direct Slack messages with questions, overdue P1 tasks, projects with approaching deadlines.
+
+**Meeting → Project linking:** When creating meeting notes in Step 6, check if each meeting's title/attendees/description match an active project. If so, pre-populate the `project:` frontmatter field: `project: "[[Projects/slug]]"`.
 
 ### 5. Present
 
@@ -162,6 +171,10 @@ Display a clean, scannable plan:
 ## Must Do
 - [ ] task description (source: todoist/email/slack)
 - [ ] ...
+
+## Active Projects
+- **Project Name** (target date) — status summary, today's related meeting
+- ...
 
 ## Should Do
 - [ ] task description

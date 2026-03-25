@@ -42,13 +42,18 @@ All skills must preflight-check MCP connections before running. Report what's un
 PersonalOS/
 ├── Daily/          # Daily notes (YYYY-MM-DD.md)
 ├── Meetings/       # Meeting notes (auto-generated from Otter transcripts)
-│   └── Transcripts/ # Full Otter transcripts linked from meeting notes
+│   └── Transcripts/ # Full Otter transcripts with speaker names
 ├── People/         # Contact profiles with meeting history and context
 ├── Resources/      # KB items — one note per article/video/tool from Readwise→Notion pipeline
 ├── Topics/         # Map of Content notes — one per topic (AI, Crypto, etc.), auto-populated
-├── Reflections/    # (unused, reflections go in Daily notes)
+├── Projects/       # Active work initiatives — auto-detected from meetings, MOC-style with Dataview
+├── Ideas/          # Quick idea capture via /idea — conversational, linked to vault
 ├── Weekly Reviews/ # YYYY-WXX.md
-├── Projects/       # Project-specific notes
-├── Ideas/          # Capture pad
-└── Templates/      # Daily Note, Meeting Note, Weekly Review, Person, Resource, Topic
+└── Templates/      # Daily Note, Meeting Note, Weekly Review, Person, Resource, Topic, Project, Idea
+
+## Project Conventions
+- Meeting notes should populate the `project:` frontmatter field when related to an active project
+- Format: `project: "[[Projects/slug]]"` — creates Dataview-queryable link
+- Projects are auto-detected from recurring meeting themes during /reflect and /weekly-review
+- Use /idea for quick idea capture — ideas can optionally link to projects via `project:` field
 ```
