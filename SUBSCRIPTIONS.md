@@ -4,14 +4,21 @@ Track all recurring costs associated with the Personal OS system.
 
 ## Active Subscriptions
 
-| Service | Cost | Billing | Purpose | Started |
+| Service | Cost | Billing | Purpose | Paid By |
 |---------|------|---------|---------|---------|
-| Obsidian Sync | $4/mo | Monthly | Vault sync across devices | 2026-03-25 |
-| Claude Pro | $20/mo | Monthly | Claude Code + claude.ai | — |
-| Readwise Reader | $8/mo | Monthly | Reading capture + highlights | — |
-| Otter.ai | — | — | Meeting transcripts | — |
-| Todoist Pro | — | — | Task management | — |
-| Notion | — | — | AI Knowledge Base | — |
+| Claude Max | $200/mo | Monthly | Claude Code + claude.ai | Personal |
+| Obsidian Sync | $4/mo | Monthly | Vault sync across devices | Personal |
+| Todoist Pro | $5/mo | Monthly | Task management | Personal |
+| Readwise Reader | $8/mo | Monthly | Reading capture + highlights | Personal |
+| Notion | Free | — | AI Knowledge Base | — |
+| Otter.ai | — | — | Meeting transcripts | Ripple? |
+| Google Calendar | Free | — | Calendar (claude.ai integration) | Ripple |
+| Gmail | Free | — | Email (claude.ai integration) | Ripple |
+| Slack | Free | — | Messaging (claude.ai integration) | Ripple |
+| iMessage MCP | Free | — | Message search | — |
+| GitHub | Free | — | Repo hosting | — |
+
+## Monthly Total: ~$217/mo (personal costs)
 
 ## One-Time Costs
 
@@ -21,6 +28,6 @@ Track all recurring costs associated with the Personal OS system.
 | Every.to Production Ready Apps | — | — | Personal training |
 
 ## Notes
-- Update costs as you confirm them — replace "—" with actual amounts
-- Otter, Todoist, and Notion may be covered by Ripple's enterprise licenses
-- Claude Pro cost depends on plan (Pro $20/mo, Max $100/mo, or API usage)
+- Otter.ai — confirm if this is personal or covered by Ripple
+- Readwise — confirm actual monthly cost ($8/mo is standard Reader plan)
+- Todoist Pro — confirm actual cost ($5/mo annual, $8/mo monthly)
