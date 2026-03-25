@@ -125,15 +125,17 @@ Run these in parallel:
 - Due today or overdue
 Also fetch any tasks due in the next 3 days for awareness.
 
-**Gmail:** Use `gmail_search_messages` to find messages from the last 12 hours. Limit to 10 messages. Focus on unread or messages that may need a response.
+**Gmail:** Use `gmail_search_messages` to find messages since the last `/morning-plan` run. Default to `newer_than:24h` if no prior run date is known, but prefer `is:unread` to catch anything missed. Limit to 10 messages. **For any thread with an actionable subject (action requested, review, update tracker, etc.), use `gmail_read_thread` to read the full thread and extract action items** — don't rely solely on the snippet.
 
-**Slack:** Use `slack_search_public_and_private` to find mentions and DMs from the last 12 hours. Limit to 10 results.
+**Slack:** Use `slack_search_public_and_private` to find mentions and DMs since the last run. Default to `after:YYYY-MM-DD` using yesterday's date. Limit to 10 results.
 
 **Notion:** Use `API-query-data-source` with the Data Source ID from CLAUDE.md to count items where Status = "Action Items" (items with pending Todoist tasks from triage). Use `{ "property": "Status", "select": { "equals": "Action Items" } }` (Status is a **select** field).
 
 **Otter (if available):** Use `otter_list_transcripts` to check for any transcripts from yesterday that haven't been processed into Obsidian Meeting notes yet. Flag them as needing `/reflect` processing.
 
 **iMessage (if available):** Use `extract_action_items(hours=24)` to scan the last 24 hours of messages for potential requests, commitments, or action items. This is awareness only — present what's found, do not auto-create tasks.
+
+**Coverage principle:** All surfaces (Gmail, Slack, iMessage, Otter) should cover the period since the last `/morning-plan` or `/reflect` run — not a fixed time window. This prevents action items from falling through the cracks if a session runs at an unusual time. When in doubt, go wider (24h+) rather than narrower.
 
 **Projects:** Read all files in `~/Documents/PersonalOS/Projects/`. For each with `status: active`:
 - Extract `target_date` — flag if within 7 days
