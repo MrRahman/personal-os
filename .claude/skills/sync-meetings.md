@@ -137,7 +137,22 @@ Fill in the meeting note sections — replace placeholder content but preserve f
 If the match is to a NEW note (no existing file), create the note using the Meeting Note template with all sections filled in.
 
 **f. Resolve speaker names:**
-Map Otter speaker names to `[[People/First-Last]]` wikilinks wherever they appear in the meeting note. Use the People directory map from Step 2. For unresolved names, use the raw name.
+
+Speaker resolution is critical for building the Obsidian knowledge graph. Use ALL available signals:
+
+1. **Otter speaker labels** — if Otter identified speakers by name, map directly to `[[People/First-Last]]`
+2. **Calendar attendees** — cross-reference the meeting's attendee list from Google Calendar
+3. **Context clues in dialogue** — look for names mentioned in conversation ("Monica reported on Brazil", "Mark's team", "as Brad said"), someone being addressed directly, or self-identification
+4. **User's My Notes section** — if the user added notes to the meeting file with speaker names (e.g., "Brad - heading to DC"), use these to confirm speaker identity
+5. **People directory** — match against existing `People/*.md` files for known contacts
+
+Apply resolved names in:
+- `## Transcript Highlights` — use `[[People/First-Last]]` for speaker attribution (e.g., "[[People/Brad-Garlinghouse]] (~5min): 'One of the problem statements...'")
+- `## Key Points` — attribute key decisions and updates to specific people where clear
+- `## Action Items` — use `@[[People/First-Last]]` for owners
+- Transcript files — replace generic "Speaker:" labels with resolved names where confident
+
+If a speaker cannot be confidently identified, use "Unknown Speaker" rather than guessing. Flag in the summary: "X of Y speakers could not be identified."
 
 ### 6. Update People Notes
 
