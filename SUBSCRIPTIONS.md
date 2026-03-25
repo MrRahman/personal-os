@@ -11,14 +11,14 @@ Track all recurring costs associated with the Personal OS system.
 | Todoist Pro | $5/mo | Monthly | Task management | Personal |
 | Readwise Reader | $8/mo | Monthly | Reading capture + highlights | Personal |
 | Notion | Free | — | AI Knowledge Base | — |
-| Otter.ai | — | — | Meeting transcripts | Ripple? |
+| Otter.ai Business | $20/mo ($239.88/yr) | Annual | Meeting transcripts | Personal |
 | Google Calendar | Free | — | Calendar (claude.ai integration) | Ripple |
 | Gmail | Free | — | Email (claude.ai integration) | Ripple |
 | Slack | Free | — | Messaging (claude.ai integration) | Ripple |
 | iMessage MCP | Free | — | Message search | — |
 | GitHub | Free | — | Repo hosting | — |
 
-## Monthly Total: ~$217/mo (personal costs)
+## Monthly Total: ~$237/mo (personal costs)
 
 ## One-Time Costs
 
@@ -28,6 +28,5 @@ Track all recurring costs associated with the Personal OS system.
 | Every.to Production Ready Apps | — | — | Personal training |
 
 ## Notes
-- Otter.ai — confirm if this is personal or covered by Ripple
 - Readwise — confirm actual monthly cost ($8/mo is standard Reader plan)
 - Todoist Pro — confirm actual cost ($5/mo annual, $8/mo monthly)
