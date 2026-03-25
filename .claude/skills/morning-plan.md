@@ -96,6 +96,12 @@ tags:
 
 Use the same slugification rules as meeting notes (lowercase, hyphens, strip special chars) but **without a date prefix** — the date is stored in frontmatter, not the filename.
 
+**Auto-populate `## Connections`:** After creating the Resource note, scan the vault for related content:
+- **Search Meetings/** (last 30 days) — grep for keywords from the Resource's title and tags. If a meeting discussed this topic, add `[[Meetings/slug|Title]]` to Connections.
+- **Search People/** — if the Resource mentions or is relevant to a known person (e.g., author is a contact, or topic matches a person's Key Topics), link them.
+- **Search other Resources/** — find Resources with overlapping tags. If 2+ tags match, add as a related Resource link.
+- Target 2-4 connection links per Resource. Only add clear, meaningful connections.
+
 5. **Update Topic MOC notes** — For each topic assigned, check if `~/Documents/PersonalOS/Topics/TopicName.md` exists. If not, create it from the Topic template. Append the new resource to the `## Resources` section:
 
 ```markdown

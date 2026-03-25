@@ -154,6 +154,20 @@ Apply resolved names in:
 
 If a speaker cannot be confidently identified, use "Unknown Speaker" rather than guessing. Flag in the summary: "X of Y speakers could not be identified."
 
+**g. Vault connection scan:**
+
+After extracting content from the transcript, scan the vault for related notes and auto-populate the meeting note's connections:
+
+1. **Search Resources/** — grep for topic keywords from the meeting (e.g., if the meeting discussed "AI metrics", search Resources for files tagged `#topic/AI`). Add up to 3 most relevant as wikilinks in a `## Related Resources` section or append to Key Points where contextually relevant.
+
+2. **Search recent Meetings/** — glob for meeting notes from the last 14 days involving the same attendees. If found, add a link in Context: "Last met on YYYY-MM-DD in [[Meetings/slug|Title]]". This creates continuity threads across meetings.
+
+3. **Cross-link Topics** — if the meeting covered topics that have Topic MOCs (e.g., `Topics/AI.md`, `Topics/Career.md`), add the meeting as a reference in the relevant Topic MOC's `## Key People` or a new `## Related Meetings` section.
+
+4. **People → Topics** — if a person is clearly associated with a topic (e.g., Hope works on AI, Treasury; Marc on Prime, Crypto), add `[[Topics/TopicName]]` links to their People note's `## Key Topics` section if not already there.
+
+Keep links conservative — only add when the connection is clear and meaningful. 3-5 cross-links per meeting note is the target, not exhaustive.
+
 ### 6. Update People Notes
 
 For each person mentioned across all processed transcripts:
