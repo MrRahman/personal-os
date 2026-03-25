@@ -92,7 +92,13 @@ Create or update `~/Documents/PersonalOS/Daily/YYYY-MM-DD.md`:
 - If the file exists (from morning plan), **preserve the Plan section** and fill in:
   - `## Completed` — list of completed tasks
   - `## Incomplete` — list of incomplete tasks with new due dates if rescheduled
-  - `## Reflection` — the generated reflection text
+  - `## Reflection` — the auto-generated reflection text
+  - `## My Reflection` — leave the following sections for the user to fill in:
+    - `### Highlight` — "What's the one thing I'm most proud of or grateful for today?"
+    - `### Adjustments` — "What would I do differently tomorrow?"
+    - `### Check-In` — table with 5 scores (1-10): Energy, Focus, Impact, Balance, Mood
+
+- **Frontmatter scores:** If the user provides Check-In scores, add them to the YAML frontmatter (`energy`, `focus`, `impact`, `balance`, `mood`). These are queryable by Tracker/Dataview/Bases for graphing over time. Leave blank if user hasn't provided scores yet.
 
 - If the file doesn't exist, create it with all sections (Plan section will note "No morning plan recorded").
 
