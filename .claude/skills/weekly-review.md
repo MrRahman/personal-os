@@ -65,6 +65,8 @@ Run in parallel where possible:
 
 **Energy patterns:** Based on reflections and completion data, note which days felt most/least productive.
 
+**Decisions this week:** Scan all meeting notes from this week (glob `~/Documents/PersonalOS/Meetings/` for this week's dates). For each note that has a `## Decisions` section, extract the decisions. Aggregate into a list for the output.
+
 ### 5. KB Review
 
 List knowledge base items captured this week, grouped by relevance:
@@ -87,6 +89,39 @@ In KB: Z already captured. W not yet captured.
 If uncaptured items exist, offer: "Run `/capture` to import remaining items?"
 
 **Obsidian Resources (if available):** Scan `~/Documents/PersonalOS/Resources/` for notes created this week (by filename date prefix). Group by topic for the KB Highlights section.
+
+### 5.5 Relationship Radar
+
+Scan all People notes in `~/Documents/PersonalOS/People/`. For each, read the `last_interaction` frontmatter field and `relationship` field. Flag people who are going cold based on relationship type:
+
+| Relationship | Threshold | Context |
+|-------------|-----------|---------|
+| `work` (+ stakeholder on active project) | 21+ days | Check if they're a stakeholder on any active Project note |
+| `family` | 14+ days | Always flag |
+| `personal` | 14+ days | Always flag |
+| `networking` | 30+ days | Flag with note about job search relevance |
+| `mentor` | 30+ days | Flag |
+
+**Output:**
+```
+## Relationship Radar
+
+### Work — Going Cold
+- [Name] — X days, stakeholder on [[Projects/slug]]
+- ...
+
+### Personal — Check In
+- [Name] — X days (family/personal)
+- ...
+
+### Network — Warm Up
+- [Name] — X days
+- ...
+```
+
+If no one is flagged in a category, omit that category. If no one is flagged at all, write: "All relationships active — no flags."
+
+After presenting, ask: "Want to draft a quick message to anyone? Or add a Todoist reminder to reach out?"
 
 ### 6. Goal Progress Check-in
 
@@ -171,11 +206,26 @@ Wait for confirmation before proceeding.
 ## Chronic Blockers
 - [tasks that rolled 3+ days with context]
 
+## Decisions This Week
+- [Date] [[Meetings/slug|Meeting Title]]: **[Topic]** — [Decision] (decided by [person])
+- ...
+
 ## Goal Progress — QX YYYY
 ### [Goal Name]
 - Milestones: X/Y | Next: [milestone] ([date], X days)
 - This week: [activity summary]
 - Proposed target for next week: [specific action]
+
+## Relationship Radar
+
+### Work — Going Cold
+- [Name] — X days, stakeholder on [[Projects/slug]]
+
+### Personal — Check In
+- [Name] — X days (family/personal)
+
+### Network — Warm Up
+- [Name] — X days
 
 ## KB Highlights
 ### High Relevance

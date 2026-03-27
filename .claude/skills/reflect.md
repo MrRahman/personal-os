@@ -95,7 +95,7 @@ For priority 3+ incomplete tasks, just list them — don't auto-reschedule.
 
 ### 6. Sync Meeting Transcripts
 
-**ALWAYS run sync-meetings as part of reflect.** Do not skip this step or defer it to a separate session. Inline the full `/sync-meetings` logic for today's date:
+**ALWAYS run sync-meetings as part of reflect.** Do not skip this step or defer it to a separate session. Inline the full `/sync-meetings` logic for today's date (including the new decision detection, commitment detection, and waiting-on label features added to sync-meetings):
 
 1. Fetch all Otter transcripts for today (`otter_list_transcripts` with today's date filter)
 2. Match each transcript to existing meeting notes (by title + time + attendees)
@@ -133,6 +133,8 @@ Tone: honest and constructive, like a thoughtful coach. Not overly positive or n
 > **Adjustments:** What would you do differently tomorrow?
 >
 > **Check-In scores (1-10):** Energy, Focus, Impact, Balance, Mood
+>
+> **Personal wins:** Anything outside work worth noting? Workout, family time, networking call, personal project progress? (type or skip)
 
 **Wait for the user's response.** Do NOT fill in Highlight, Adjustments, or Check-In scores yourself. Do NOT write to Obsidian until the user provides their input. If the user says "skip" or doesn't want to fill these in, leave the sections with placeholder comments in Obsidian.
 
@@ -150,6 +152,7 @@ Create or update `~/Documents/PersonalOS/Daily/YYYY-MM-DD.md`:
     - `### Highlight` — user's response (or placeholder comment if skipped)
     - `### Adjustments` — user's response (or placeholder comment if skipped)
     - `### Check-In` — table with 5 scores from user (or blank if skipped)
+  - `## Personal` — user's personal wins from Step 8 (only if provided; omit section entirely if skipped)
 
 - **Frontmatter scores:** Only write scores to YAML frontmatter if the user provided them in Step 8. Never fill in scores from Claude's perspective. Leave blank if user hasn't provided scores.
 

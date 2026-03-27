@@ -1,6 +1,7 @@
 # Generated files
 *.html
 !diagrams/*.html
+!personal-os.html
 *.pdf
 !diagrams/*.pdf
 .mcp.json

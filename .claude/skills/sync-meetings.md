@@ -93,6 +93,14 @@ If the transcript has < 500 words of dialogue, flag to user: "[title] has very l
   - Decisions requiring follow-through → action item
   - Vague ("we should think about...") → NOT an action item
   - Unclear owner → "owner unclear, raised by [[People/Speaker-Name]]"
+- **Decisions** — explicit decisions made during the meeting:
+  - "We decided to...", "The decision is...", "We're going with...", "Brad approved...", "Agreed to...", "[Person] signed off on..."
+  - NOT vague direction ("we should think about...") or preferences ("I'd prefer...")
+  - Format: `- **[Topic]**: [Decision made] — decided by [[People/First-Last]], context: [one-line why]`
+- **Commitments** — promises made by or to the user:
+  - Detect: "I'll...", "Let me...", "I'll send you...", "Can you send me...", "I'll follow up with...", "[Person] will..."
+  - Capture: who committed, what they committed to, deadline if mentioned, and which direction (user → them, or them → user)
+  - These will be written to People notes in Step 6.
 - **Follow-ups** (future attention items, not immediate actions)
 - **Transcript Highlights** (2–4 notable quotes with speaker name + approximate timestamp)
 
@@ -129,6 +137,7 @@ Fill in the meeting note sections — replace placeholder content but preserve f
 - Set `otter_id` in frontmatter to the Otter transcript ID
 - Fill `## Summary` with the extracted summary
 - Fill `## Key Points` with extracted bullets
+- Fill `## Decisions` with extracted decisions. If no decisions were made, omit this section rather than leaving it empty.
 - Fill `## Action Items` with extracted action items (checkbox format)
 - Fill `## Follow-ups` with extracted follow-ups
 - Fill `## Transcript Highlights` with extracted quotes
@@ -176,6 +185,12 @@ For each person mentioned across all processed transcripts:
 - Read the current file
 - Prepend to `## Meeting History`: `- YYYY-MM-DD: [[Meetings/YYYY-MM-DD-slug|Meeting Title]] — one-line context from summary`
 - Update `last_interaction` in frontmatter to the target date
+- **Write commitments to `## Open Commitments`** (if the section exists):
+  - From the Commitments extracted in Step 5c, find ones involving this person
+  - Under `### I owe them`: add commitments the user made to this person. Format: `- (YYYY-MM-DD) [commitment text] — from [[Meetings/slug]]`
+  - Under `### They owe me`: add commitments this person made to the user. Format: `- (YYYY-MM-DD) [commitment text] — from [[Meetings/slug]]`
+  - Before writing new commitments, scan existing ones: if a matching Todoist task is completed or a Slack/email shows follow-through, mark the old commitment with ~~strikethrough~~
+  - If the People note doesn't have an `## Open Commitments` section yet, create it (following the Person template structure)
 
 **Unknown speakers** (no matching file):
 - Collect all unknown names
@@ -207,6 +222,7 @@ If there are any:
 - Clearly mark any items that were flagged as potentially resolved by Slack cross-check
 - If confirmed, create tasks in the **Work** project with:
   - `follow-up` label
+  - **`waiting-on` label** (in addition to `follow-up`) if the action item owner is someone other than the user — i.e., the user is waiting on someone else to deliver. Detection: if the owner `@[[People/...]]` is NOT Sul/Sulaiman/me/I, add `waiting-on`.
   - Due date from the action item if mentioned, otherwise tomorrow
   - Description: "From [[Meetings/YYYY-MM-DD-slug|Meeting Title]]"
 

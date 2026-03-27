@@ -125,6 +125,8 @@ Run these in parallel:
 - Due today or overdue
 Also fetch any tasks due in the next 3 days for awareness.
 
+**Todoist — Waiting On:** Also fetch tasks with the `waiting-on` label. For each, note the task description, creation date, and any linked meeting note from the description. Flag items that are 3+ days old as stale.
+
 **Gmail:** Use `gmail_search_messages` to find messages since the last `/morning-plan` run. Default to `newer_than:24h` if no prior run date is known, but prefer `is:unread` to catch anything missed. Limit to 10 messages. **For any thread with an actionable subject (action requested, review, update tracker, etc.), use `gmail_read_thread` to read the full thread and extract action items** — don't rely solely on the snippet.
 
 **Slack:** Use `slack_search_public_and_private` to find mentions and DMs since the last run. Default to `after:YYYY-MM-DD` using yesterday's date. Limit to 10 results.
@@ -265,6 +267,12 @@ Display a clean, scannable plan:
 |--------|------|-----|---------------|
 | [Gmail/Slack/iMessage] | [person] | [one-line summary] | [task title] (P[1-3], [project], [due]) |
 Create all? (y/n) or select individually
+
+## Waiting On
+| Who | What | Age | Source |
+|-----|------|-----|--------|
+| [person from task] | [task description] | X days | [meeting link from description] |
+Follow up on any? (select to draft Slack message or create follow-up task)
 
 ## KB Sync
 - Captured: X new items from Reader
@@ -435,6 +443,22 @@ Synthesize into a 2-3 sentence Context block like:
 > "Recurring weekly sync with Jane Smith (VP Treasury) and Bob Chen (Risk). Last met on 2026-03-13 for 'Treasury Pipeline Review' — discussed stablecoin custody requirements. Jane's key focus areas: regulatory compliance, APAC expansion."
 
 If no prior context exists, write: "No prior meeting notes found for these attendees."
+
+#### Strategic Frame (exec-facing meetings only)
+
+For meetings where the title contains "staff", "QBR", "offsite", "debrief", "executive", OR any attendee matches Brad-Garlinghouse, Eric-van-Miltenburg, Jon-Bilich, Monica-Long, or Marc-Asch, add a `## Strategic Frame` section between `## Context` and `## Suggested Topics`:
+
+```markdown
+## Strategic Frame
+<!-- What would Brad ask about this? What decision or outcome matters? -->
+- **Brad's lens:** [one-line framing of what Brad cares about in this meeting — outcomes, accountability, speed]
+- **Decision needed:** [if applicable — what needs to be decided today, or "None — status update"]
+- **Outcome to drive:** [what "done" looks like for this meeting — a decision made, a blocker cleared, alignment reached]
+```
+
+Generate the Strategic Frame using context from the People notes (especially Brad's communication preferences), the meeting's Suggested Topics, and any active Projects linked to this meeting. Think like Brad: what would he ask? What outcome matters?
+
+Skip this section entirely for non-exec meetings.
 
 ### 7. Confirm & Save
 
