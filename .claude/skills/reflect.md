@@ -53,7 +53,37 @@ If a morning plan exists, compare:
 
 If no morning plan exists, skip this comparison and note: "No morning plan found — showing today's activity without comparison."
 
-### 4. Reschedule
+### 4. Action Loop Closure
+
+Check whether uncaptured actions surfaced by this morning's `/morning-plan` were addressed during the day. Skip this step if no morning plan exists or if it has no "Uncaptured Actions" section.
+
+1. **Read today's daily note** (`~/Documents/PersonalOS/Daily/YYYY-MM-DD.md`) and find the Uncaptured Actions section from the morning plan.
+2. **For each uncaptured action that was surfaced**, check for evidence of follow-through:
+   - **Todoist**: Search for tasks matching keywords from the proposed task title. If found → "Task created."
+   - **Slack**: Search for replies or messages from the user related to this action (after morning-plan timestamp). If found → "Resolved via Slack."
+   - **Gmail**: Search sent folder for replies to the original thread. If found → "Resolved via email."
+   - **Meeting notes**: Check today's meeting notes for related action items or decisions. If found → "Addressed in [meeting name]."
+3. **Classify each action** as:
+   - **Resolved**: Clear evidence of follow-through found
+   - **Task created, not done**: Todoist task exists but still open (this is normal — it may not be due today)
+   - **Still unaddressed**: No evidence of action taken
+4. **Present still-unaddressed items** with options per item:
+   - Create Todoist task (due tomorrow, suggested priority from morning plan)
+   - Intentionally skip (no further tracking — user made a conscious choice)
+   - Defer to weekly review (will appear in Friday's `/weekly-review`)
+5. **User batch-confirms** which items to create tasks for, skip, or defer.
+
+**Output format:**
+```
+## Action Loop
+- Morning surfaced: X uncaptured actions
+- Resolved during the day: X
+- Tasks created (pending): X
+- Still unaddressed: X
+  → [description] — Create task / Skip / Defer to weekly review
+```
+
+### 5. Reschedule
 
 For incomplete tasks that are priority 1 or 2:
 - List them with their current due dates
@@ -63,7 +93,7 @@ For incomplete tasks that are priority 1 or 2:
 
 For priority 3+ incomplete tasks, just list them — don't auto-reschedule.
 
-### 5. Sync Meeting Transcripts
+### 6. Sync Meeting Transcripts
 
 **ALWAYS run sync-meetings as part of reflect.** Do not skip this step or defer it to a separate session. Inline the full `/sync-meetings` logic for today's date:
 
@@ -80,7 +110,7 @@ If Otter is unavailable (detected in preflight), skip with a note: "Otter unavai
 
 If no transcripts found: "No transcripts found for today."
 
-### 6. Generate Reflection
+### 7. Generate Reflection
 
 Write a 5-8 sentence reflection covering:
 1. **What went well** — completed tasks, productive meetings, good focus blocks
@@ -90,7 +120,7 @@ Write a 5-8 sentence reflection covering:
 
 Tone: honest and constructive, like a thoughtful coach. Not overly positive or negative.
 
-### 7. Write to Obsidian
+### 8. Write to Obsidian
 
 Create or update `~/Documents/PersonalOS/Daily/YYYY-MM-DD.md`:
 
@@ -126,6 +156,13 @@ Display the full reflection in the terminal as well.
 ## Incomplete
 - [ ] task — rescheduled to YYYY-MM-DD / not rescheduled
 - ...
+
+## Action Loop
+- Morning surfaced: X uncaptured actions
+- Resolved during the day: X
+- Tasks created (pending): X
+- Still unaddressed: X
+  → [description] — Create task / Skip / Defer
 
 ## Reflection
 [5-8 sentence reflection]

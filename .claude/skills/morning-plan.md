@@ -142,6 +142,54 @@ Also fetch any tasks due in the next 3 days for awareness.
 - Check if today's meetings relate to this project (match title/attendees)
 - Note any open questions or recent status changes
 
+#### 3a. Action Detection
+
+After gathering data from Gmail, Slack, and iMessage, analyze each message for uncaptured work. **Time window:** since the last `/morning-plan` run (check the daily note's Plan section timestamp). Fall back to 24h if no prior run date is known.
+
+For each Gmail thread and Slack message, classify as one or more of:
+
+1. **Direct ask**: "Can you...", "Please send...", "Need you to...", "Would you be able to..."
+2. **Question awaiting your response**: Someone asked you something and you haven't replied
+3. **Commitment you made**: "I'll...", "Let me get back to you...", "I'll follow up on..."
+4. **Deadline-bearing item**: Contains "by Friday", "before the offsite", "EOW", "end of week", specific dates
+5. **FYI needing acknowledgment**: Shared a doc for review, asked "thoughts?", "let me know what you think", flagged something for your awareness
+6. **CC'd thread where you should weigh in**: You're not the direct recipient but the topic maps to your domains (M&A integration, AI transformation, CEO ops) or involves your direct reports (Hope, Christina, David)
+7. **Stale thread** (deep mode only): Conversation involving you that went quiet 3+ days without resolution
+
+For iMessage: fold in results from `extract_action_items` directly — it already detects asks and commitments.
+
+For each detected action, capture:
+- **Source**: Gmail / Slack channel or DM / iMessage
+- **From**: Person name
+- **Ask**: One-line summary of what's needed
+- **Deadline**: If mentioned (otherwise blank)
+- **Detection type**: Which category (1-7) triggered it
+
+#### 3b. Todoist Cross-Reference
+
+For each detected action from 3a:
+
+1. **Search Todoist** for existing tasks by keywords from the ask + person name. Use `get_tasks_list` with content search.
+2. **Check today's calendar** — is this covered by a meeting today with the same person? If so, note "Covered in today's [meeting name]" instead of flagging as uncaptured.
+3. **Check active Projects** — does this belong to an active workstream? If so, tag the action with the project name.
+
+Classify each detected action as:
+- **Already tracked**: Matching Todoist task found → skip
+- **Covered by meeting**: Today's calendar has a meeting with this person on this topic → note it, don't flag
+- **Uncaptured**: No match → include in Uncaptured Actions list
+
+#### 3c. Meeting Attendee Batch Search
+
+Collect unique attendees across ALL of today's confirmed meetings (deduplicate by name). For each unique person:
+
+1. **Todoist**: Search for open tasks mentioning this person's name
+2. **Obsidian Meetings/**: Grep for unchecked `- [ ]` items in meeting notes from the last 30 days where this person is an attendee
+3. **Obsidian People/**: Read their People note if it exists — extract `last_interaction`, Key Topics, and recent Meeting History entries
+
+Cache all results by person name. These will be distributed to relevant meeting notes in Step 6.
+
+**Performance note:** This step only does vault reads and one Todoist search per unique person — no additional Gmail/Slack API calls. Deep mode (Step 5 opt-in) adds per-attendee Slack/email searches later.
+
 ### 4. Analyze
 
 From the gathered data:
@@ -158,6 +206,13 @@ From the gathered data:
 **Flags:** Identify anything needing immediate attention — urgent emails, direct Slack messages with questions, overdue P1 tasks, projects with approaching deadlines.
 
 **Meeting → Project linking:** When creating meeting notes in Step 6, check if each meeting's title/attendees/description match an active project. If so, pre-populate the `project:` frontmatter field: `project: "[[Projects/slug]]"`.
+
+**Uncaptured Actions:** From Step 3a/3b, compile the list of detected actions classified as "Uncaptured." For each, prepare a proposed Todoist task with:
+- **Title**: concise action description
+- **Priority**: P1 if deadline is today/tomorrow, P2 if within the week, P3 otherwise
+- **Project**: Work (if from work Slack/Gmail) or Personal/Us (if from iMessage)
+- **Due date**: from the deadline if mentioned, otherwise tomorrow
+- **Description**: "Detected from [source]: [original message preview]"
 
 ### 5. Present
 
@@ -191,6 +246,13 @@ Display a clean, scannable plan:
 - [slack messages needing response]
 - iMessage: X potential action items (from [contact]: "preview...")
 
+## Uncaptured Actions
+[Table of actions detected in Gmail/Slack/iMessage that aren't in Todoist]
+| Source | From | Ask | Proposed Task |
+|--------|------|-----|---------------|
+| [Gmail/Slack/iMessage] | [person] | [one-line summary] | [task title] (P[1-3], [project], [due]) |
+Create all? (y/n) or select individually
+
 ## KB Sync
 - Captured: X new items from Reader
 - Triaged: Y items (Z actionable)
@@ -201,6 +263,23 @@ Display a clean, scannable plan:
 ## Coming Up (Next 3 Days)
 - [upcoming deadlines and events worth knowing about]
 ```
+
+After presenting the plan, ask:
+
+> "Run deep prep for today's meetings? This searches Slack/email threads per attendee for richer Suggested Topics (~2-3 min)."
+
+If yes → proceed to Step 5b (Deep Mode) before creating meeting notes.
+If no → skip to Step 6 with vault-based Suggested Topics only.
+
+#### 5b. Deep Mode (opt-in)
+
+Only runs if the user confirms. For each unique attendee from Step 3c:
+
+1. **Slack search**: `slack_search_public_and_private` for messages involving this person (last 7 days). Look for unresolved threads — open questions, pending decisions, no clear conclusion.
+2. **Gmail search**: `gmail_search_messages` for threads with this person's email (last 7 days). For actionable threads, use `gmail_read_thread` to get full context.
+3. **Stale thread detection**: Flag any thread involving you that went quiet 3+ days without resolution.
+
+Cache results by person name alongside Step 3c results. These will enrich Suggested Topics in Step 6.
 
 Use 12-hour time format for display (e.g., 9:00 AM). Keep descriptions concise — one line per item.
 
@@ -229,6 +308,28 @@ Which meetings need notes? (y/n for each, or "skip all")
 
 **After collecting all responses, create notes in parallel.**
 
+#### Suggested Topics (per meeting)
+
+For each confirmed work meeting, generate a **## Suggested Topics** section using the cached data from Steps 3c and 5b (if deep mode ran). Place this section between `## Context` and `## Summary` in the meeting note.
+
+**Build topics from these sources (in priority order):**
+
+1. **Open action items**: From the 3c cache, find Todoist tasks and unchecked meeting note items involving this meeting's attendees. Format: `**[Topic]** — Open action from [date]: [person] committed to [action text]`
+
+2. **Unresolved follow-ups**: From the 3c cache, find unchecked Follow-up items from past meeting notes (last 30 days) with the same attendees. Format: `**[Topic]** — Follow-up from [date meeting]: [follow-up text] (still open)`
+
+3. **Project status** (if meeting links to an active project): Read the project note's Current Status, Open Questions, and target_date. Format: `**[Project name]** — [deadline proximity], [key blocker or open question]`
+
+4. **Recent Slack/email threads** (deep mode only): From the 5b cache, find unresolved threads with attendees. Format: `**[Thread topic]** — Active [Slack/email] thread ([last message date]), [status: awaiting decision/review/response]`
+
+5. **Relationship context**: From People notes, flag if `last_interaction` was 3+ weeks ago. Format: `**Catch up with [person]** — Last met [date]. Key topics: [from People note]`
+
+**Rules:**
+- 3-7 topics max per meeting, prioritized by urgency (deadlines > open actions > follow-ups > threads > relationship)
+- Each topic is 1-2 lines with enough context to be actionable during the meeting
+- **Deduplication**: If an uncaptured action (from Step 3a) involves one of this meeting's attendees, surface it here as a Suggested Topic AND remove it from the standalone Uncaptured Actions list. Don't double-surface.
+- If no relevant topics are found, write: `No suggested topics found — check vault connections after the meeting.`
+
 #### Meeting note creation
 
 **File:** `~/Documents/PersonalOS/Meetings/YYYY-MM-DD-slug.md`
@@ -256,6 +357,9 @@ calendar: work
 
 ## Context
 [2-3 sentence summary from context lookup — see below]
+
+## Suggested Topics
+[Auto-populated from vault data + optional deep mode — see "Suggested Topics" section above]
 
 ## Summary
 
@@ -323,9 +427,11 @@ If no prior context exists, write: "No prior meeting notes found for these atten
 
 After presenting the plan and creating any meeting notes, ask the user:
 
-1. **"Create KB tasks?"** — If the KB Sync step found actionable items, confirm which Todoist tasks to create. Create confirmed tasks in the "Personal" project with the `learning` label (default p3, due next week). Include the Notion item URL in the task description. Update each Notion item's `Related Task` field with the Todoist task URL.
+1. **"Create uncaptured action tasks?"** — If Step 3a/3b found uncaptured actions, present the proposed Todoist tasks for batch confirmation. User can "create all", select individually, or skip. Create confirmed tasks with the suggested priority/project/due date from Step 4. Include "Detected from [source]: [original message preview]" in the task description.
 
-2. **"Write to Obsidian?"** — If yes, create or update `~/Documents/PersonalOS/Daily/YYYY-MM-DD.md`. Fill in the Plan section (Meetings, Must Do, Should Do, KB Highlights, Proposed Schedule) while preserving any existing content in other sections.
+2. **"Create KB tasks?"** — If the KB Sync step found actionable items, confirm which Todoist tasks to create. Create confirmed tasks in the "Personal" project with the `learning` label (default p3, due next week). Include the Notion item URL in the task description. Update each Notion item's `Related Task` field with the Todoist task URL.
+
+3. **"Write to Obsidian?"** — If yes, create or update `~/Documents/PersonalOS/Daily/YYYY-MM-DD.md`. Fill in the Plan section (Meetings, Must Do, Should Do, Uncaptured Actions, KB Highlights, Proposed Schedule) while preserving any existing content in other sections. Include the Uncaptured Actions table in the Plan section so `/reflect` can reference it later.
 
 In the KB Highlights section, include wikilinks to Resource notes created in Step 2:
 
@@ -345,7 +451,7 @@ In the Meetings section, include wikilinks to any meeting notes created in Step 
 
 Only link meetings where notes were created — skipped meetings are not linked.
 
-3. **"Block focus time?"** — If yes, offer to create calendar events in free slots for deep work using `gcal_create_event`. Use 30-minute minimum blocks. Name them "Focus: [suggested task]".
+4. **"Block focus time?"** — If yes, offer to create calendar events in free slots for deep work using `gcal_create_event`. Use 30-minute minimum blocks. Name them "Focus: [suggested task]".
 
 ## Notes
 - All times in America/Los_Angeles
