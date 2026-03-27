@@ -110,7 +110,7 @@ If Otter is unavailable (detected in preflight), skip with a note: "Otter unavai
 
 If no transcripts found: "No transcripts found for today."
 
-### 7. Generate Reflection
+### 7. Generate Reflection (Claude's Analysis)
 
 Write a 5-8 sentence reflection covering:
 1. **What went well** — completed tasks, productive meetings, good focus blocks
@@ -120,20 +120,38 @@ Write a 5-8 sentence reflection covering:
 
 Tone: honest and constructive, like a thoughtful coach. Not overly positive or negative.
 
-### 8. Write to Obsidian
+**This is Claude's perspective only.** Present it in the terminal, then proceed to Step 8 to get the user's own reflection.
+
+### 8. Interactive Check-In (User's Reflection)
+
+**STOP and ask the user before writing anything to Obsidian.** Present Claude's reflection from Step 7, then prompt:
+
+> "That's my read on the day. Now yours —"
+>
+> **Highlight:** What's the one thing you're most proud of or grateful for today?
+>
+> **Adjustments:** What would you do differently tomorrow?
+>
+> **Check-In scores (1-10):** Energy, Focus, Impact, Balance, Mood
+
+**Wait for the user's response.** Do NOT fill in Highlight, Adjustments, or Check-In scores yourself. Do NOT write to Obsidian until the user provides their input. If the user says "skip" or doesn't want to fill these in, leave the sections with placeholder comments in Obsidian.
+
+### 9. Write to Obsidian
+
+**Only run this step after the user has responded to Step 8 (or explicitly skipped it).**
 
 Create or update `~/Documents/PersonalOS/Daily/YYYY-MM-DD.md`:
 
 - If the file exists (from morning plan), **preserve the Plan section** and fill in:
   - `## Completed` — list of completed tasks
   - `## Incomplete` — list of incomplete tasks with new due dates if rescheduled
-  - `## Reflection` — the auto-generated reflection text
-  - `## My Reflection` — leave the following sections for the user to fill in:
-    - `### Highlight` — "What's the one thing I'm most proud of or grateful for today?"
-    - `### Adjustments` — "What would I do differently tomorrow?"
-    - `### Check-In` — table with 5 scores (1-10): Energy, Focus, Impact, Balance, Mood
+  - `## Reflection` — Claude's auto-generated reflection text (clearly labeled: `<!-- Claude's analysis -->`)
+  - `## My Reflection` — the user's own words from Step 8:
+    - `### Highlight` — user's response (or placeholder comment if skipped)
+    - `### Adjustments` — user's response (or placeholder comment if skipped)
+    - `### Check-In` — table with 5 scores from user (or blank if skipped)
 
-- **Frontmatter scores:** If the user provides Check-In scores, add them to the YAML frontmatter (`energy`, `focus`, `impact`, `balance`, `mood`). These are queryable by Tracker/Dataview/Bases for graphing over time. Leave blank if user hasn't provided scores yet.
+- **Frontmatter scores:** Only write scores to YAML frontmatter if the user provided them in Step 8. Never fill in scores from Claude's perspective. Leave blank if user hasn't provided scores.
 
 - If the file doesn't exist, create it with all sections (Plan section will note "No morning plan recorded").
 

@@ -142,6 +142,13 @@ Also fetch any tasks due in the next 3 days for awareness.
 - Check if today's meetings relate to this project (match title/attendees)
 - Note any open questions or recent status changes
 
+**Goals:** Read `~/Documents/PersonalOS/Goals/` for the current quarter file (e.g., `2026-Q2.md`). For each goal section:
+- Extract unchecked milestones with target dates
+- Flag milestones due this week or overdue
+- Flag goals with no related task activity in Todoist and no related meetings in the past 7 days ("Stale")
+- Read the `This Week` section for any targets proposed by last week's `/weekly-review`
+- Match goals to today's meetings via their linked Projects
+
 #### 3a. Action Detection
 
 After gathering data from Gmail, Slack, and iMessage, analyze each message for uncaptured work. **Time window:** since the last `/morning-plan` run (check the daily note's Plan section timestamp). Fall back to 24h if no prior run date is known.
@@ -228,6 +235,12 @@ Display a clean, scannable plan:
 ## Must Do
 - [ ] task description (source: todoist/email/slack)
 - [ ] ...
+
+## Active Goals
+- **Goal Name** — Next: Milestone (due date, X days) | Project: [[Projects/slug]]
+- **Goal Name** — STALE: no activity in X days | This week target: [from weekly-review]
+- **Goal Name** — This week: X/Y sessions
+[For each active quarterly goal: show next milestone + due date + days remaining. Flag STALE if no related task or meeting activity in 7+ days. Show "This Week" target if set by weekly-review. If a meeting today maps to a goal's project, note it.]
 
 ## Active Projects
 - **Project Name** (target date) — status summary, today's related meeting

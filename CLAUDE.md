@@ -47,13 +47,23 @@ PersonalOS/
 ├── Resources/      # KB items — one note per article/video/tool from Readwise→Notion pipeline
 ├── Topics/         # Map of Content notes — one per topic (AI, Crypto, etc.), auto-populated
 ├── Projects/       # Active work initiatives — auto-detected from meetings, MOC-style with Dataview
+├── Goals/          # Annual direction (YYYY.md) + quarterly goals (YYYY-QX.md)
 ├── Ideas/          # Quick idea capture via /idea — conversational, linked to vault
 ├── Weekly Reviews/ # YYYY-WXX.md
-└── Templates/      # Daily Note, Meeting Note, Weekly Review, Person, Resource, Topic, Project, Idea
+└── Templates/      # Daily Note, Meeting Note, Weekly Review, Person, Resource, Topic, Project, Idea, Goal
 
 ## Project Conventions
 - Meeting notes should populate the `project:` frontmatter field when related to an active project
 - Format: `project: "[[Projects/slug]]"` — creates Dataview-queryable link
 - Projects are auto-detected from recurring meeting themes during /reflect and /weekly-review
 - Use /idea for quick idea capture — ideas can optionally link to projects via `project:` field
+
+## Goals
+- Goals live in `~/Documents/PersonalOS/Goals/`
+- Annual note: `Goals/YYYY.md` — big-picture direction, set once, reviewed quarterly
+- Quarterly notes: `Goals/YYYY-QX.md` — 5-7 active goals with outcomes and milestones
+- Goals link to Projects via wikilinks. Projects can serve multiple goals.
+- Morning-plan surfaces approaching milestones and stale goals (no activity in 7+ days).
+- Weekly-review tracks milestone progress and proposes weekly targets.
+- `area` field: work | personal (no sub-categories)
 ```

@@ -88,7 +88,39 @@ If uncaptured items exist, offer: "Run `/capture` to import remaining items?"
 
 **Obsidian Resources (if available):** Scan `~/Documents/PersonalOS/Resources/` for notes created this week (by filename date prefix). Group by topic for the KB Highlights section.
 
-### 6. Propose Next-Week Priorities
+### 6. Goal Progress Check-in
+
+Read the current quarterly goals file (`~/Documents/PersonalOS/Goals/YYYY-QX.md`). For each active goal:
+
+1. **Milestone status:** Which milestones were completed this week? Which are approaching (next 2 weeks)? Which are overdue?
+2. **Activity signal:** Check related projects for status changes, meetings, or completed Todoist tasks this week. If no activity in 14+ days, flag as **STALE**.
+3. **Weekly target check:** Did the user achieve the target in the goal's `This Week` section (if one was set last week)?
+4. **Propose next week's target:**
+   - For goals with weekly milestones (short initiatives): propose a specific deliverable
+   - For goals with monthly milestones (complex/personal): propose the next incremental step
+   - For habit goals (fitness, routines): propose the weekly cadence target
+
+**Output section:**
+```
+## Goal Progress — QX YYYY
+
+### [Goal Name]
+- Milestones: X/Y completed | Next: [milestone] ([date], X days)
+- This week: [summary of activity — tasks, meetings, or "No activity"]
+- Last week's target: [achieved / not achieved / not set]
+- **Proposed target for next week:** [specific, achievable action]
+
+### [Goal Name] — STALE
+- Milestones: X/Y completed | Next: [milestone] ([date])
+- No activity in X days
+- **Proposed target for next week:** [action to restart momentum]
+```
+
+After presenting Goal Progress, ask: **"Update 'This Week' section in each goal note with proposed targets? (y/n)"**
+
+If yes, write the proposed targets into each goal's `## This Week` section in the quarterly goals file. Morning-plan will read these and display them.
+
+### 7. Propose Next-Week Priorities
 
 Based on the analysis, propose 3-5 priorities for next week. These should be a mix of:
 - **Carryover:** High-priority incomplete work from this week
@@ -97,7 +129,7 @@ Based on the analysis, propose 3-5 priorities for next week. These should be a m
 
 Each priority should be specific and actionable, not vague.
 
-### 7. Confirm with User
+### 8. Confirm with User
 
 Present the full review, then ask:
 1. "Do these priorities look right? Any to add, remove, or reorder?"
@@ -106,7 +138,7 @@ Present the full review, then ask:
 
 Wait for confirmation before proceeding.
 
-### 8. Write & Create
+### 9. Write & Create
 
 **Obsidian:** Create `~/Documents/PersonalOS/Weekly Reviews/YYYY-WXX.md` using the Weekly Review template. Fill in all sections.
 
@@ -138,6 +170,12 @@ Wait for confirmation before proceeding.
 
 ## Chronic Blockers
 - [tasks that rolled 3+ days with context]
+
+## Goal Progress — QX YYYY
+### [Goal Name]
+- Milestones: X/Y | Next: [milestone] ([date], X days)
+- This week: [activity summary]
+- Proposed target for next week: [specific action]
 
 ## KB Highlights
 ### High Relevance
