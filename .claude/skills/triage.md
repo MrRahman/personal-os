@@ -62,7 +62,7 @@ For each inbox item:
 **AI:** prompt-engineering, agents, MCP, LLMs, fine-tuning, RAG, evals, computer-use, multimodal, AI-safety, AI-tooling, workflows, automation
 **Crypto:** tokenomics, DeFi, regulation, stablecoins, cross-border-payments, CBDCs, blockchain-infra, web3
 **Finance:** investing, markets, personal-finance, fintech, payments
-**Career:** networking, job-strategy, negotiation, personal-brand
+**Career:** networking, job-strategy, negotiation, personal-brand, job-search, interviewing, resume
 **Leadership:** management, decision-making, team-building, communication
 **Tech:** engineering, architecture, developer-tools, APIs, open-source
 **Health:** nutrition, mental-health, sleep, longevity, biohacking

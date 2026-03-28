@@ -27,7 +27,8 @@ Labels are user-scoped in Todoist (not project-scoped). Wife will not see these 
 | `learning` | Courses, skills, research, reading |
 | `to-buy` | Shopping, things to purchase |
 | `health` | Medical, fitness, wellness |
-| `finance` | Money, insurance, investments, admin |
+| `finances` | Money, insurance, investments, admin |
+| `career` | Job search, networking, personal brand, resume |
 | `social` | Texts to send, gifts, events, people |
 | `creative` | Personal site, writing, side projects |
 | `errands` | Returns, pickups, miscellaneous to-dos |
@@ -92,11 +93,11 @@ Consistent across all projects. Used by `/morning-plan` to build daily plan.
 | Ring insurance | Us | `finances` |
 | Text pegah back | Personal | `social` |
 | Wedding insurance add | Us | `finances` |
-| Financial advisor tasks + | Personal | `finance` |
+| Financial advisor tasks + | Personal | `finances` |
 | Wedding photos + Ask for additional video | Personal | `social` |
 | Bed | Us | `house` |
 | Sixth | Personal | `errands` |
-| All subscriptions + credit cards review | Personal | `finance` |
+| All subscriptions + credit cards review | Personal | `finances` |
 | Amazon Returns | Personal | `errands` |
 | Amazon orders | Personal | `to-buy` |
 | Try on all clothes | Personal | `errands` |
@@ -104,7 +105,7 @@ Consistent across all projects. Used by `/morning-plan` to build daily plan.
 | Thank you notes | Personal | `social` |
 | Check apple tasks | Personal | `errands` |
 | Watch one video on coding | Personal | `learning` |
-| 401k check | Personal | `finance` |
+| 401k check | Personal | `finances` |
 
 **Personal - quick** (project `6CrfwxRXJX686JG4`) — 1 task:
 

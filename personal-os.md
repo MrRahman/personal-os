@@ -172,7 +172,7 @@ One tool for all tasks. Labels for organization, priorities for daily planning.
 
 ```
 Personal (individual tasks)
-  Labels: learning, to-buy, health, finance, social, creative, errands
+  Labels: learning, to-buy, health, finances, career, social, creative, errands
 
 Us (shared with wife)
   Labels: house, finances, family, travel, groceries

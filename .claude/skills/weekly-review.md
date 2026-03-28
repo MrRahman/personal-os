@@ -155,7 +155,27 @@ After presenting Goal Progress, ask: **"Update 'This Week' section in each goal 
 
 If yes, write the proposed targets into each goal's `## This Week` section in the quarterly goals file. Morning-plan will read these and display them.
 
-### 7. Propose Next-Week Priorities
+### 7. Idea Review
+
+Scan `~/Documents/PersonalOS/Ideas/` for all idea files. For each idea with `status: seed`:
+- Calculate age (days since `date:` in frontmatter)
+- If older than 14 days, flag it
+
+Present:
+
+```
+## Idea Review
+| Idea | Age | Status |
+|------|-----|--------|
+| Brain Wellness App | 14 days | seed |
+| Friend Hangout Scheduler | 14 days | seed |
+```
+
+For ideas older than 14 days, ask: **"Any of these ready to promote (`/promote slug`), archive, or leave as seed?"**
+
+If the user wants to archive, update that idea's `status: archived`.
+
+### 8. Propose Next-Week Priorities
 
 Based on the analysis, propose 3-5 priorities for next week. These should be a mix of:
 - **Carryover:** High-priority incomplete work from this week
@@ -164,7 +184,7 @@ Based on the analysis, propose 3-5 priorities for next week. These should be a m
 
 Each priority should be specific and actionable, not vague.
 
-### 8. Confirm with User
+### 9. Confirm with User
 
 Present the full review, then ask:
 1. "Do these priorities look right? Any to add, remove, or reorder?"
@@ -173,7 +193,7 @@ Present the full review, then ask:
 
 Wait for confirmation before proceeding.
 
-### 9. Write & Create
+### 10. Write & Create
 
 **Obsidian:** Create `~/Documents/PersonalOS/Weekly Reviews/YYYY-WXX.md` using the Weekly Review template. Fill in all sections.
 

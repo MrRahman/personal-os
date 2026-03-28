@@ -75,7 +75,7 @@ For each confirmed item, use `API-post-page` to create a page in the KB database
 | title | Title | Direct mapping |
 | source_url or url | URL | Prefer source_url (original link) |
 | category | Type | Map: article→Article, video→Video, podcast→Podcast, epub→Book, tweet→Twitter, pdf→Article, email→Article, rss→Article, note→Other. Default→Other |
-| published_date or saved_at | Date Captured | YYYY-MM-DD, prefer published_date, fall back to saved_at |
+| saved_at | Date Captured | YYYY-MM-DD. Always use saved_at (when the user captured it), NOT published_date (when the source was published) |
 | summary | Summary | Readwise summary as seed text (enhanced by /triage later) |
 | highlights | Key Insights | See formatting below |
 | — | Status | "Inbox" |
