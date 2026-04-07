@@ -17,7 +17,7 @@ Claude serves as the central intelligence layer, connecting five core services a
 | Service | Role | Details |
 |---------|------|---------|
 | **Todoist** | Tasks | All tasks — personal, work, shared with wife |
-| **Google Calendar** | Time | Work (srahman@ripple.com) + personal calendars |
+| **Google Calendar** | Time | Work + personal calendars |
 | **Obsidian** | Second Brain | Meeting notes, daily notes, connected thinking |
 | **Notion** | Knowledge Base | AI resource pipeline (structured database) |
 | **Readwise Reader** | Capture + Read | Articles, YouTube, newsletters, highlights |
@@ -192,13 +192,13 @@ Priority system: P1 (must do today), P2 (this week), P3 (when you can), P4 (some
 
 | Service | Status | Details |
 |---------|--------|---------|
-| Google Calendar (work) | **Connected** | srahman@ripple.com — full read/write (owner) |
-| Google Calendar (personal) | **Connected (Limited)** | 1srahman@gmail.com — freeBusyReader only, needs full access |
-| Gmail | **Connected** | srahman@ripple.com — search, read messages and threads |
-| Slack | **Connected** | Ripple workspace — search, read channels, threads, DMs |
+| Google Calendar (work) | **Connected** | Work email — full read/write (owner) |
+| Google Calendar (personal) | **Connected (Limited)** | Personal email — freeBusyReader only, needs full access |
+| Gmail | **Connected** | Work email — search, read messages and threads |
+| Slack | **Connected** | Your workspace — search, read channels, threads, DMs |
 | Todoist | **Connected** | HTTP MCP — 4 projects: Inbox, Personal, Work, Us + 19 labels |
 | Obsidian | **Connected** | Local filesystem — Claude reads/writes ~/Documents/PersonalOS directly |
-| Notion | **Connected** | HTTP MCP — bot user in Sulaiman's workspace, AI Knowledge Base DB |
+| Notion | **Connected** | HTTP MCP — bot user in your workspace, AI Knowledge Base DB |
 | Readwise Reader | **Connected** | mcp-remote via OAuth — highlights + Reader documents |
 | iMessage | **Connected** | stdio MCP — reads ~/Library/Messages/chat.db via Full Disk Access |
 | Otter.ai | **Connected** | stdio MCP via Python wrapper — transcripts, search |

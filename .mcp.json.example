@@ -1,0 +1,41 @@
+{
+  "mcpServers": {
+    "todoist-local": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote@0.1.38",
+        "https://ai.todoist.net/mcp"
+      ]
+    },
+    "notion-local": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@notionhq/notion-mcp-server"
+      ],
+      "env": {
+        "OPENAPI_MCP_HEADERS": "{\"Authorization\":\"Bearer YOUR_NOTION_TOKEN\",\"Notion-Version\":\"2025-09-03\"}"
+      }
+    },
+    "readwise": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote@0.1.38",
+        "https://mcp2.readwise.io/mcp"
+      ]
+    },
+    "otter": {
+      "type": "stdio",
+      "command": "./mcp-servers/otter-wrapper.sh",
+      "args": [],
+      "env": {
+        "OTTER_SESSION_COOKIE": "YOUR_OTTER_SESSION_COOKIE"
+      }
+    }
+  }
+}

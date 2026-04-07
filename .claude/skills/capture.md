@@ -79,30 +79,39 @@ For each confirmed item, use `API-post-page` to create a page in the KB database
 | summary | Summary | Readwise summary as seed text (enhanced by /triage later) |
 | highlights | Key Insights | See formatting below |
 | — | Status | "Inbox" |
+| (AI-generated) | Tags | Infer 1-3 tags from content (reuse existing tags when possible: AI-tooling, developer-tools, workflows, automation, PKM, MCP, etc.) |
+| (AI-generated) | Topics | Infer 1-2 topics from content (reuse existing: AI, Tech, Productivity, Career, Relationships, etc.) |
+| (AI-generated) | Action Required | true if the item is a tool to try, a technique to implement, or directly applicable to an active project. false for reference/awareness items. |
 
-**Key Insights formatting from highlights:**
+**Key Insights formatting:**
 
-Format as:
+If highlights exist, format as:
 ```
 **Your highlights:**
 - highlight text 1
 - highlight text 2
-- highlight text 3
 ```
 
-Cap at 5-7 highlights (by position in document). If more exist, append: "\n\n*X more highlights available in Readwise.*"
+If no highlights (common for Threads/social posts), generate Claude's insights from the summary:
+```
+**Claude's insights:**
+- Key takeaway 1
+- Key takeaway 2
+- How it connects to the user's projects/goals (if applicable)
+```
 
-Respect the 2000 character Notion rich_text limit — truncate if needed, noting truncation.
+Cap at 3-5 insights. Respect the 2000 character Notion rich_text limit.
 
-**Leave blank** (these are `/triage`'s responsibility): Topics, Tags, Action Required, Related Task, Date Reviewed.
+**Leave blank** (these are `/triage`'s responsibility): Related Task, Date Reviewed.
 
-### 7. Tag Readwise Documents
+### 7. Tag and Archive Readwise Documents
 
-After each successful Notion page creation, tag the Readwise document:
+After each successful Notion page creation:
 
-`reader_add_tags_to_document(document_id, tags=["synced-to-notion"])`
+1. Tag the document: `reader_add_tags_to_document(document_id, tag_names=["synced-to-notion"])`
+2. Archive the document: `reader_move_documents(document_ids=[document_id], location="archive")`
 
-This lets the user see what's been captured without leaving Reader.
+This keeps the Reader inbox clean — synced items move to archive automatically so the user never needs to open Reader to triage.
 
 ### 8. Summary
 

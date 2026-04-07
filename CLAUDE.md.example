@@ -1,8 +1,11 @@
 # Personal OS — Project Configuration
 
 ## Identity
-- Work email: srahman@ripple.com
-- Personal email: 1srahman@gmail.com
+- Name: YOUR_FULL_NAME
+- People wikilink: [[People/Your-Name]]
+- Short name: YOUR_SHORT_NAME
+- Work email: YOUR_WORK_EMAIL
+- Personal email: YOUR_PERSONAL_EMAIL
 - Timezone: America/Los_Angeles
 
 ## Paths
@@ -31,11 +34,32 @@ All skills must preflight-check MCP connections before running. Report what's un
 | Otter.ai | stdio MCP (Python) | Meeting transcripts |
 
 ## Todoist Projects
-- Personal, Us (shared with wife), Work, Inbox
+- Personal, Shared (optional), Work, Inbox
+
+## Todoist Label → Obsidian Project Map
+<!-- Customize these labels to match your work. Each label maps a Todoist label to an Obsidian project. -->
+<!-- Labels without a project mapping (marked —) are cross-cutting concerns. -->
+| Todoist Label | Obsidian Project | Notes |
+|---------------|-----------------|-------|
+| work-ops | — | Operational cadence, not a project |
+| project-alpha | [[Projects/project-alpha]] | Example: your main work initiative |
+| team | — | People management |
+| career | [[Projects/career]] | |
+| meeting-action | (per meeting's project field) | Auto-mapped from meeting frontmatter |
+| follow-up | — | Cross-project |
+| 1-1 | — | Relational |
 
 ## Notion Databases
-- AI Knowledge Base (Database ID: 32873b7c-bcd4-816c-8f24-e2585c9668ea, Data Source ID: 32873b7c-bcd4-8167-a01c-000b91db06d7) — inbox for AI resources, articles, tools
+- AI Knowledge Base (Database ID: YOUR_NOTION_DATABASE_ID, Data Source ID: YOUR_NOTION_DATA_SOURCE_ID) — inbox for AI resources, articles, tools
 - Use the **Data Source ID** when calling `API-query-data-source`; use **Database ID** for `API-retrieve-a-database`
+
+## Executive Contacts (optional)
+<!-- List names that trigger Strategic Frame in meeting notes. -->
+<!-- These are senior leaders whose meetings get extra strategic context. -->
+<!-- Remove this section entirely if not needed. -->
+<!-- Example: -->
+<!-- - Jane-Smith -->
+<!-- - John-Doe -->
 
 ## Obsidian Vault Structure
 ```

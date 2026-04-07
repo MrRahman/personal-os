@@ -28,7 +28,7 @@ Report which services are available. If Calendar or Todoist fail, warn the user 
 
 Run these in parallel:
 
-**Calendar:** Use `gcal_list_events` to get today's events from ALL calendars. The user has both work (srahman@ripple.com) and personal (1srahman@gmail.com — free/busy only) calendars. Use timezone America/Los_Angeles. Get events for today's full day.
+**Calendar:** Use `gcal_list_events` to get today's events from ALL calendars. The user has both work and personal calendars (see CLAUDE.md Identity section for email addresses — work calendar is the primary, personal is free/busy only). Use timezone America/Los_Angeles. Get events for today's full day.
 
 **Todoist:** Fetch open tasks that are:
 - Priority 1, 2, or 3
@@ -37,7 +37,9 @@ Also fetch any tasks due in the next 3 days for awareness.
 
 **Gmail:** Use `gmail_search_messages` to find messages from the last 12 hours. Limit to 10 messages. Focus on unread or messages that may need a response.
 
-**Slack:** Use `slack_search_public_and_private` to find mentions and DMs from the last 12 hours. Limit to 10 results.
+**Slack — Mentions:** Use `slack_search_public_and_private` to find mentions and DMs from the last 12 hours. Limit to 10 results.
+
+**Slack — Saved for Later:** Use `slack_search_public_and_private(query="is:saved", sort="timestamp", sort_dir="desc", limit=20, include_context=false, response_format="concise")` to find messages marked "Save for later." Filter to last 7 days. For each: extract sender, channel/DM, message preview (100 chars), permalink. Dedup against Todoist (search for permalink in task descriptions). Present in Inbox for user to confirm as tasks.
 
 **Notion:** Use Notion MCP to query the "AI Knowledge Base" database (see CLAUDE.md for database ID) for items where Status = "Inbox" or Action Required = true.
 
@@ -45,11 +47,12 @@ Also fetch any tasks due in the next 3 days for awareness.
 
 **iMessage (if available):** Use `extract_action_items(hours=24)` to scan the last 24 hours of messages for potential requests, commitments, or action items. This is awareness only — present what's found, do not auto-create tasks.
 
-**Readwise (if available):** Run in parallel:
-- `reader_list_documents(location="archive", limit=5)`
-- `reader_list_documents(location="shortlist", limit=5)`
+**Yesterday's Missed Actions:** Glob yesterday's meeting notes (`~/Documents/PersonalOS/Meetings/YYYY-MM-DD-*.md` using yesterday's date). Scan each file for uncompleted checkboxes (`- [ ]`) containing the user's People wikilink (e.g., `[[People/First-Last]]` or `@[[People/First-Last]]`) or the user's short name (see CLAUDE.md Identity section). For each found item, search Todoist for a matching task by keywords. Items with no Todoist match are added to the MISSED flags list with the source meeting name. If all items match, skip.
 
-Count items not yet tagged with `synced-to-notion` (i.e., not yet captured to KB). This is awareness only — do not auto-import.
+**Readwise (if available):** Auto-capture from Reader inbox to Notion KB:
+1. Fetch: `reader_list_documents(location="new", updated_after=7_days_ago, limit=50, response_fields=["url","title","author","category","tags","summary","reading_progress","published_date","saved_at","source_url"])`
+2. For each item not tagged `synced-to-notion`: fetch highlights, dedup against Notion KB by URL, create Notion page (Status="Inbox"), tag with `synced-to-notion`, then archive: `reader_move_documents(document_ids=[id], location="archive")`
+3. Report count in Inbox & Notifications section. No user confirmation needed — this is fully automatic.
 
 ### 3. Analyze
 
@@ -62,43 +65,67 @@ From the gathered data:
 - **Should Do:** P2-P3 tasks + items due in next 3 days
 - **Could Do:** Lower priority items, KB inbox items
 
-**Flags:** Identify anything needing immediate attention — urgent emails, direct Slack messages with questions, overdue P1 tasks.
+**Flags:** Generate a prioritized flags list using three detection tiers:
+
+**DEADLINE flags (automatic):** Todoist tasks due today/tomorrow with `exec-ops` or `team` labels; milestones from Goals/ due this week; calendar conflicts.
+
+**STALE flags (automatic):** Uncompleted meeting note action items >3 days old with no Todoist match; `waiting-on` tasks older than 5 days; People notes where `last_interaction` >21 days (top 5 work contacts).
+
+**MISSED flags (automatic):** Yesterday's meeting note action items assigned to the user (see CLAUDE.md Identity section for name/short name) with no Todoist match (from Gather Data scan).
+
+**STRATEGIC flags (AI-generated, max 2):** Based on executive priorities (execution over process, accountability — see CLAUDE.md Executive Contacts section if present), what from today's schedule or open tasks would leadership ask about? Frame as a question, not a task. Only generate if genuinely warranted.
+
+Present Flags immediately after Schedule in terminal output. If no flags, omit the section entirely.
 
 ### 4. Present
 
-Display a clean, scannable plan:
+Display the morning plan in two tiers: a compact terminal view and a full Obsidian daily note.
+
+**Terminal output (Quick View — default, 30-40 lines max):**
+
+Only show these sections in the terminal:
 
 ```
 # Morning Plan — YYYY-MM-DD (Day of Week)
 
 ## Today's Schedule
-[chronological list of meetings with times, attendees, and which calendar they're from]
-[personal calendar events show as "Personal block: HH:MM - HH:MM (busy)"]
+  7:30    You/[exec] || monthly skip level .......... [Exec], [EA]
+  9:00    AI priority sync up ...................... [team]
+ 10:00    ---- Building Time (3h) ----
+  2:00    1:1 || [Manager] & You ................... [Manager]
+[Left-aligned times, dotted leaders to attendees, ---- dashes ---- for personal/focus blocks]
+
+## Flags
+DEADLINE  CEO proposal due tomorrow — no draft exists
+STALE     Jon milestone conversation — 4 days, no follow-up
+MISSED    2 action items from Every.to meeting not in Todoist
+STRATEGIC QBR Tuesday — leadership expects execution proof. Your slides?
+[Only show if flags exist. Omit section entirely if none.]
 
 ## Must Do
-- [ ] task description (source: todoist/email/slack)
-- [ ] ...
+- [ ] Task description [label, due today]
+[Compact: one line per task, inline details, label tags in brackets]
 
-## Should Do
-- [ ] task description
-- [ ] ...
+## Missed from Yesterday
+- "Submit reimbursement" — from Executive Staff Meeting (no Todoist match)
+[Only show if missed items found.]
 
-## Free Slots
-- HH:MM - HH:MM (Xmin) — suggested use
-- ...
+## Respond
+  - Sender (source): Subject or message preview
+[Urgent inbox items only]
 
-## Inbox & Notifications
-- [flagged emails with subject + sender]
-- [slack messages needing response]
-- [notion KB items in inbox]
-- iMessage: X potential action items (from [contact]: "preview...")
-- Readwise: X items not yet in KB. Run `/capture` to sync.
+## Slack Later (X new)
+  Check Slack app — X saved items pending triage
 
-## Coming Up (Next 3 Days)
-- [upcoming deadlines and events worth knowing about]
+---
+Should Do (N) + Coming Up + Free Slots → Obsidian | Readwise: X | Otter: X
 ```
 
-Use 12-hour time format for display (e.g., 9:00 AM). Keep descriptions concise — one line per item.
+**Obsidian daily note gets EVERYTHING:** All the above plus Should Do, Active Goals, Active Projects, Free Slots, Coming Up, full Inbox & Notifications, Uncaptured Actions, Waiting On, KB Sync.
+
+**Expand mode:** If the user says "full" or "expand", show the complete output including Should Do, Goals, Projects, Free Slots, Coming Up, and Waiting On in the terminal.
+
+Use 12-hour time format. Keep descriptions concise — one line per item.
 
 ### 5. Meeting Notes
 

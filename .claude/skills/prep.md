@@ -12,8 +12,8 @@ Generate a one-pager to prepare for any conversation — a scheduled meeting, ne
 ### 1. Parse Input
 
 Accept one of:
-- **Person name**: `/prep Brad` or `/prep Eric van Miltenburg`
-- **Company name**: `/prep Stripe` or `/prep Hidden Road`
+- **Person name**: `/prep John` or `/prep Jane Smith`
+- **Company name**: `/prep Stripe` or `/prep Acme Corp`
 - **Calendar event**: `/prep next meeting` or `/prep 2pm meeting`
 
 If bare (`/prep`), ask: "Who are you prepping for? (person name, company, or describe the meeting)"
@@ -24,7 +24,7 @@ Run these in parallel based on input type:
 
 **If person:**
 
-1. **People note**: Glob `~/Documents/PersonalOS/People/` for matching filename (fuzzy: "Brad" matches `Brad-Garlinghouse.md`). Read full note — Context, Meeting History (last 5 entries), Key Topics, Open Commitments, Notes.
+1. **People note**: Glob `~/Documents/PersonalOS/People/` for matching filename (fuzzy: "John" matches `John-Smith.md`). Read full note — Context, Meeting History (last 5 entries), Key Topics, Open Commitments, Notes.
 2. **Recent meetings**: Glob `~/Documents/PersonalOS/Meetings/` for last 30 days, grep for the person's name. Read Summary and Key Points from the 2-3 most recent.
 3. **Todoist**: Search for open tasks mentioning this person's name. Also search for `waiting-on` label tasks related to them.
 4. **Resources**: Scan the person's Key Topics from their People note. For each topic, grep `~/Documents/PersonalOS/Resources/` for matching items saved in last 30 days.
@@ -88,7 +88,7 @@ After presenting:
 - "Draft a message to warm up the relationship?" (if last_interaction > 21 days)
 
 ## Notes
-- Fuzzy match person names: "Brad" → Brad-Garlinghouse, "EvM" → Eric-van-Miltenburg, "MK" → look for common abbreviations
+- Fuzzy match person names: "John" → John-Smith, "JS" → John-Smith, "MK" → look for common abbreviations
 - Keep the one-pager under 30 lines — concise, scannable
 - If no People note exists: note it and work with whatever vault data is available
 - If no data found at all: "No vault data for [name]. Want to create a People note?"

@@ -1,8 +1,19 @@
-# Generated files
+# Generated exports
 *.html
 !diagrams/*.html
-!personal-os.html
 *.pdf
 !diagrams/*.pdf
+
+# Secrets and personal config
 .mcp.json
 .claude.json
+CLAUDE.md
+
+# System files
+.DS_Store
+.auto-redesign/
+.conductor/
+.claude/settings.local.json
+
+# Confidential
+commercialize.md

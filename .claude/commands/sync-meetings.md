@@ -153,7 +153,7 @@ For each person mentioned across all processed transcripts:
 
 ### 7. Todoist (optional, user-confirmed)
 
-Collect all action items where the owner is the user (Sulaiman / me / I) across all processed transcripts.
+Collect all action items where the owner is the user (see CLAUDE.md Identity section for name variants — match on the user's name, short name, and "me/I") across all processed transcripts.
 
 If there are any:
 - Present the list: "You have X action items from today's meetings. Create Todoist tasks? (y/n)"

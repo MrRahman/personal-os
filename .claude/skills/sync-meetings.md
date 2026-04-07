@@ -94,7 +94,7 @@ If the transcript has < 500 words of dialogue, flag to user: "[title] has very l
   - Vague ("we should think about...") → NOT an action item
   - Unclear owner → "owner unclear, raised by [[People/Speaker-Name]]"
 - **Decisions** — explicit decisions made during the meeting:
-  - "We decided to...", "The decision is...", "We're going with...", "Brad approved...", "Agreed to...", "[Person] signed off on..."
+  - "We decided to...", "The decision is...", "We're going with...", "[Exec] approved...", "Agreed to...", "[Person] signed off on..."
   - NOT vague direction ("we should think about...") or preferences ("I'd prefer...")
   - Format: `- **[Topic]**: [Decision made] — decided by [[People/First-Last]], context: [one-line why]`
 - **Commitments** — promises made by or to the user:
@@ -151,12 +151,12 @@ Speaker resolution is critical for building the Obsidian knowledge graph. Use AL
 
 1. **Otter speaker labels** — if Otter identified speakers by name, map directly to `[[People/First-Last]]`
 2. **Calendar attendees** — cross-reference the meeting's attendee list from Google Calendar
-3. **Context clues in dialogue** — look for names mentioned in conversation ("Monica reported on Brazil", "Mark's team", "as Brad said"), someone being addressed directly, or self-identification
-4. **User's My Notes section** — if the user added notes to the meeting file with speaker names (e.g., "Brad - heading to DC"), use these to confirm speaker identity
+3. **Context clues in dialogue** — look for names mentioned in conversation ("[Person] reported on [topic]", "[Person]'s team", "as [Person] said"), someone being addressed directly, or self-identification
+4. **User's My Notes section** — if the user added notes to the meeting file with speaker names (e.g., "[Person] - heading to [location]"), use these to confirm speaker identity
 5. **People directory** — match against existing `People/*.md` files for known contacts
 
 Apply resolved names in:
-- `## Transcript Highlights` — use `[[People/First-Last]]` for speaker attribution (e.g., "[[People/Brad-Garlinghouse]] (~5min): 'One of the problem statements...'")
+- `## Transcript Highlights` — use `[[People/First-Last]]` for speaker attribution (e.g., "[[People/Jane-Smith]] (~5min): 'One of the problem statements...'")
 - `## Key Points` — attribute key decisions and updates to specific people where clear
 - `## Action Items` — use `@[[People/First-Last]]` for owners
 - Transcript files — replace generic "Speaker:" labels with resolved names where confident
@@ -215,14 +215,14 @@ Skip this step if Slack is unavailable.
 
 ### 8. Todoist (optional, user-confirmed)
 
-Collect all **unresolved** action items where the owner is the user (Sulaiman / me / I) across all processed transcripts.
+Collect all **unresolved** action items where the owner is the user (see CLAUDE.md Identity section for name variants — match on the user's name, short name, and "me/I") across all processed transcripts.
 
 If there are any:
 - Present the list: "You have X action items from today's meetings. Create Todoist tasks? (y/n)"
 - Clearly mark any items that were flagged as potentially resolved by Slack cross-check
 - If confirmed, create tasks in the **Work** project with:
   - `follow-up` label
-  - **`waiting-on` label** (in addition to `follow-up`) if the action item owner is someone other than the user — i.e., the user is waiting on someone else to deliver. Detection: if the owner `@[[People/...]]` is NOT Sul/Sulaiman/me/I, add `waiting-on`.
+  - **`waiting-on` label** (in addition to `follow-up`) if the action item owner is someone other than the user — i.e., the user is waiting on someone else to deliver. Detection: if the owner `@[[People/...]]` is NOT the user (see CLAUDE.md Identity section for name variants), add `waiting-on`.
   - Due date from the action item if mentioned, otherwise tomorrow
   - Description: "From [[Meetings/YYYY-MM-DD-slug|Meeting Title]]"
 

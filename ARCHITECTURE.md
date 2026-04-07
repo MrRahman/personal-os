@@ -71,8 +71,8 @@ On-demand: `/idea` (capture ideas from any project), `/kb` (search knowledge bas
 ┌─────────────────────────────────────────────────────────┐
 │                 CONNECTED SERVICES                        │
 │                                                         │
-│  Google Calendar ── work (srahman@ripple.com)            │
-│                    personal (1srahman@gmail.com)         │
+│  Google Calendar ── work (your work email)               │
+│                    personal (your personal email)        │
 │  Gmail ─────────── email triage + thread reading         │
 │  Slack ─────────── mentions, DMs, cross-check actions    │
 │  Todoist ───────── task management (Work/Personal/Us)    │
@@ -176,10 +176,8 @@ Nested tags mean searching `#AI` in Obsidian returns everything: `#topic/AI`, `#
                                    readable + writable from any project
 
 ~/projects/personal-os/          ← hub: daily routines, 8 skills, all automation
-~/projects/design-agency/        ← Ripple brand system (reads from vault for context)
-~/projects/my-app/               ← Vercel product, 10 skills
-~/projects/auto-redesign/        ← design scoring plugin (global via settings)
-~/projects/personal-web+writing/ ← personal brand + content (planned)
+~/projects/your-project-a/       ← other projects read from vault for context
+~/projects/your-project-b/       ← each project has its own skills + workflows
 ```
 
 **Rule:** Projects are independent workspaces. Obsidian is shared memory. Universal skills go global (`~/.claude/`). Project-specific workflows stay in their project.

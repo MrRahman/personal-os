@@ -42,7 +42,7 @@ Run in parallel where possible:
 
 **Todoist — Incomplete/Overdue:** Fetch tasks that were due this week but remain open.
 
-**Obsidian Daily Notes:** Read all daily notes for this week from `~/Documents/PersonalOS/Daily/`. Look for files matching the week's dates (YYYY-MM-DD.md). Extract reflection sections from each.
+**Obsidian Daily Notes:** Read all daily notes for this week from `~/Documents/PersonalOS/Daily/`. Look for files matching the week's dates (YYYY-MM-DD.md). Extract reflection sections from each. Track coverage: count days with a daily note, days with a completed reflection, and days skipped (file exists with `*Skipped — no reflection recorded.*` or no file at all). Report as "Reflected X/7 days" in the output. Do not backfill or create notes for missed days.
 
 **Notion KB:** Query "AI Knowledge Base" for items where Date Captured falls within this week.
 

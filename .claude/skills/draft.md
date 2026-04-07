@@ -1,6 +1,6 @@
 ---
 name: draft
-description: Generate personal brand content from vault material — LinkedIn posts, blog articles, talk outlines — in Sul's voice
+description: Generate personal brand content from vault material — LinkedIn posts, blog articles, talk outlines — in the user's voice
 ---
 
 # Content Draft
@@ -49,9 +49,9 @@ Write the draft using these principles:
 - Tight sentences, strong verbs, clean structure
 
 **Content rules:**
-- **Sanitize by default**: Replace internal names, financial figures, and confidential details with generic placeholders. Example: "Our CEO" instead of "Brad", "the company" instead of "Ripple", "a $X deal" instead of specific numbers. Note what was sanitized.
+- **Sanitize by default**: Replace internal names, financial figures, and confidential details with generic placeholders. Example: "Our CEO" instead of "[executive name]", "the company" instead of "[company name]", "a $X deal" instead of specific numbers. Note what was sanitized.
 - **Source from vault**: Every claim or example should trace back to vault content (a meeting, resource, reflection, or project). Don't fabricate examples.
-- **Lead with insight, not resume**: The reader should learn something, not just hear about Sul's role.
+- **Lead with insight, not resume**: The reader should learn something, not just hear about the user's role.
 - **End with action**: Every piece should end with something the reader can do or think about differently.
 
 **Format-specific:**
@@ -89,7 +89,7 @@ Show the draft, followed by:
 - [[Daily/date|Reflection]] — pattern about [what]
 - [[Projects/slug|Project]] — context about [what]
 
-**Sanitized:** [list of what was genericized — "Brad → 'our CEO'", "Ripple → 'the company'"]
+**Sanitized:** [list of what was genericized — e.g. "[exec name] → 'our CEO'", "[company] → 'the company'"]
 ```
 
 ### 5. Iterate
@@ -104,4 +104,4 @@ After presenting, ask:
 - Sanitization is the default. Only de-sanitize if the user explicitly says to use real names.
 - If no vault material found on the topic: say so honestly, then offer to write from general knowledge (clearly labeled as not vault-sourced)
 - The goal is a publishable first draft, not a perfect final product. User will iterate.
-- Reference CLAUDE.md for paths, conventions, and Sul's writing style
+- Reference CLAUDE.md for paths, conventions, and the user's writing style

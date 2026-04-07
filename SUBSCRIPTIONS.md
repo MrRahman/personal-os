@@ -12,9 +12,9 @@ Track all recurring costs associated with the Personal OS system.
 | Readwise Reader | $8/mo | Monthly | Reading capture + highlights | Personal |
 | Notion | Free | — | AI Knowledge Base | — |
 | Otter.ai Business | $20/mo ($239.88/yr) | Annual | Meeting transcripts | Personal |
-| Google Calendar | Free | — | Calendar (claude.ai integration) | Ripple |
-| Gmail | Free | — | Email (claude.ai integration) | Ripple |
-| Slack | Free | — | Messaging (claude.ai integration) | Ripple |
+| Google Calendar | Free | — | Calendar (claude.ai integration) | Employer |
+| Gmail | Free | — | Email (claude.ai integration) | Employer |
+| Slack | Free | — | Messaging (claude.ai integration) | Employer |
 | iMessage MCP | Free | — | Message search | — |
 | GitHub | Free | — | Repo hosting | — |
 

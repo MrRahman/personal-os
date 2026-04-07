@@ -9,6 +9,12 @@ End-of-day review that compares your morning plan against what actually happened
 
 ## Instructions
 
+### Missed-Day Policy
+
+**Never backfill.** `/reflect` only processes today's date. If the user missed yesterday or any prior day, those days stay as-is. Do not offer to "catch up" on missed reflections, do not create daily notes for past dates, and do not retroactively fill in Completed/Reflection sections for prior days.
+
+If today's daily note doesn't exist, create it fresh for today — but never for a past date.
+
 ### 1. Preflight Check
 
 Test access to these services:
@@ -110,7 +116,38 @@ If Otter is unavailable (detected in preflight), skip with a note: "Otter unavai
 
 If no transcripts found: "No transcripts found for today."
 
-### 7. Generate Reflection (Claude's Analysis)
+### 7. Sync Action Items to Todoist
+
+After meeting notes are finalized (including transcript-extracted action items from Step 6), sweep today's meeting notes for action items assigned to the user and create corresponding Todoist tasks.
+
+1. **Glob today's meeting notes:** `~/Documents/PersonalOS/Meetings/YYYY-MM-DD-*.md` (using today's date)
+2. **Extract action items assigned to the user:** Scan each file for uncompleted checkboxes that contain the user's People wikilink or short name (see CLAUDE.md Identity section). Pattern: lines matching `- [ ]` that reference the user by name or People link.
+3. **Dedup against Todoist:** For each extracted action item, search Todoist using `get_tasks_list(filter="search: <keywords>")` with 2-3 distinctive words from the task. If a matching task already exists, skip it.
+4. **Present new items for confirmation:**
+   ```
+   ## Action Items → Todoist
+
+   Found X action items assigned to you across Y meeting notes.
+   Z already exist in Todoist (skipped).
+
+   New items to create:
+   1. [y/n] "Submit NYC reimbursement" — from Executive Staff Meeting
+   2. [y/n] "Follow up with [exec] on slides" — from Debrief Meeting
+   ...
+
+   Confirm all, or y/n per item?
+   ```
+5. **Create confirmed tasks** in Todoist:
+   - **Content:** The action item text (without the People wikilink prefix)
+   - **Description:** `From [[Meetings/YYYY-MM-DD-slug|Meeting Title]]`
+   - **Due date:** Extract from action item text if present (e.g., "by Friday" → next Friday's date). If no date hint, set to tomorrow.
+   - **Priority:** 1 (default, user can adjust)
+   - **Labels:** `meeting-action` + any label mapped from the source meeting's `project:` frontmatter. Check the source meeting note's `project:` field and look up the Todoist Label → Obsidian Project Map in CLAUDE.md. If the meeting has `project: "[[Projects/ai-transformation]]"`, add label `AI Transformation`. If no mapping exists or no project is set, use `meeting-action` only.
+6. **Report:** "Created X Todoist tasks from today's meeting notes."
+
+If no meeting notes exist for today, or no action items are found assigned to the user, skip with: "No new action items found in today's meeting notes."
+
+### 8. Generate Reflection (Claude's Analysis)
 
 Write a 5-8 sentence reflection covering:
 1. **What went well** — completed tasks, productive meetings, good focus blocks
@@ -122,9 +159,9 @@ Tone: honest and constructive, like a thoughtful coach. Not overly positive or n
 
 **This is Claude's perspective only.** Present it in the terminal, then proceed to Step 8 to get the user's own reflection.
 
-### 8. Interactive Check-In (User's Reflection)
+### 9. Interactive Check-In (User's Reflection)
 
-**STOP and ask the user before writing anything to Obsidian.** Present Claude's reflection from Step 7, then prompt:
+**STOP and ask the user before writing anything to Obsidian.** Present Claude's reflection from Step 8, then prompt:
 
 > "That's my read on the day. Now yours —"
 >
@@ -138,9 +175,9 @@ Tone: honest and constructive, like a thoughtful coach. Not overly positive or n
 
 **Wait for the user's response.** Do NOT fill in Highlight, Adjustments, or Check-In scores yourself. Do NOT write to Obsidian until the user provides their input. If the user says "skip" or doesn't want to fill these in, leave the sections with placeholder comments in Obsidian.
 
-### 9. Write to Obsidian
+### 10. Write to Obsidian
 
-**Only run this step after the user has responded to Step 8 (or explicitly skipped it).**
+**Only run this step after the user has responded to Step 9 (or explicitly skipped it).**
 
 Create or update `~/Documents/PersonalOS/Daily/YYYY-MM-DD.md`:
 
@@ -162,38 +199,55 @@ Display the full reflection in the terminal as well.
 
 ## Output Format
 
+Display the reflection in two tiers: a compact terminal view and a full Obsidian daily note.
+
+**Terminal output (Quick View):**
+
 ```
 # Daily Reflection — YYYY-MM-DD
 
-## Summary
-- Meetings: X (Y hours)
-- Tasks completed: X of Y planned
-- Unplanned items: X
+Meetings: X (Yh)  |  Tasks: A/B completed (Z%)  |  Unplanned: X
 
 ## Completed
-- [x] task (source)
-- ...
+- [x] task [label]
+- [x] task [label]
 
-## Incomplete
-- [ ] task — rescheduled to YYYY-MM-DD / not rescheduled
-- ...
-
-## Action Loop
-- Morning surfaced: X uncaptured actions
-- Resolved during the day: X
-- Tasks created (pending): X
-- Still unaddressed: X
-  → [description] — Create task / Skip / Defer
+## Flags for Tomorrow
+DEADLINE  Oracle go-live tomorrow — prep checklist needed
+STALE     Jon milestone conversation — 4 days, no follow-up
+STRATEGIC QBR Thursday — leadership expects execution proof. Where are your slides?
+[Only show if flags exist. Omit section entirely if none.
+DEADLINE: anything due tomorrow. STALE: anything >3 days without progress.
+STRATEGIC: what leadership would ask about based on this week's trajectory. Max 2, skip if nothing warrants it.]
 
 ## Reflection
-[5-8 sentence reflection]
+What went well: [1-2 sentences]
+What's at risk: [1-2 sentences]
+Pattern: [1 sentence connecting to broader trends]
+Tomorrow: [1 concrete action]
+
+## Check-In (after user provides scores)
+Energy    ██████░░░░ 6
+Focus     ██████░░░░ 6
+Impact    █████████░ 9
+Balance   ████████░░ 8
+Mood      ███████░░░ 7
+[Generate bar using █ (filled) and ░ (empty), 10 chars wide. Score at end.]
 
 ---
-Meeting notes created: X (from Otter transcripts)
-People notes updated: X
-Obsidian note updated: ~/Documents/PersonalOS/Daily/YYYY-MM-DD.md
-Tasks rescheduled: X
+Transcripts: X | People: X | Tasks: X created | Full → Obsidian
 ```
+
+**Obsidian daily note gets EVERYTHING:**
+
+The full reflection written to `~/Documents/PersonalOS/Daily/YYYY-MM-DD.md` includes all of the above plus:
+
+- `## Incomplete` — list of incomplete tasks with rescheduled dates and labels
+- `## Action Loop` — morning surfaced count, resolved, pending, unaddressed with options
+- `## Action Items → Todoist` — from meeting note sweep (Step 7), per-item confirmation
+- Meeting-by-meeting transcript summaries from Step 6
+
+**Note:** The Obsidian daily note retains the standard markdown table format for Check-In scores (for Dataview compatibility). The visual bars are terminal-only.
 
 ## Notes
 - Timezone: America/Los_Angeles
