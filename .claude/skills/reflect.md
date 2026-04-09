@@ -120,6 +120,23 @@ If Otter is unavailable (detected in preflight), skip with a note: "Otter unavai
 
 If no transcripts found: "No transcripts found for today."
 
+### 6b. People Notes — Calendar Catch-All
+
+After sync-meetings (Step 6), ensure People notes are updated for ALL of today's meetings — not just those with transcripts.
+
+1. Gather all today's meeting notes: Glob `~/Documents/PersonalOS/Meetings/YYYY-MM-DD-*.md` (using today's date)
+2. For each meeting note, read the `attendees:` frontmatter field
+3. For each attendee, check if their People note was ALREADY updated by sync-meetings in Step 6 (track which People were updated during transcript processing to avoid double-updating)
+4. For attendees NOT already updated:
+   - **If People note exists:** update `last_interaction` to today, prepend to `## Meeting History`: `- YYYY-MM-DD: [[Meetings/slug|Title]] — (no transcript)`
+   - **If People note doesn't exist:** collect for user confirmation: "These attendees don't have People notes: [list]. Create notes for any? (y/n for each)"
+   - For confirmed new People: create `People/First-Last.md` from the Person template with `first_met` and `last_interaction` set to today, add the meeting to `## Meeting History`
+5. Skip attendees that are the user themselves (match against CLAUDE.md Identity section)
+
+This ensures every person you met today has an up-to-date `last_interaction` and Meeting History entry, regardless of whether a transcript was recorded.
+
+Prepare all People note updates in memory — writes happen in Step 10.
+
 ### 7. Sync Action Items to Todoist
 
 After meeting notes are finalized (including transcript-extracted action items from Step 6), sweep today's meeting notes for action items assigned to the user and create corresponding Todoist tasks.
