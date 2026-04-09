@@ -10,11 +10,14 @@ Test access to:
 
 | Service | Test Call | Required? |
 |---------|-----------|-----------|
-| Google Calendar | `gcal_list_events` | Yes |
+| Google Calendar (Work) | `gcal_list_events` | Yes |
+| Google Calendar (Personal) | `manage_calendar(operation: "agenda")` via google-personal MCP | No |
 | Todoist | List tasks | Yes |
 | Notion | `search_objects` | No |
 | Readwise | `reader_list_documents` (limit 1) | No |
 | Obsidian vault | Read `~/Documents/PersonalOS/` | Yes |
+
+See CLAUDE.md Google Account Mapping for tool-to-account details.
 
 Report availability. Continue with what works, noting any gaps.
 
@@ -31,7 +34,12 @@ Timezone: America/Los_Angeles.
 
 Run in parallel where possible:
 
-**Calendar:** Use `gcal_list_events` to get ALL events from Monday through Sunday, all calendars (work + personal).
+**Calendar (dual query — run both in parallel):**
+
+1. **[Work]** Use `gcal_list_events` (claude.ai Google Calendar integration) to get all events from Monday through Sunday. This covers srahman@ripple.com calendars.
+2. **[Personal]** Use `manage_calendar(operation: "agenda")` via the **google-personal** MCP server to get all events for the same Monday-through-Sunday range. This covers 1srahman@gmail.com calendars.
+
+Merge both result sets into a single timeline. Tag every event **[Work]** or **[Personal]** based on which query returned it. If the personal calendar is unavailable (preflight failed), continue with work-only data and note the gap.
 
 **Todoist — Completed:** Fetch tasks completed during the week.
 
@@ -45,11 +53,13 @@ Run in parallel where possible:
 
 **Completion rate:** Tasks completed / total tasks due this week. Break down by project if useful.
 
-**Time analysis:**
-- Total meeting hours (from calendar events)
-- Estimated focus hours (gaps between meetings during work hours, 9 AM - 6 PM)
-- Meeting-heavy days vs focus-heavy days
-- Personal vs work event split
+**Time analysis (work + personal split):**
+- Work meeting hours (from [Work] calendar events)
+- Personal event hours (from [Personal] calendar events)
+- Total scheduled hours (work + personal combined)
+- Estimated focus hours (gaps between ALL events during work hours, 9 AM - 6 PM)
+- Meeting-heavy days breakdown by type: flag days with 4+ hours of [Work] meetings; separately flag days with significant [Personal] blocks that reduced focus time
+- Work/personal balance ratio for the week
 
 **Reflection themes:** Read through the week's daily reflections and identify:
 - Recurring wins or positive patterns
@@ -113,7 +123,8 @@ Wait for confirmation before proceeding.
 
 ## By the Numbers
 - Tasks completed: X / Y due (Z%)
-- Meeting hours: X
+- Work meeting hours: X
+- Personal event hours: X
 - Estimated focus hours: X
 - KB items captured: X
 
@@ -125,7 +136,10 @@ Wait for confirmation before proceeding.
 - ...
 
 ## Time Analysis
-[day-by-day breakdown or summary of meeting vs focus time]
+[Work] Meeting hours: X | [Personal] Event hours: X | Focus hours: X
+Meeting-heavy days (4+ hrs work meetings): Mon, Wed
+Personal-heavy days: Sat (X hrs personal events)
+[day-by-day breakdown with work/personal split]
 
 ## Patterns from Reflections
 - ...

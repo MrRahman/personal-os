@@ -21,20 +21,23 @@ Test access to these services:
 
 | Service | Test Call | Required? |
 |---------|-----------|-----------|
-| Google Calendar | `gcal_list_events` (today) | Yes |
+| Google Calendar (Work) | `gcal_list_events` (today) | Yes |
+| Google Calendar (Personal) | `manage_calendar(operation: "agenda")` via google-personal MCP | No — degrade gracefully |
 | Todoist | List tasks | Yes |
 | Obsidian vault | Read `~/Documents/PersonalOS/` | Yes |
 | Otter.ai | `otter_list_transcripts` (limit 1) | No |
 | iMessage | `list_conversations` (limit 1) | No |
 | Readwise | `reader_list_documents` (limit 1) | No |
 
-Report availability. Calendar, Todoist, and Obsidian are important for a full reflection. Otter is optional but enables meeting summaries.
+Report availability. Work Calendar, Todoist, and Obsidian are required for a full reflection. Personal Calendar is optional — if google-personal MCP is unavailable, proceed with work calendar only and note "Personal calendar unavailable." Otter is optional but enables meeting summaries. See CLAUDE.md Google Account Mapping for tool details.
 
 ### 2. Gather Data
 
 Run in parallel:
 
-**Calendar:** Get today's events from all calendars (work + personal) using `gcal_list_events`. Timezone: America/Los_Angeles.
+**Calendar (Work):** Get today's work events using `gcal_list_events` (srahman@ripple.com). Timezone: America/Los_Angeles. Tag all results **[Work]**.
+
+**Calendar (Personal):** Get today's personal events using `manage_calendar(operation: "agenda")` via google-personal MCP (1srahman@gmail.com). Timezone: America/Los_Angeles. Tag all results **[Personal]**. If google-personal MCP is unavailable, skip with a note and proceed with work calendar only.
 
 **Todoist — Completed:** Fetch tasks completed today.
 
@@ -55,7 +58,7 @@ If a morning plan exists, compare:
 - **Must Do tasks vs completed tasks** — what got done?
 - **Unplanned work** — tasks or meetings that appeared after the morning plan
 - **Completion rate** — X of Y planned tasks completed
-- **Time analysis** — estimate hours in meetings vs hours of focus time based on calendar
+- **Time analysis** — estimate hours in work meetings [Work] vs personal events [Personal] vs focus time based on combined calendar data
 
 If no morning plan exists, skip this comparison and note: "No morning plan found — showing today's activity without comparison."
 
@@ -103,7 +106,7 @@ For priority 3+ incomplete tasks, just list them — don't auto-reschedule.
 
 **Write deferral:** Prepare all transcript files, meeting note updates, and People note updates in memory. Do NOT write to the vault until Step 10.
 
-**Cross-skill caching:** Reuse calendar events from Step 2 for transcript-to-meeting matching. Do NOT re-fetch via `gcal_list_events`. Similarly, reuse Todoist task data from Step 2 for deduplication.
+**Cross-skill caching:** Reuse calendar events from Step 2 (both [Work] and [Personal]) for transcript-to-meeting matching. Do NOT re-fetch via `gcal_list_events` or `manage_calendar`. Similarly, reuse Todoist task data from Step 2 for deduplication.
 
 **ALWAYS run sync-meetings as part of reflect.** Do not skip this step or defer it to a separate session. Inline the full `/sync-meetings` logic for today's date (including the new decision detection, commitment detection, and waiting-on label features added to sync-meetings):
 
@@ -163,6 +166,7 @@ After meeting notes are finalized (including transcript-extracted action items f
    - **Description:** `From [[Meetings/YYYY-MM-DD-slug|Meeting Title]]`
    - **Due date:** Extract from action item text if present (e.g., "by Friday" → next Friday's date). If no date hint, set to tomorrow.
    - **Priority:** 1 (default, user can adjust)
+   - **Project routing:** If the source event was tagged **[Personal]** (from personal calendar), route the task to Todoist project "Personal" instead of "Work". If the source event was tagged **[Work]**, route to "Work" (or use default project logic).
    - **Labels:** `meeting-action` + any label mapped from the source meeting's `project:` frontmatter. Check the source meeting note's `project:` field and look up the Todoist Label → Obsidian Project Map in CLAUDE.md. If the meeting has `project: "[[Projects/ai-transformation]]"`, add label `AI Transformation`. If no mapping exists or no project is set, use `meeting-action` only.
 6. **Report:** "Created X Todoist tasks from today's meeting notes."
 
@@ -237,7 +241,7 @@ Display the reflection in two tiers: a compact terminal view and a full Obsidian
 ```
 # Daily Reflection — YYYY-MM-DD
 
-Meetings: X (Yh)  |  Tasks: A/B completed (Z%)  |  Unplanned: X
+Meetings: X (Yh) [W work / P personal]  |  Tasks: A/B completed (Z%)  |  Unplanned: X
 
 ## Completed
 - [x] task [label]
@@ -286,3 +290,4 @@ The full reflection written to `~/Documents/PersonalOS/Daily/YYYY-MM-DD.md` incl
 - Be empathetic but honest in reflections
 - Never reschedule without user confirmation
 - Reference CLAUDE.md for paths and conventions
+- **Dual calendar:** Work calendar via `gcal_list_events` (srahman@ripple.com), personal calendar via `manage_calendar(operation: "agenda")` on google-personal MCP (1srahman@gmail.com). Personal events show full details with [Personal] tag. See CLAUDE.md Google Account Mapping for tool routing.

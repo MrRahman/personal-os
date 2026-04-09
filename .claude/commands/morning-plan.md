@@ -125,7 +125,9 @@ Track: `triaged_count`, `action_items` (list), `resource_notes_created` (count).
 
 Run these in parallel:
 
-**Calendar:** Use `gcal_list_events` to get today's events from ALL calendars. The user has both work and personal calendars (see CLAUDE.md Identity section for email addresses — work calendar is the primary, personal is free/busy only). Use timezone America/Los_Angeles. Get events for today's full day.
+**Calendar (Work):** Use `gcal_list_events` to get today's events from the work calendar. Use timezone America/Los_Angeles. Get events for today's full day. Tag all results `[Work]`.
+
+**Calendar (Personal):** Use `manage_calendar(operation: "agenda")` via the `google-personal` MCP server to get today's personal calendar events. Tag all results `[Personal]`. Merge both calendar results chronologically for schedule display. Personal events now get full details (title, attendees, description) — not just free/busy blocks. See CLAUDE.md Google Account Mapping for tool details.
 
 **Todoist:** Fetch open tasks that are:
 - Priority 1, 2, or 3
@@ -134,7 +136,9 @@ Also fetch any tasks due in the next 3 days for awareness.
 
 **Todoist — Waiting On:** Also fetch tasks with the `waiting-on` label. For each, note the task description, creation date, and any linked meeting note from the description. Flag items that are 3+ days old as stale.
 
-**Gmail:** Use `gmail_search_messages` to find messages since the last `/morning-plan` run. Default to `newer_than:24h` if no prior run date is known, but prefer `is:unread` to catch anything missed. Limit to 10 messages. **For any thread with an actionable subject (action requested, review, update tracker, etc.), use `gmail_read_thread` to read the full thread and extract action items** — don't rely solely on the snippet. When reading threads with `gmail_read_thread`, focus on the most recent 5 messages. For threads with 10+ messages, note 'long thread' and focus on the last 5.
+**Gmail (Work):** Use `gmail_search_messages` to find work messages since the last `/morning-plan` run. Default to `newer_than:24h` if no prior run date is known, but prefer `is:unread` to catch anything missed. Limit to 10 messages. **For any thread with an actionable subject (action requested, review, update tracker, etc.), use `gmail_read_thread` to read the full thread and extract action items** — don't rely solely on the snippet. When reading threads with `gmail_read_thread`, focus on the most recent 5 messages. For threads with 10+ messages, note 'long thread' and focus on the last 5. Tag all results `[Work]`.
+
+**Gmail (Personal):** Use `manage_email(operation: "search")` via the `google-personal` MCP server to find personal messages since the last run. Limit to 5 messages. For actionable threads, use `manage_email(operation: "read")` to get full context. Tag all results `[Personal]`. Personal email actions route to Todoist "Personal" project.
 
 **Slack — Mentions:** Use `slack_search_public_and_private(response_format="concise", include_context=false)` to find mentions and DMs since the last run. Only fetch full context for items that appear actionable. Default to `after:YYYY-MM-DD` using yesterday's date. Limit to 10 results.
 
@@ -266,7 +270,7 @@ Present Flags immediately after Schedule in the terminal output. If no flags, om
 **Uncaptured Actions:** From Step 4a/4b, compile the list of detected actions classified as "Uncaptured." For each, prepare a proposed Todoist task with:
 - **Title**: concise action description
 - **Priority**: P1 if deadline is today/tomorrow, P2 if within the week, P3 otherwise
-- **Project**: Work (if from work Slack/Gmail) or Personal/Us (if from iMessage)
+- **Project**: Work (if from work Slack/Gmail `[Work]`) or Personal (if from personal Gmail `[Personal]` or iMessage) or Us (if from iMessage with wife)
 - **Due date**: from the deadline if mentioned, otherwise tomorrow
 - **Description**: "Detected from [source]: [original message preview]"
 
@@ -282,14 +286,16 @@ Only show these sections in the terminal:
 # Morning Plan — YYYY-MM-DD (Day of Week)
 
 ## Today's Schedule
-  7:30    You/[exec] || monthly skip level .......... [Exec], [EA]
-  9:00    AI priority sync up ...................... [team]
-  9:30    Staff Weekly ............................. [team]
+  7:30    You/[exec] || monthly skip level .......... [Exec], [EA]  [Work]
+  9:00    AI priority sync up ...................... [team]  [Work]
+  9:30    Staff Weekly ............................. [team]  [Work]
  10:00    ---- Building Time (3h) ----
-  2:00    1:1 || [Manager] & You ................... [Manager]
-  5:00    Personal block (busy)
+ 12:00    Lunch with Dad .......................... [Personal]
+  2:00    1:1 || [Manager] & You ................... [Manager]  [Work]
+  5:00    Dentist appointment ..................... [Personal]
 [Use left-aligned monospace times. Dotted leaders connect meeting title to attendees.
-Personal blocks and focus time use ---- dashes ----. Show attendee count for large meetings.]
+Focus time uses ---- dashes ----. Show attendee count for large meetings.
+Tag every event [Work] or [Personal] at the end of the line.]
 
 ## Flags
 DEADLINE  CEO proposal due tomorrow — no draft exists
@@ -309,9 +315,13 @@ STRATEGIC QBR Tuesday — leadership expects execution proof. Your slides?
 [Only show if missed items found. See Change 4 detection logic in Step 4.]
 
 ## Respond
-  - Sender (email/slack): Subject or message preview
+### Work
+  - Sender (email): Subject or message preview
+  - Sender (slack): Subject or message preview
+### Personal
+  - Sender (email): Subject or message preview
   - Sender (iMessage): "message preview"
-[Urgent inbox items only — needs action today]
+[Urgent inbox items only — needs action today. Split by Work/Personal source.]
 
 ## Slack Later (X new)
   Check Slack app — X saved items pending triage
@@ -369,13 +379,13 @@ Which meetings need notes? (y/n for each, or "skip all")
 
 1. [y/n] 10:00 AM — Q1 Treasury Review (Jane Smith, Bob Chen, Sarah Lee)
 2. [y/n] 11:30 AM — Team Standup (full team)
-3. [y/n] 2:00 PM — Personal block (busy)
-4. [y/n] 3:30 PM — 1:1 with Sarah Lee
+3. [y/n] 2:00 PM — Lunch with Dad [Personal]
+4. [y/n] 3:30 PM — 1:1 with Sarah Lee [Work]
 ```
 
-**For work calendar events:** show title + attendees. If user says yes, create note with context.
+**For work calendar events:** show title + attendees + `[Work]` tag. If user says yes, create note with context.
 
-**For personal calendar events (free/busy only):** show as "Personal block (busy)". If user says yes, ask: "What's the meeting name?" Then create note with just the template (no attendees or context lookup).
+**For personal calendar events:** show title + attendees (if any) + `[Personal]` tag. If user says yes, create note with `calendar: personal` frontmatter. Skip People/vault context lookup and Strategic Frame. Personal meeting action items route to Todoist "Personal" project.
 
 **If user says "skip all":** list what was skipped ("Skipped notes for: 11:30 AM Team Standup, 3:30 PM 1:1 with Sarah Lee").
 
@@ -557,6 +567,6 @@ Only link meetings where notes were created — skipped meetings are not linked.
 - Dates formatted as YYYY-MM-DD
 - If a service is unavailable, skip its section with a brief note like "[Gmail unavailable — skipped]"
 - Cap email and Slack results at 10 each to avoid context overflow
-- Personal calendar events show as "busy" blocks — no titles or attendees visible
+- Personal calendar events show with full details and [Personal] tag. See CLAUDE.md Google Account Mapping for tool details.
 - Do not auto-create People notes — that is `/reflect`'s responsibility
 - Reference CLAUDE.md for paths and conventions

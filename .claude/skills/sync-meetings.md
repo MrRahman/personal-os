@@ -17,10 +17,11 @@ Test access to each service:
 |---------|-----------|-----------|
 | Otter.ai | `otter_list_transcripts` (limit 1) | Yes — abort if unavailable, suggest `python3 refresh-otter-cookie.py` |
 | Obsidian vault | Read `~/Documents/PersonalOS/Templates/Meeting Note.md` | Yes |
-| Google Calendar | `gcal_list_events` (target date) | Recommended (enables time-proximity matching) |
+| Google Calendar (Work) | `gcal_list_events` (target date) | Recommended (enables time-proximity matching) |
+| Google Calendar (Personal) | `manage_calendar(operation: "agenda")` via google-personal MCP (target date) | Recommended (captures personal meetings) |
 | Todoist | List projects (limit 1) | No (only for optional action item task creation) |
 
-Report availability. If Otter is unavailable, stop and tell the user to run the cookie refresh script. If Obsidian is unavailable, stop. Continue without Calendar or Todoist — just note reduced matching accuracy or skipped task creation.
+Report availability. If Otter is unavailable, stop and tell the user to run the cookie refresh script. If Obsidian is unavailable, stop. Continue without either Calendar or Todoist — just note reduced matching accuracy or skipped task creation. Each calendar is independent; if one fails, continue with the other.
 
 ### 2. Gather Data (parallel)
 
@@ -32,7 +33,10 @@ Run all of these in parallel:
 
 **Existing meeting notes:** Glob `~/Documents/PersonalOS/Meetings/TARGET_DATE-*.md` — read each file's frontmatter (`otter_id`, `attendees`, `calendar`) and H1 title.
 
-**Calendar events (if available):** `gcal_list_events` for the target date from all calendars. Collect event titles, start times, attendees.
+**Calendar events (if available):** Query BOTH calendars in parallel and merge results. Tag each event with its source:
+- **Work calendar:** `gcal_list_events` for the target date from all work calendars. Tag each event `[Work]`.
+- **Personal calendar:** `manage_calendar(operation: "agenda")` via google-personal MCP for the target date. Tag each event `[Personal]`.
+Collect event titles, start times, attendees from both. See CLAUDE.md Google Account Mapping for tool details.
 
 **People directory:** Glob `~/Documents/PersonalOS/People/*.md` filenames — build a name resolution map (filename → display name). Only read filenames, not contents.
 
@@ -59,7 +63,7 @@ For each remaining transcript, score against each unmatched meeting note using t
 - Word overlap: exact match = 30, >50% shared words = 20, any shared meaningful word = 10, none = 0
 
 **Attendee overlap (0–30 pts):**
-- Compare Otter speaker names to meeting note attendee wikilinks and calendar event attendees
+- Compare Otter speaker names to meeting note attendee wikilinks and calendar event attendees (from both [Work] and [Personal] calendars)
 - 10 pts per matching attendee, capped at 30
 
 **Scoring thresholds:**
@@ -149,6 +153,10 @@ If the match is to a NEW note (no existing file), create the note using the Meet
 
 Speaker resolution is critical for building the Obsidian knowledge graph. Use ALL available signals:
 
+0. **Calendar attendee emails (highest priority):** Before resolving speaker names from the Otter transcript, fetch the Google Calendar event for this meeting using `gcal_list_events` with the meeting date/time. Extract the attendee list (emails + display names). Use this as the canonical name source:
+   - Map each email to an existing People note by matching the `email:` frontmatter field in `~/Documents/PersonalOS/People/*.md`
+   - If no People note match by email, use the display name from the calendar attendee entry
+   - Calendar attendee names take precedence over Otter transcription labels (prevents name drift like "Prabhaker" vs "Prashanth")
 1. **Otter speaker labels** — if Otter identified speakers by name, map directly to `[[People/First-Last]]`
 2. **Calendar attendees** — cross-reference the meeting's attendee list from Google Calendar
 3. **Context clues in dialogue** — look for names mentioned in conversation ("[Person] reported on [topic]", "[Person]'s team", "as [Person] said"), someone being addressed directly, or self-identification
@@ -220,7 +228,10 @@ Collect all **unresolved** action items where the owner is the user (see CLAUDE.
 If there are any:
 - Present the list: "You have X action items from today's meetings. Create Todoist tasks? (y/n)"
 - Clearly mark any items that were flagged as potentially resolved by Slack cross-check
-- If confirmed, create tasks in the **Work** project with:
+- If confirmed, create tasks routed by calendar source:
+  - Action items from **[Work]** calendar meetings → **Work** Todoist project
+  - Action items from **[Personal]** calendar meetings → **Personal** Todoist project
+  - Action items from unmatched/no-calendar meetings → **Work** project (default)
   - `follow-up` label
   - **`waiting-on` label** (in addition to `follow-up`) if the action item owner is someone other than the user — i.e., the user is waiting on someone else to deliver. Detection: if the owner `@[[People/...]]` is NOT the user (see CLAUDE.md Identity section for name variants), add `waiting-on`.
   - Due date from the action item if mentioned, otherwise tomorrow

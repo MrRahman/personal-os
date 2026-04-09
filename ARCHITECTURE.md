@@ -71,9 +71,10 @@ On-demand: `/idea` (capture ideas from any project), `/kb` (search knowledge bas
 ┌─────────────────────────────────────────────────────────┐
 │                 CONNECTED SERVICES                        │
 │                                                         │
-│  Google Calendar ── work (your work email)               │
-│                    personal (your personal email)        │
-│  Gmail ─────────── email triage + thread reading         │
+│  Google Calendar ── work (claude.ai, srahman@ripple.com) │
+│                    personal (MCP, 1srahman@gmail.com)    │
+│  Gmail ─────────── work (claude.ai, srahman@ripple.com)  │
+│                    personal (MCP, 1srahman@gmail.com)    │
 │  Slack ─────────── mentions, DMs, cross-check actions    │
 │  Todoist ───────── task management (Work/Personal/Us)    │
 │  Notion ────────── AI Knowledge Base (structured data)   │

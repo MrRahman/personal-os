@@ -15,11 +15,14 @@ Test access to:
 
 | Service | Test Call | Required? |
 |---------|-----------|-----------|
-| Google Calendar | `gcal_list_events` | Yes |
+| Google Calendar (Work) | `gcal_list_events` | Yes |
+| Google Calendar (Personal) | `manage_calendar(operation: "agenda")` via google-personal MCP | No |
 | Todoist | List tasks | Yes |
 | Notion | `search_objects` | No |
 | Readwise | `reader_list_documents` (limit 1) | No |
 | Obsidian vault | Read `~/Documents/PersonalOS/` | Yes |
+
+See CLAUDE.md Google Account Mapping for tool-to-account details.
 
 Report availability. Continue with what works, noting any gaps.
 
@@ -36,7 +39,12 @@ Timezone: America/Los_Angeles.
 
 Run in parallel where possible:
 
-**Calendar:** Use `gcal_list_events` to get ALL events from Monday through Sunday, all calendars (work + personal).
+**Calendar (dual query — run both in parallel):**
+
+1. **[Work]** Use `gcal_list_events` (claude.ai Google Calendar integration) to get all events from Monday through Sunday. This covers srahman@ripple.com calendars.
+2. **[Personal]** Use `manage_calendar(operation: "agenda")` via the **google-personal** MCP server to get all events for the same Monday-through-Sunday range. This covers 1srahman@gmail.com calendars.
+
+Merge both result sets into a single timeline. Tag every event **[Work]** or **[Personal]** based on which query returned it. If the personal calendar is unavailable (preflight failed), continue with work-only data and note the gap.
 
 **Todoist — Completed:** Fetch tasks completed during the week.
 
@@ -50,11 +58,19 @@ Run in parallel where possible:
 
 **Completion rate:** Tasks completed / total tasks due this week. Break down by project if useful.
 
-**Time analysis:**
-- Total meeting hours (from calendar events)
-- Estimated focus hours (gaps between meetings during work hours, 9 AM - 6 PM)
-- Meeting-heavy days vs focus-heavy days
-- Personal vs work event split
+**Time analysis (work + personal split):**
+- Work meeting hours (from [Work] calendar events)
+- Personal event hours (from [Personal] calendar events)
+- Total scheduled hours (work + personal combined)
+- Estimated focus hours (gaps between ALL events during work hours, 9 AM - 6 PM)
+- Meeting-heavy days breakdown by type: flag days with 4+ hours of [Work] meetings; separately flag days with significant [Personal] blocks that reduced focus time
+- Work/personal balance ratio for the week
+
+**Block adherence (if /plan-week was used):** Check if a `Weekly Reviews/YYYY-WXX-preview.md` file exists for this week. If so, read the planned blocks and compare against what actually happened on the calendar:
+- Count plan-week blocks that survived (still on calendar at their original time)
+- Count plan-week blocks that were displaced (moved or deleted due to new meetings)
+- Report: `Block adherence: X/Y focus blocks kept (Z displaced by new meetings)`
+- If adherence is below 50%, note which days lost the most blocks — this informs next week's `/plan-week` to deprioritize those days for deep work.
 
 **Reflection themes:** Read through the week's daily reflections and identify:
 - Recurring wins or positive patterns
@@ -122,6 +138,30 @@ Scan all People notes in `~/Documents/PersonalOS/People/`. For each, read the `l
 If no one is flagged in a category, omit that category. If no one is flagged at all, write: "All relationships active — no flags."
 
 After presenting, ask: "Want to draft a quick message to anyone? Or add a Todoist reminder to reach out?"
+
+### 5.6 People Note Reconciliation
+
+Scan all meeting notes from this week: `~/Documents/PersonalOS/Meetings/YYYY-MM-DD-*.md` where the date falls within the review week.
+
+For each meeting note with attendees:
+1. Check if each attendee's People note exists in `~/Documents/PersonalOS/People/`
+2. If the People note exists, check if this meeting appears in their `## Meeting History` section
+3. Track gaps: missing People notes, missing meeting history entries
+
+**Output (only if gaps found):**
+```
+## People Note Gaps
+
+Missing People notes:
+- [Name] — appeared in X meetings this week (most recent: [date])
+
+Missing meeting history entries:
+- [Person]: missing [meeting title] ([date])
+```
+
+If gaps are found, offer: "Backfill these gaps now? (y/n)" If yes, create missing People notes using the Person template and add missing meeting history entries with `— (backfilled)` suffix.
+
+If no gaps, omit this section entirely.
 
 ### 6. Goal Progress Check-in
 
@@ -199,6 +239,12 @@ Wait for confirmation before proceeding.
 
 **Todoist:** Create confirmed tasks for next week. Assign appropriate priorities and due dates (generally Monday of next week unless specific).
 
+After all weekly review content is written and confirmed, prompt:
+
+> "Run `/plan-week` now to set up next week's blocks?"
+
+If yes, invoke the plan-week skill. If no, end the session.
+
 ## Output Format
 
 ```
@@ -206,7 +252,8 @@ Wait for confirmation before proceeding.
 
 ## By the Numbers
 - Tasks completed: X / Y due (Z%)
-- Meeting hours: X
+- Work meeting hours: X
+- Personal event hours: X
 - Estimated focus hours: X
 - KB items captured: X
 
@@ -218,7 +265,10 @@ Wait for confirmation before proceeding.
 - ...
 
 ## Time Analysis
-[day-by-day breakdown or summary of meeting vs focus time]
+[Work] Meeting hours: X | [Personal] Event hours: X | Focus hours: X
+Meeting-heavy days (4+ hrs work meetings): Mon, Wed
+Personal-heavy days: Sat (X hrs personal events)
+[day-by-day breakdown with work/personal split]
 
 ## Patterns from Reflections
 - ...

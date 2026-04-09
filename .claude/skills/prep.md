@@ -29,7 +29,10 @@ Run these in parallel based on input type:
 3. **Todoist**: Search for open tasks mentioning this person's name. Also search for `waiting-on` label tasks related to them.
 4. **Resources**: Scan the person's Key Topics from their People note. For each topic, grep `~/Documents/PersonalOS/Resources/` for matching items saved in last 30 days.
 5. **Projects**: Check if this person is a stakeholder on any active project (grep `~/Documents/PersonalOS/Projects/` for their name). Read project status.
-6. **Calendar** (optional): Search today's + tomorrow's events for meetings with this person.
+6. **Calendar** (optional): Search BOTH calendars in parallel for meetings with this person on today + tomorrow. Tag results `[Work]` or `[Personal]`:
+   - **Work calendar:** `gcal_list_events` for today and tomorrow, filter for this person's name in attendees.
+   - **Personal calendar:** `manage_calendar(operation: "agenda")` via google-personal MCP for today and tomorrow, filter for this person's name.
+   See CLAUDE.md Google Account Mapping for tool details.
 
 **If company:**
 
@@ -48,7 +51,7 @@ Present a clean, scannable prep sheet:
 
 ## At a Glance
 - **Role:** [from People note or inferred]
-- **Last interaction:** [date] — [meeting title or channel]
+- **Last interaction:** [date] — [meeting title or channel] [Work]/[Personal]
 - **Relationship:** [work/family/networking/mentor]
 - **Days since contact:** X days [flag if >21 for work, >14 for personal]
 

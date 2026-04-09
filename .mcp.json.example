@@ -36,6 +36,18 @@
       "env": {
         "OTTER_SESSION_COOKIE": "YOUR_OTTER_SESSION_COOKIE"
       }
+    },
+    "google-personal": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@aaronsb/google-workspace-mcp"
+      ],
+      "env": {
+        "GOOGLE_CLIENT_ID": "YOUR_GOOGLE_CLIENT_ID",
+        "GOOGLE_CLIENT_SECRET": "YOUR_GOOGLE_CLIENT_SECRET"
+      }
     }
   }
 }
