@@ -11,6 +11,7 @@ CLAUDE.md
 
 # System files
 .DS_Store
+__pycache__/
 .auto-redesign/
 .conductor/
 .claude/settings.local.json
