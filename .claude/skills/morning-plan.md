@@ -23,11 +23,11 @@ Test access to each service. For each, make one lightweight call:
 | Slack | `slack_search_public_and_private` (limit 1) | No |
 | Notion | `search_objects` (limit 1) | No |
 | Otter.ai | `otter_list_transcripts` (limit 1) | No |
-| Obsidian vault | Read `~/Documents/PersonalOS/Templates/Meeting Note.md` | No |
+| Obsidian vault | Read `~/Documents/PersonalOS/Templates/Meeting Note.md` | Yes |
 | Readwise | `reader_list_documents` (limit 1) | No |
 | iMessage | `list_conversations` (limit 1) | No |
 
-Report which services are available. If Calendar or Todoist fail, warn the user that the plan will be incomplete. If Obsidian vault is unreachable, skip the meeting notes step (Step 7) with a warning. Continue with whatever works.
+Report which services are available. If Calendar, Todoist, or Obsidian vault fail, STOP and report — these are required for a complete morning plan. Continue with whatever works for optional services.
 
 ### 2. Gap Detection (Yesterday's Missed Reflection)
 
@@ -49,7 +49,7 @@ Skip if Readwise or Notion are unavailable. Otherwise:
 
 1. Fetch `reader_list_documents(location="new", updated_after=7_days_ago, limit=50, response_fields=["url","title","author","category","tags","summary","reading_progress","published_date","saved_at","source_url"])`
 2. For each item not already tagged `synced-to-notion`, fetch highlights: `reader_get_document_highlights(document_id)`. Batch in parallel.
-3. Deduplicate against Notion KB by URL: prefer `source_url`, strip `utm_*`, `ref`, `source`, `fbclid`, `gclid` params, remove trailing slashes. Query Notion KB for matching URLs.
+3. **Batch deduplication:** Fetch recent Notion KB items (last 14 days) using `API-query-data-source` with a date filter on Date Captured. Extract URLs from results into a set. Compare Readwise candidate URLs against this set in memory — this replaces N individual URL queries with 1 batch query. Prefer `source_url`, strip `utm_*`, `ref`, `source`, `fbclid`, `gclid` params, remove trailing slashes before comparison.
 4. For new items: create Notion pages (Status="Inbox") using the same field mapping as `/capture` Step 6 (title, URL, type, date, summary, highlights as Key Insights).
 5. Tag each captured Readwise item with `synced-to-notion`.
 6. Archive each captured item: `reader_move_documents(document_ids=[document_id], location="archive")`. This keeps the Reader inbox clean — the user never needs to open Reader to triage.
@@ -70,7 +70,7 @@ Skip if Notion is unavailable. Otherwise:
    - **Extract insights** (2-4 key takeaways). If Key Insights field already has content from highlights, append under `**Claude's insights:**` header.
    - **Determine Action Required**: true for tools to try, techniques to implement, workflows to build, concepts to study. False for general interest.
 3. Update each Notion item: Type, Topics, Tags, Summary, Key Insights, Action Required, Status ("Processed" or "Action Items"), Date Reviewed (today).
-4. **Create Obsidian Resource note** for each triaged item at `~/Documents/PersonalOS/Resources/slug.md` (title-only slug, no date prefix — date is in frontmatter):
+4. **Prepare Obsidian Resource note** for each triaged item (do NOT write files yet — all vault writes happen in Step 8). Prepare the content for `~/Documents/PersonalOS/Resources/slug.md` (title-only slug, no date prefix — date is in frontmatter):
 
 ```markdown
 ---
@@ -107,13 +107,13 @@ tags:
 
 Use the same slugification rules as meeting notes (lowercase, hyphens, strip special chars) but **without a date prefix** — the date is stored in frontmatter, not the filename.
 
-**Auto-populate `## Connections`:** After creating the Resource note, scan the vault for related content:
+**Auto-populate `## Connections`:** After preparing the Resource note content, scan the vault for related content:
 - **Search Meetings/** (last 30 days) — grep for keywords from the Resource's title and tags. If a meeting discussed this topic, add `[[Meetings/slug|Title]]` to Connections.
 - **Search People/** — if the Resource mentions or is relevant to a known person (e.g., author is a contact, or topic matches a person's Key Topics), link them.
 - **Search other Resources/** — find Resources with overlapping tags. If 2+ tags match, add as a related Resource link.
 - Target 2-4 connection links per Resource. Only add clear, meaningful connections.
 
-5. **Update Topic MOC notes** — For each topic assigned, check if `~/Documents/PersonalOS/Topics/TopicName.md` exists. If not, create it from the Topic template. Append the new resource to the `## Resources` section:
+5. **Prepare Topic MOC updates** (do NOT write yet — deferred to Step 8) — For each topic assigned, check if `~/Documents/PersonalOS/Topics/TopicName.md` exists. If not, prepare it from the Topic template. Prepare an append of the new resource to the `## Resources` section:
 
 ```markdown
 - [[Resources/YYYY-MM-DD-slug|Title]] — one-line summary #Tag1 #Tag2
@@ -138,16 +138,16 @@ Also fetch any tasks due in the next 3 days for awareness.
 
 **Todoist — Waiting On:** Also fetch tasks with the `waiting-on` label. For each, note the task description, creation date, and any linked meeting note from the description. Flag items that are 3+ days old as stale.
 
-**Gmail:** Use `gmail_search_messages` to find messages since the last `/morning-plan` run. Default to `newer_than:24h` if no prior run date is known, but prefer `is:unread` to catch anything missed. Limit to 10 messages. **For any thread with an actionable subject (action requested, review, update tracker, etc.), use `gmail_read_thread` to read the full thread and extract action items** — don't rely solely on the snippet.
+**Gmail:** Use `gmail_search_messages` to find messages since the last `/morning-plan` run. Default to `newer_than:24h` if no prior run date is known, but prefer `is:unread` to catch anything missed. Limit to 10 messages. **For any thread with an actionable subject (action requested, review, update tracker, etc.), use `gmail_read_thread` to read the full thread and extract action items** — don't rely solely on the snippet. When reading threads with `gmail_read_thread`, focus on the most recent 5 messages. For threads with 10+ messages, note 'long thread' and focus on the last 5.
 
-**Slack — Mentions:** Use `slack_search_public_and_private` to find mentions and DMs since the last run. Default to `after:YYYY-MM-DD` using yesterday's date. Limit to 10 results.
+**Slack — Mentions:** Use `slack_search_public_and_private(response_format="concise", include_context=false)` to find mentions and DMs since the last run. Only fetch full context for items that appear actionable. Default to `after:YYYY-MM-DD` using yesterday's date. Limit to 10 results.
 
 **Slack — Saved for Later:** Use `slack_search_public_and_private(query="is:saved", sort="timestamp", sort_dir="desc", limit=20, include_context=false, response_format="concise")` to find messages the user marked "Save for later." Filter to items saved in the last 7 days. For each:
 - Extract: sender name, channel/DM context, message text (truncated to 100 chars), permalink
 - Dedup: search Todoist for existing tasks containing the permalink in their description. Skip matches.
 - These will be presented in the Inbox section for user to confirm as Todoist tasks.
 
-**Notion:** Use `API-query-data-source` with the Data Source ID from CLAUDE.md to count items where Status = "Action Items" (items with pending Todoist tasks from triage). Use `{ "property": "Status", "select": { "equals": "Action Items" } }` (Status is a **select** field).
+**Notion:** Use `API-query-data-source` with the Data Source ID from CLAUDE.md to count items where Status = "Action Items" (items with pending Todoist tasks from triage). Use `{ "property": "Status", "select": { "equals": "Action Items" } }` (Status is a **select** field). Use `page_size: 1` — you only need the count from the response's `has_more` flag, not full page content.
 
 **Otter (if available):** Use `otter_list_transcripts` to check for any transcripts from yesterday that haven't been processed into Obsidian Meeting notes yet. Flag them as needing `/reflect` processing.
 
@@ -383,7 +383,7 @@ Which meetings need notes? (y/n for each, or "skip all")
 
 **If user says "skip all":** list what was skipped ("Skipped notes for: 11:30 AM Team Standup, 3:30 PM 1:1 with Sarah Lee").
 
-**After collecting all responses, create notes in parallel.**
+**After collecting all responses, prepare meeting note content (filename + markdown body) for each confirmed meeting. Do NOT write files yet — all vault writes happen in Step 8.**
 
 #### Suggested Topics (per meeting)
 
@@ -518,7 +518,17 @@ Skip this section entirely for non-exec meetings.
 
 ### 8. Confirm & Save
 
-After presenting the plan and creating any meeting notes, ask the user:
+**Vault gate:** Before writing anything, re-verify Obsidian vault access by reading `~/Documents/PersonalOS/Templates/Meeting Note.md`. If this fails, display all prepared content in the terminal and warn the user — do not attempt any vault writes.
+
+**Write order:** When the user confirms writes, execute all vault writes in this order:
+1. Resource notes (from KB triage) — `Resources/*.md`
+2. Topic MOC updates — `Topics/*.md`
+3. Meeting notes — `Meetings/*.md`
+4. Daily note — `Daily/YYYY-MM-DD.md`
+
+If any write fails, report which files succeeded and which failed. Do not silently skip.
+
+After presenting the plan, ask the user:
 
 1. **"Create uncaptured action tasks?"** — If Step 4a/4b found uncaptured actions, present the proposed Todoist tasks for batch confirmation. User can "create all", select individually, or skip. Create confirmed tasks with the suggested priority/project/due date from Step 5. Include "Detected from [source]: [original message preview]" in the task description.
 

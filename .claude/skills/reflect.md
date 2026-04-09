@@ -101,12 +101,16 @@ For priority 3+ incomplete tasks, just list them — don't auto-reschedule.
 
 ### 6. Sync Meeting Transcripts
 
+**Write deferral:** Prepare all transcript files, meeting note updates, and People note updates in memory. Do NOT write to the vault until Step 10.
+
+**Cross-skill caching:** Reuse calendar events from Step 2 for transcript-to-meeting matching. Do NOT re-fetch via `gcal_list_events`. Similarly, reuse Todoist task data from Step 2 for deduplication.
+
 **ALWAYS run sync-meetings as part of reflect.** Do not skip this step or defer it to a separate session. Inline the full `/sync-meetings` logic for today's date (including the new decision detection, commitment detection, and waiting-on label features added to sync-meetings):
 
 1. Fetch all Otter transcripts for today (`otter_list_transcripts` with today's date filter)
 2. Match each transcript to existing meeting notes (by title + time + attendees)
-3. For each match: fetch the full transcript (`otter_get_transcript`), extract summary/key points/action items/follow-ups/highlights, write the transcript file to `Meetings/Transcripts/`, and update the meeting note
-4. Update People notes with meeting history
+3. For each match: fetch the full transcript (`otter_get_transcript`), extract summary/key points/action items/follow-ups/highlights, prepare the transcript file for `Meetings/Transcripts/`, and prepare the meeting note update (writes deferred to Step 10)
+4. Prepare People note updates with meeting history (writes deferred to Step 10)
 5. Run the Slack cross-check (Step 7 of sync-meetings) before presenting action items
 6. Present action items for Todoist task creation (user confirms)
 
@@ -178,6 +182,16 @@ Tone: honest and constructive, like a thoughtful coach. Not overly positive or n
 ### 10. Write to Obsidian
 
 **Only run this step after the user has responded to Step 9 (or explicitly skipped it).**
+
+**Vault gate:** Before writing anything, re-verify Obsidian vault access by reading `~/Documents/PersonalOS/Templates/Meeting Note.md`. If this fails, display all prepared content in the terminal and warn the user.
+
+**Write order:** Execute all vault writes in this sequence:
+1. Transcript files — `Meetings/Transcripts/*.md`
+2. Meeting note updates — `Meetings/*.md`
+3. People note updates — `People/*.md`
+4. Daily note — `Daily/YYYY-MM-DD.md`
+
+If any write fails, report which files succeeded and which failed.
 
 Create or update `~/Documents/PersonalOS/Daily/YYYY-MM-DD.md`:
 

@@ -47,7 +47,7 @@ For each candidate, normalize its URL before comparing:
 - Strip query parameters: `utm_*`, `ref`, `source`, `fbclid`, `gclid`
 - Remove trailing slashes
 
-Query the Notion KB database (see CLAUDE.md for database ID) with a URL filter for each normalized URL. Remove items that already exist in Notion from the candidate list.
+**Batch deduplication:** Fetch recent Notion KB items (last 14 days) using `API-query-data-source` with a date filter on Date Captured. Extract URLs from results into a set. Compare Readwise candidate URLs against this set in memory — this replaces N individual URL queries with 1 batch query. Remove items that already exist in Notion from the candidate list.
 
 ### 5. Present to User
 

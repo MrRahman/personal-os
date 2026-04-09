@@ -29,6 +29,8 @@ Query the Notion "AI Knowledge Base" database (see CLAUDE.md for database ID) fo
 
 Use `mcp__notion-local__API-query-data-source` with the database ID from CLAUDE.md and filter: `{ "property": "Status", "select": { "equals": "Inbox" } }`.
 
+When querying inbox items, request only the properties needed for processing: Title, URL, Status, Summary, Key Insights, Tags, Topics, Type, Action Required, Date Captured. Do not request or process other properties.
+
 Batch up to 10 items. If more than 10 exist, process the first 10 and tell the user how many remain.
 
 ### 3. Process Each Item

@@ -161,7 +161,7 @@ Partially. iMessage requires macOS (it reads `~/Library/Messages/chat.db`). Ever
 The system is built around Obsidian's local markdown files. Obsidian is free and Claude reads/writes the files directly — no plugins needed.
 
 **How do I update?**
-`git pull` to get skill updates. Your `CLAUDE.md` and `.mcp.json` are gitignored and won't be overwritten.
+`git pull` to get the latest skill updates. Your `CLAUDE.md` and `.mcp.json` are gitignored and won't be overwritten. For stable releases, check the [Releases page](https://github.com/MrRahman/personal-os/releases) — each release includes a changelog.
 
 ## License
 
