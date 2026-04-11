@@ -18,22 +18,60 @@ Test access to these services:
 | Service | Test Call | Required? |
 |---------|-----------|-----------|
 | Google Calendar (Work) | `gcal_list_events` (today) | Yes |
-| Google Calendar (Personal) | `manage_calendar(operation: "agenda")` via google-personal MCP | No — degrade gracefully |
+| Google Calendar (Personal) | `manage_calendar(operation: "agenda")` via google-personal MCP | Yes |
 | Todoist | List tasks | Yes |
 | Obsidian vault | Read `~/Documents/PersonalOS/` | Yes |
-| Otter.ai | `otter_list_transcripts` (limit 1) | No |
-| iMessage | `list_conversations` (limit 1) | No |
-| Readwise | `reader_list_documents` (limit 1) | No |
+| Otter.ai | `otter_list_transcripts` (limit 1) | Yes — if unavailable, suggest `python3 mcp-servers/refresh-otter-cookie.py` |
+| iMessage | `list_conversations` (limit 1) | Yes |
+| Readwise | `reader_list_documents` (limit 1) | Yes |
 
-Report availability. Work Calendar, Todoist, and Obsidian are required for a full reflection. Personal Calendar is optional — if google-personal MCP is unavailable, proceed with work calendar only and note "Personal calendar unavailable." Otter is optional but enables meeting summaries. See CLAUDE.md Google Account Mapping for tool details.
+**All services are required.** If any service is unavailable, stop and tell the user how to fix it before proceeding. Do not degrade gracefully or skip unavailable services. See CLAUDE.md Google Account Mapping for tool details.
+
+### 1b. Otter Transcript Freshness Gate
+
+Hard gate — ensures all meeting recordings are uploaded before processing transcripts.
+
+1. **Fetch today's calendars** (both work + personal, same dual-query pattern as Step 2). Cache these results for reuse in Step 2 — do not re-fetch later.
+2. **Fetch today's Otter transcripts:** `otter_list_transcripts` filtered to today's date.
+3. **Identify meetings that should have transcripts:** From calendar events, filter to meetings only (2+ human attendees, or has a conferencing link). Exclude blocks per CLAUDE.md Block Conventions. Exclude meetings that haven't happened yet (start time in the future). Exclude meetings shorter than 5 minutes.
+4. **Compare:** For each qualifying meeting, check if a matching Otter transcript exists (match by title similarity + time proximity within 30 minutes).
+5. **If gaps exist**, present them and wait:
+   ```
+   These meetings don't have Otter transcripts yet:
+   - 10:00 AM — Q1 Treasury Review (3 attendees)
+   - 2:00 PM — 1:1 with Sarah Lee
+
+   Upload the recordings to Otter, then type "ready" to continue.
+   ```
+   Wait for the user to confirm "ready", then re-fetch Otter transcripts and re-check. Repeat until all gaps are resolved or the user explicitly says to proceed without them.
+6. **If no gaps** (all meetings have transcripts, or no qualifying meetings today): proceed silently.
+
+### 1c. Todoist Completion Freshness Gate
+
+Hard gate — ensures Todoist reflects actual completions before calculating stats.
+
+1. **Fetch tasks due today that are still open:** Use `find-tasks-by-date` for today, excluding overdue tasks from prior days.
+2. **If open tasks exist**, present them and wait:
+   ```
+   These tasks are still marked open in Todoist:
+   - [ ] Submit expenses [exec-ops, p1]
+   - [ ] Draft metrics framework [AI Transformation, p2]
+   - [ ] Call dentist [health, p4]
+
+   Mark any completed tasks in Todoist, then type "ready".
+   ```
+   Wait for the user to confirm "ready", then re-fetch completed and incomplete tasks for today. This refreshed data replaces what Step 2 would otherwise fetch for Todoist.
+3. **If no open tasks due today**: proceed silently.
 
 ### 2. Gather Data
 
 Run in parallel:
 
+**Cross-step caching:** If Step 1b already fetched today's calendar events, reuse them — do not re-fetch. If Step 1c already fetched and re-fetched Todoist data (user said "ready"), reuse that — do not re-fetch.
+
 **Calendar (Work):** Get today's work events using `gcal_list_events` (srahman@ripple.com). Timezone: America/Los_Angeles. Tag all results **[Work]**.
 
-**Calendar (Personal):** Get today's personal events using `manage_calendar(operation: "agenda")` via google-personal MCP (1srahman@gmail.com). Timezone: America/Los_Angeles. Tag all results **[Personal]**. If google-personal MCP is unavailable, skip with a note and proceed with work calendar only.
+**Calendar (Personal):** Get today's personal events using `manage_calendar(operation: "agenda")` via google-personal MCP (1srahman@gmail.com). Timezone: America/Los_Angeles. Tag all results **[Personal]**.
 
 **Todoist — Completed:** Fetch tasks completed today.
 
@@ -41,11 +79,15 @@ Run in parallel:
 
 **Morning Plan:** Read `~/Documents/PersonalOS/Daily/YYYY-MM-DD.md` (using today's date). If it exists and has a Plan section, extract the planned items. If it doesn't exist, note that no morning plan was found.
 
-**Otter Transcripts (if available):** Use `otter_list_transcripts` with today's date filter to find meeting transcripts from today. For each transcript, use `otter_get_transcript` to fetch the full text.
+**Otter Transcripts:** Use `otter_list_transcripts` with today's date filter to find meeting transcripts from today. For each transcript, use `otter_get_transcript` to fetch the full text.
 
-**iMessage (if available):** Use `extract_action_items(hours=16)` to scan today's messages for requests or commitments you may not have acted on. Awareness only — present what's found, do not auto-create tasks.
+**iMessage:** Use `extract_action_items(hours=16)` to scan today's messages for requests or commitments you may not have acted on. Awareness only — present what's found, do not auto-create tasks.
 
-**Readwise (if available):** Run `reader_list_documents(location="new", limit=5)`. Count items not yet tagged with `synced-to-notion`. Awareness only — note in the reflection output. These will be auto-captured by tomorrow's `/morning-plan`.
+**Readwise:** Run `reader_list_documents(location="new", limit=5)`. Count items not yet tagged with `synced-to-notion`. Awareness only — note in the reflection output. These will be auto-captured by tomorrow's `/morning-plan`.
+
+**Quarterly Goals:** Read `~/Documents/PersonalOS/Goals/YYYY-QX.md` (current quarter). Extract: goal names, unchecked milestones with target dates, `This Week` targets, and linked Projects. If milestones are TBD or empty for a goal, note "milestones not yet defined" and skip goal-alignment analysis for that goal in Step 5.
+
+**Tomorrow + 3-Day Calendar:** Fetch calendar events for tomorrow through day+3 (both work and personal). Also run `gcal_find_my_free_time` for tomorrow to calculate available hours. Cache for Step 5 (Smart Reschedule).
 
 ### 3. Compare (Plan vs Actual)
 
@@ -88,15 +130,94 @@ Check whether uncaptured actions surfaced by this morning's `/morning-plan` were
   → [description] — Create task / Skip / Defer to weekly review
 ```
 
-### 5. Reschedule
+### 5. Smart Reschedule
 
-For incomplete tasks that are priority 1 or 2:
-- List them with their current due dates
-- Propose rescheduling each to tomorrow
-- **Ask the user to confirm** before making any changes in Todoist
-- Only update tasks the user approves
+Context-aware rescheduling for ALL incomplete tasks (P1–P4). Uses goal alignment, calendar capacity, and pattern detection to recommend the best action per task.
 
-For priority 3+ incomplete tasks, just list them — don't auto-reschedule.
+#### 5a. Gather Reschedule Context
+
+Collect from earlier steps (do not re-fetch):
+- **Incomplete tasks** from Step 2 — with metadata: priority, labels, project, description, `dueString`, `deadlineDate`, recurring status
+- **Quarterly goals** from Step 2 — goal names, milestones with target dates, This Week targets, linked projects
+- **Tomorrow's calendar + free time** from Step 2
+- **3-day calendar** from Step 2
+
+Gather additionally:
+- **Reschedule history:** For each incomplete task, use `find-activity(objectId=task_id, objectType="task", eventType="updated", limit=10)` to check how many times the task's due date has been changed. Count date-change events in the last 14 days as "roll count." Note: `find-activity` has no date filter — fetch the last 10 events and count those within the 14-day window.
+- **Tomorrow's task load:** Fetch tasks already due tomorrow, broken down by priority.
+
+#### 5b. Generate Recommendations
+
+For **each** incomplete task (all priorities P1–P4), apply this decision cascade in order:
+
+**1. Chronic blocker check (first):**
+If the task has been rescheduled 3+ times in the last 14 days → recommend **Drop or Break Down**. Reasoning: "Rescheduled X times in 14 days — consider breaking into smaller steps or dropping entirely."
+
+**2. Goal alignment scan:**
+Match the task to quarterly goals via: Todoist label → Obsidian Project (CLAUDE.md Label → Project Map) → Goal's `Projects:` field. Also match by keyword overlap between task content and goal names/milestones.
+- If a linked goal has a milestone due within 7 days → **Escalate + specific date**. Reasoning: "Maps to [goal], milestone '[milestone]' due [date]."
+- If no goal alignment and no `deadlineDate` → candidate for **Deprioritize**.
+
+**3. Deadline check:**
+- If `deadlineDate` exists and is within 3 days → **Tomorrow** (or next available day with capacity). Reasoning: "Hard deadline [date] — [N] days remaining."
+- If `deadlineDate` exists but is 4+ days out → defer to 2 days before deadline.
+
+**4. Calendar capacity check:**
+- Calculate tomorrow's available hours = free time minus estimated load from existing tasks (P1=2h, P2=1h, P3/P4=30m, or use task `duration` field if set).
+- If remaining capacity < 1 hour → tomorrow is **packed**. Look at day+2 and day+3 for the next day with 2+ hours free.
+
+**5. Priority balancing:**
+- If 4+ P1 tasks are already due tomorrow → defer P2–P4 tasks to a later day. Reasoning: "Already X P1 tasks due tomorrow — deferring to avoid overload."
+- If all incomplete tasks are from the same area (all Work or all Personal) → note work/personal balance in the recommendation.
+
+**6. Recommendation assignment** (in priority order):
+
+| Condition | Recommendation |
+|-----------|---------------|
+| Rolled 3+ times in 14 days | 🛑 Drop or Break Down |
+| Goal milestone within 7 days | ⬆ Escalate + Reschedule to [date] |
+| Hard deadline within 3 days | → Tomorrow (or next free day) |
+| Tomorrow has capacity + aligns with priorities | → Tomorrow |
+| Tomorrow packed, capacity day+2/+3 | → [Specific date] |
+| No goal alignment, no deadline, P3/P4 | ↓ Deprioritize |
+
+#### 5c. Present Recommendations
+
+Display as a structured table:
+
+```
+## Reschedule Recommendations
+
+Tomorrow (Fri 4/11): ~3h free, 2 tasks already due
+
+| Task | P | Rec | Reason |
+|------|---|-----|--------|
+| Submit expenses | 1 | → Tomorrow (Fri) | Hard deadline Mon, 2h free block available |
+| Draft metrics | 2 | → Mon 4/14 | Tomorrow packed; AI goal milestone 4/15 |
+| Review slides | 2 | ⬆ Escalate + Tomorrow | QBR goal milestone 4/8, 3 days away |
+| Organize photos | 3 | ↓ Deprioritize | No goal alignment, no deadline |
+| Update CRM | 4 | 🛑 Break down or drop | Rescheduled 4x in 14 days |
+| Call dentist | 4 | → Wed 4/16 | Personal task, tomorrow all-work — balance |
+
+Confirm all, adjust per task, or skip?
+```
+
+**User interaction:**
+- **"confirm all"** — apply all recommendations
+- **Per-task adjustments** — user modifies individual rows, then confirms
+- **"skip"** — leave all tasks as-is (no rescheduling)
+
+#### 5d. Apply Changes
+
+For confirmed reschedules, use `reschedule-tasks` (never `update-tasks` for date changes — preserves recurrence). Batch confirmed tasks into a single call where possible.
+
+For **Escalate** recommendations that include a priority bump, use `update-tasks` to change priority only (separate call from reschedule).
+
+For **Deprioritize** where user confirms removing the due date, use `update-tasks(dueString: "remove")`.
+
+For **Drop** recommendations, ask: "Remove from Todoist or mark complete?" — then `delete-object` or `complete-tasks` accordingly.
+
+**Never reschedule without user confirmation.**
 
 ### 6. Sync Meeting Transcripts
 
@@ -214,7 +335,7 @@ Create or update `~/Documents/PersonalOS/Daily/YYYY-MM-DD.md`:
 
 - If the file exists (from morning plan), **preserve the Plan section** and fill in:
   - `## Completed` — list of completed tasks
-  - `## Incomplete` — list of incomplete tasks with new due dates if rescheduled
+  - `## Incomplete` — Smart Reschedule table from Step 5: task, priority, recommendation, reason, and new date if rescheduled
   - `## Reflection` — Claude's auto-generated reflection text (clearly labeled: `<!-- Claude's analysis -->`)
   - `## My Reflection` — the user's own words from Step 8:
     - `### Highlight` — user's response (or placeholder comment if skipped)
@@ -273,7 +394,7 @@ Transcripts: X | People: X | Tasks: X created | Full → Obsidian
 
 The full reflection written to `~/Documents/PersonalOS/Daily/YYYY-MM-DD.md` includes all of the above plus:
 
-- `## Incomplete` — list of incomplete tasks with rescheduled dates and labels
+- `## Incomplete` — Smart Reschedule recommendation table with per-task reasoning and applied dates
 - `## Action Loop` — morning surfaced count, resolved, pending, unaddressed with options
 - `## Action Items → Todoist` — from meeting note sweep (Step 7), per-item confirmation
 - Meeting-by-meeting transcript summaries from Step 6
@@ -285,5 +406,6 @@ The full reflection written to `~/Documents/PersonalOS/Daily/YYYY-MM-DD.md` incl
 - Dates: YYYY-MM-DD
 - Be empathetic but honest in reflections
 - Never reschedule without user confirmation
+- **Smart Reschedule tools:** Use `reschedule-tasks` for date changes (preserves recurrence), `update-tasks` only for priority changes or due date removal, `complete-tasks` or `delete-object` for drops. Never use `update-tasks` for date changes.
 - Reference CLAUDE.md for paths and conventions
 - **Dual calendar:** Work calendar via `gcal_list_events` (srahman@ripple.com), personal calendar via `manage_calendar(operation: "agenda")` on google-personal MCP (1srahman@gmail.com). Personal events show full details with [Personal] tag. See CLAUDE.md Google Account Mapping for tool routing.

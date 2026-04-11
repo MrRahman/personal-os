@@ -50,7 +50,17 @@ Skip if Readwise or Notion are unavailable. Otherwise:
 1. Fetch `reader_list_documents(location="new", updated_after=7_days_ago, limit=50, response_fields=["url","title","author","category","tags","summary","reading_progress","published_date","saved_at","source_url"])`
 2. For each item not already tagged `synced-to-notion`, fetch highlights: `reader_get_document_highlights(document_id)`. Batch in parallel.
 3. **Batch deduplication:** Fetch recent Notion KB items (last 14 days) using `API-query-data-source` with a date filter on Date Captured. Extract URLs from results into a set. Compare Readwise candidate URLs against this set in memory — this replaces N individual URL queries with 1 batch query. Prefer `source_url`, strip `utm_*`, `ref`, `source`, `fbclid`, `gclid` params, remove trailing slashes before comparison.
-4. For new items: create Notion pages (Status="Inbox") using the same field mapping as `/capture` Step 6 (title, URL, type, date, summary, highlights as Key Insights).
+4. For new items: create Notion pages (Status="Inbox") using the **full** field mapping from `/capture` Step 6. You MUST populate ALL of these fields per page — do not skip AI-generated fields:
+   - **Title** ← Readwise title
+   - **URL** ← source_url (preferred) or url
+   - **Type** ← mapped from Readwise category
+   - **Date Captured** ← saved_at (YYYY-MM-DD)
+   - **Summary** ← Readwise summary
+   - **Key Insights** ← If highlights exist: format under `**Your highlights:**`. If no highlights: generate `**Claude's insights:**` (2-3 takeaways from title + summary)
+   - **Tags** ← AI-generated, 1-3 tags from the `/triage` taxonomy scoped to assigned topics
+   - **Topics** ← AI-generated, 1-2 topics (AI, Tech, Productivity, Career, etc.)
+   - **Action Required** ← true if tool to try, technique to implement, or applicable to active project; false for reference/awareness
+   - **Status** ← "Inbox"
 5. Tag each captured Readwise item with `synced-to-notion`.
 6. Archive each captured item: `reader_move_documents(document_ids=[document_id], location="archive")`. This keeps the Reader inbox clean — the user never needs to open Reader to triage.
 
