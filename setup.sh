@@ -52,10 +52,23 @@ read -p "  Notion Data Source ID (for API-query-data-source): " NOTION_DS_ID
 echo ""
 
 # ─────────────────────────────────────────────
-# Step 3: Otter.ai (optional)
+# Step 3: Google Personal Account (optional)
 # ─────────────────────────────────────────────
 
-echo -e "${BOLD}Step 3: Otter.ai (optional — press Enter to skip)${NC}"
+echo -e "${BOLD}Step 3: Google Personal Account (optional — press Enter to skip)${NC}"
+echo -e "${DIM}  For personal Gmail + Calendar via @aaronsb/google-workspace-mcp.${NC}"
+echo -e "${DIM}  Create OAuth credentials at https://console.cloud.google.com/apis/credentials${NC}"
+echo ""
+
+read -p "  Google Client ID [skip]: " GOOGLE_CLIENT_ID
+read -p "  Google Client Secret [skip]: " GOOGLE_CLIENT_SECRET
+echo ""
+
+# ─────────────────────────────────────────────
+# Step 4: Otter.ai (optional)
+# ─────────────────────────────────────────────
+
+echo -e "${BOLD}Step 4: Otter.ai (optional — press Enter to skip)${NC}"
 echo -e "${DIM}  If you use Otter.ai for meeting transcripts, provide the session cookie.${NC}"
 echo -e "${DIM}  Run: python3 mcp-servers/refresh-otter-cookie.py to extract it from Chrome.${NC}"
 echo ""
@@ -64,10 +77,10 @@ read -p "  Otter session cookie [skip]: " OTTER_COOKIE
 echo ""
 
 # ─────────────────────────────────────────────
-# Step 4: Obsidian vault path
+# Step 5: Obsidian vault path
 # ─────────────────────────────────────────────
 
-echo -e "${BOLD}Step 4: Obsidian vault${NC}"
+echo -e "${BOLD}Step 5: Obsidian vault${NC}"
 echo ""
 
 read -p "  Vault path [~/Documents/PersonalOS]: " VAULT_PATH
@@ -126,6 +139,8 @@ fi
 if [ "${GENERATE_MCP:-false}" = true ]; then
   sed -e "s|YOUR_NOTION_TOKEN|${NOTION_TOKEN}|g" \
       -e "s|YOUR_OTTER_SESSION_COOKIE|${OTTER_COOKIE:-SKIP}|g" \
+      -e "s|YOUR_GOOGLE_CLIENT_ID|${GOOGLE_CLIENT_ID:-YOUR_GOOGLE_CLIENT_ID}|g" \
+      -e "s|YOUR_GOOGLE_CLIENT_SECRET|${GOOGLE_CLIENT_SECRET:-YOUR_GOOGLE_CLIENT_SECRET}|g" \
       "$REPO_DIR/.mcp.json.example" > "$REPO_DIR/.mcp.json"
   echo -e "  ${GREEN}Created${NC}"
 fi
@@ -177,7 +192,7 @@ fi
 # ─────────────────────────────────────────────
 
 echo ""
-echo -e "${BOLD}Step 5: iMessage MCP (optional — macOS only)${NC}"
+echo -e "${BOLD}Step 6: iMessage MCP (optional — macOS only)${NC}"
 echo -e "${DIM}  Requires Full Disk Access for your terminal app.${NC}"
 echo ""
 
@@ -192,6 +207,46 @@ else
 fi
 
 # ─────────────────────────────────────────────
+# Link Claude memory to repo
+# ─────────────────────────────────────────────
+
+echo ""
+echo -e "${BOLD}Linking Claude memory...${NC}"
+
+# Claude encodes the project path as the directory name:
+# /Users/foo/projects/personal-os → -Users-foo-projects-personal-os
+CLAUDE_PROJECT_SLUG="$(echo "$REPO_DIR" | sed 's|^/|-|; s|/|-|g')"
+CLAUDE_PROJECT_DIR="$HOME/.claude/projects/$CLAUDE_PROJECT_SLUG"
+
+mkdir -p "$CLAUDE_PROJECT_DIR"
+
+if [ -L "$CLAUDE_PROJECT_DIR/memory" ]; then
+  echo -e "  ${DIM}Symlink already exists${NC}"
+elif [ -d "$CLAUDE_PROJECT_DIR/memory" ]; then
+  # Memory dir exists with files — back it up, then symlink
+  mv "$CLAUDE_PROJECT_DIR/memory" "$CLAUDE_PROJECT_DIR/memory.bak"
+  echo -e "  ${DIM}Backed up existing memory → memory.bak${NC}"
+  ln -sfn "$REPO_DIR/memory" "$CLAUDE_PROJECT_DIR/memory"
+  echo -e "  ${GREEN}Linked${NC}"
+else
+  ln -sfn "$REPO_DIR/memory" "$CLAUDE_PROJECT_DIR/memory"
+  echo -e "  ${GREEN}Linked${NC}"
+fi
+
+# ─────────────────────────────────────────────
+# Install global Claude config
+# ─────────────────────────────────────────────
+
+echo ""
+echo -e "${BOLD}Installing global Claude config...${NC}"
+
+if [ -x "$REPO_DIR/scripts/install-global.sh" ]; then
+  "$REPO_DIR/scripts/install-global.sh"
+else
+  echo -e "  ${YELLOW}scripts/install-global.sh not found — skipping${NC}"
+fi
+
+# ─────────────────────────────────────────────
 # Summary
 # ─────────────────────────────────────────────
 
@@ -201,6 +256,7 @@ echo ""
 echo "  Files generated:"
 echo "    CLAUDE.md        — your personal configuration"
 echo "    .mcp.json        — MCP server connections"
+echo "    memory/ → ~/.claude symlink"
 echo ""
 echo "  Obsidian vault created at: $VAULT_PATH"
 echo ""
@@ -212,7 +268,8 @@ if [ -z "${OTTER_COOKIE:-}" ]; then
   echo "  3. Set up Otter.ai cookie if you want transcript sync"
 fi
 echo "  4. Grant Full Disk Access to your terminal (for iMessage MCP)"
-echo "  5. Set up iOS Shortcuts (see docs/ios-shortcuts-setup.md)"
+echo "  5. Enable Obsidian Sync and connect to your remote vault"
+echo "     (Settings > Sync in Obsidian)"
 echo ""
 echo -e "  Run ${BOLD}/morning-plan${NC} tomorrow morning to start."
 echo ""

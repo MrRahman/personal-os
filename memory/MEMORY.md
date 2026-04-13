@@ -1,0 +1,17 @@
+- [user_profile.md](user_profile.md) — Sulaiman Rahman's profile, work details, and Personal OS project context
+- [project_kb_pipeline.md](project_kb_pipeline.md) — Automated KB pipeline: Readwise inbox → Notion → Obsidian Resources/Topics, all inside /morning-plan
+- [feedback_filename_conventions.md](feedback_filename_conventions.md) — No redundant date prefixes in filenames; only use dates when they disambiguate (recurring meetings) or are the primary key (daily notes)
+- [feedback_meeting_attendees.md](feedback_meeting_attendees.md) — Always pull ALL attendees from Google Calendar invites when creating meeting notes, not just known People
+- [feedback_multi_project_architecture.md](feedback_multi_project_architecture.md) — Obsidian as shared layer, global skills for universal tools, project-specific workflows stay in their project
+- [project_job_search.md](project_job_search.md) — Job search is an active personal project
+- [feedback_reflection_prompts.md](feedback_reflection_prompts.md) — Always prompt Check-In questions (Highlight, Adjustments, 5 scores) interactively during /reflect before writing to Obsidian
+- [feedback_reflect_checkin.md](feedback_reflect_checkin.md) — Never write Check-In scores, Highlight, or Adjustments for the user — always prompt and wait
+- [feedback_sync_meetings_in_reflect.md](feedback_sync_meetings_in_reflect.md) — Auto-run /sync-meetings inside /reflect without asking — user considers it part of the flow
+- [feedback_completed_tasks.md](feedback_completed_tasks.md) — Always fetch completed tasks with correct params during /reflect — never estimate from incomplete list
+- [feedback_slack_saved_later.md](feedback_slack_saved_later.md) — Slack is:saved returns ALL bookmarks, not just "Later" items with reminders — API limitation
+- [feedback_readwise_capture.md](feedback_readwise_capture.md) — Always execute Readwise→Notion capture during morning-plan, never just report counts
+- [project_release_strategy.md](project_release_strategy.md) — Semver: major=milestones, minor=feature batches, patch=fixes. Batch enhancements before releasing.
+- [feedback_prep_blocks.md](feedback_prep_blocks.md) — User wants prep blocks before executive meetings AND 1:1s, not just exec meetings
+- [project_google_personal_integration.md](project_google_personal_integration.md) — Personal Gmail+Calendar via @aaronsb/google-workspace-mcp, work via claude.ai integration
+- [feedback_todoist_mcp_fix.md](feedback_todoist_mcp_fix.md) — Todoist MCP uses @doist/todoist-ai with permanent API key, not OAuth
+- [feedback_mcp_npm_registry.md](feedback_mcp_npm_registry.md) — All npx-based MCP servers need NPM_CONFIG_REGISTRY=https://registry.npmjs.org due to corporate .npmrc

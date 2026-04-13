@@ -18,6 +18,11 @@
 - Calendar blocks: 30-minute minimum
 - Time format: 24h for internal, 12h for display
 
+## Memory
+- Session memory lives in `./memory/` — read `memory/MEMORY.md` at session start
+- When creating new memory files, write them to `./memory/`, not `~/.claude/projects/`
+- Memory is synced across machines via git (symlinked to Claude's expected path by setup.sh)
+
 ## Error Handling
 All skills must preflight-check MCP connections before running. Report what's unavailable, then continue with what works. Never fail silently — always tell the user what was skipped and why.
 
