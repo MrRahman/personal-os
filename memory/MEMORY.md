@@ -15,3 +15,7 @@
 - [project_google_personal_integration.md](project_google_personal_integration.md) — Personal Gmail+Calendar via @aaronsb/google-workspace-mcp, work via claude.ai integration
 - [feedback_todoist_mcp_fix.md](feedback_todoist_mcp_fix.md) — Todoist MCP uses @doist/todoist-ai with permanent API key, not OAuth
 - [feedback_mcp_npm_registry.md](feedback_mcp_npm_registry.md) — All npx-based MCP servers need NPM_CONFIG_REGISTRY=https://registry.npmjs.org due to corporate .npmrc
+- [project_goal_system.md](project_goal_system.md) — 2026 goal system: 8 goals, WOOP, lead indicators, execution scoring, monthly/quarterly review cadences
+- [user_family_context.md](user_family_context.md) — Family: wife Bonnie, parents aging (legacy interviews), sisters Sadia (injury) and Zakia (connection), nephews
+- [user_career_context.md](user_career_context.md) — Career crossroads: 6yrs at Ripple, stay-or-go by Q2 2026, wants growth not grind, building professional brand
+- [user_health_wellness.md](user_health_wellness.md) — Health: lifts 3x/wk, tight mobility, high cholesterol, sleep/anxiety issues, wants meditation + alcohol 1x/month max

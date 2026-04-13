@@ -190,6 +190,7 @@ If all items have Todoist matches: skip — no missed items to report.
 - Flag milestones due this week or overdue
 - Flag goals with no related task activity in Todoist and no related meetings in the past 7 days ("Stale")
 - Read the `This Week` section for any targets proposed by last week's `/weekly-review`
+- Extract Lead Indicators section — display each indicator with its target in the Active Goals output
 - Match goals to today's meetings via their linked Projects
 
 #### 4a. Action Detection
@@ -355,7 +356,7 @@ Should Do (N) + Coming Up + Free Slots → Obsidian | Readwise: X | Otter: X
 The full plan written to `~/Documents/PersonalOS/Daily/YYYY-MM-DD.md` includes all of the above plus these additional sections:
 
 - `## Should Do` — P2-P3 tasks + items due in next 3 days
-- `## Active Goals` — goal name, next milestone, stale flags, linked projects
+- `## Active Goals` — goal name, next milestone, stale flags, linked projects, lead indicator targets for the week (from Lead Indicators section)
 - `## Active Projects` — project name, target date, status, today's related meeting
 - `## Free Slots` — gaps of 30+ minutes with suggested use
 - `## Coming Up (Next 3 Days)` — upcoming deadlines and events

@@ -191,6 +191,45 @@ Read the current quarterly goals file (`~/Documents/PersonalOS/Goals/YYYY-QX.md`
 - **Proposed target for next week:** [action to restart momentum]
 ```
 
+**Execution Scoring (12 Week Year method):**
+
+After checking each goal's `This Week` target (step 3 above), calculate:
+
+1. **Count planned actions:** How many goals had a non-empty `This Week` target set last week?
+2. **Count achieved:** How many of those targets were achieved (based on task completion, meeting outcomes, or observable progress)?
+3. **Calculate score:** Achieved / Planned × 100% = Execution Score
+4. **Trend check:** Read the previous weekly review note (`~/Documents/PersonalOS/Weekly Reviews/YYYY-WXX.md` for last week). Extract its Execution Score. Compare.
+
+**Output** (add to the Goal Progress section):
+
+```
+### Execution Score
+This week: X/Y targets achieved (Z%)
+Last week: A% | Trend: ↑/↓/→
+```
+
+**Thresholds:**
+- 85%+: On track. Acknowledge strong execution.
+- 70-84%: Acceptable but watch for patterns. Note which goals' targets were missed.
+- Below 70%: Flag as concern. If below 70% for 2 consecutive weeks, flag as **SYSTEMIC** — the issue isn't effort, it's how targets are being set or how time is being allocated.
+- Below 50%: Urgent. Propose: "Reduce active goals to top 5 next week?" or "Are targets too ambitious?"
+
+**Lead Indicator Summary** (new addition to Goal Progress output):
+
+For each goal, also extract and display its Lead Indicators from the quarterly goals file:
+
+```
+### Lead Indicators This Week
+| Goal | Indicator | Target | This Week |
+|------|-----------|--------|-----------|
+| Physical Health | Lift sessions | 3-4/week | |
+| Physical Health | Mobility sessions | 1/week | |
+| Inner Life | Meditation days | 5/week | |
+| ... | ... | ... | |
+```
+
+After presenting, ask: "Want me to fill in this week's lead indicator actuals? (I can check Todoist + calendar for data.)"
+
 After presenting Goal Progress, ask: **"Update 'This Week' section in each goal note with proposed targets? (y/n)"**
 
 If yes, write the proposed targets into each goal's `## This Week` section in the quarterly goals file. Morning-plan will read these and display them.
