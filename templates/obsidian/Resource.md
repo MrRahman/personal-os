@@ -10,8 +10,6 @@ tags:
 
 # {{title}}
 
-#topic/Topic1 #Topic1/tag1 #type/content_type
-
 ## Summary
 {{summary}}
 

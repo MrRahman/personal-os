@@ -97,8 +97,6 @@ tags:
 
 # {{title}}
 
-#topic/Topic1 #Topic1/tag1 #type/content_type
-
 ## Summary
 {{summary}}
 
@@ -126,7 +124,7 @@ Use the same slugification rules as meeting notes (lowercase, hyphens, strip spe
 5. **Prepare Topic MOC updates** (do NOT write yet — deferred to Step 8) — For each topic assigned, check if `~/Documents/PersonalOS/Topics/TopicName.md` exists. If not, prepare it from the Topic template. Prepare an append of the new resource to the `## Resources` section:
 
 ```markdown
-- [[Resources/YYYY-MM-DD-slug|Title]] — one-line summary #Tag1 #Tag2
+- [[Resources/YYYY-MM-DD-slug|Title]] — one-line summary
 ```
 
 Most recent first.
@@ -625,8 +623,8 @@ In the KB Highlights section, include wikilinks to Resource notes created in Ste
 
 ```markdown
 ### KB Highlights
-- [[Resources/2026-03-23-article-slug|Article Title]] — one-line summary #topic/AI
-- [[Resources/2026-03-23-tool-slug|Tool Name]] — one-line summary #topic/Tech
+- [[Resources/2026-03-23-article-slug|Article Title]] — one-line summary
+- [[Resources/2026-03-23-tool-slug|Tool Name]] — one-line summary
 ```
 
 In the Meetings section, include wikilinks to any meeting notes created in Step 7:
