@@ -14,9 +14,12 @@ Use semantic versioning for Personal OS releases on GitHub:
 
 **How to apply:** When committing enhancements, accumulate them on main. When the user says "release" or a logical batch is complete, create a minor release. Only bump major version when the user explicitly decides to (e.g., "this is v2.0"). Prefer batching 2-5 related changes into one minor release over releasing every single commit.
 
+**CRITICAL — Use GitHub Releases, NOT git tags.** Always use `gh release create vX.Y --title "..." --notes "..."` to create a proper GitHub Release. NEVER use `git tag` alone — that only creates a tag without a release page. The user has corrected this multiple times.
+
 **Current state (2026-04-10):**
 - v1.0 — Initial public release (da37e69)
 - v1.1 — Connection gate + token efficiency (914b4a0)
 - v1.2 — Calendar catch-all People updates (dd52c3c)
 - v1.3 — Plan-week skill, calendar-smart morning-plan, People reconciliation (7a13596)
 - v1.4 — Freshness gates + smart reschedule for /reflect (8591b89)
+- v1.5 — Evidence-based goal system with WOOP, execution scoring, monthly/quarterly reviews (47ff992)

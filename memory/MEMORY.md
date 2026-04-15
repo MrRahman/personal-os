@@ -19,3 +19,5 @@
 - [user_family_context.md](user_family_context.md) — Family: wife Bonnie, parents aging (legacy interviews), sisters Sadia (injury) and Zakia (connection), nephews
 - [user_career_context.md](user_career_context.md) — Career crossroads: 6yrs at Ripple, stay-or-go by Q2 2026, wants growth not grind, building professional brand
 - [user_health_wellness.md](user_health_wellness.md) — Health: lifts 3x/wk, tight mobility, high cholesterol, sleep/anxiety issues, wants meditation + alcohol 1x/month max
+- [feedback_github_releases.md](feedback_github_releases.md) — Always use `gh release create`, NEVER `git tag` alone — user corrected this multiple times
+- [project_coaching_system.md](project_coaching_system.md) — /coach skill with 3 personas + "Around the Corner" proactive alerts in morning-plan

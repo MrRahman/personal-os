@@ -261,6 +261,16 @@ This ensures every person you met today has an up-to-date `last_interaction` and
 
 Prepare all People note updates in memory — writes happen in Step 10.
 
+### 6c. People Notes — Relationship Catch-All
+
+After calendar-based People note updates (Step 6b), also update People notes for non-meeting interactions detected today:
+
+1. **iMessage family contacts:** If iMessage data from Step 2 shows conversations with core family members (Bonnie-Rahman, Asiya-Rahman, Malik-Rahman, Sadia-Rahman, Zakia-Rahman) today, update their People note `last_interaction` to today's date. Add to Meeting History as: `- YYYY-MM-DD: iMessage conversation — [brief topic if action items were detected, otherwise "check-in"]`
+2. **Personal email contacts:** If personal email data from Step 2 included exchanges with people who have People notes, update `last_interaction` accordingly.
+3. This ensures family and friend People notes stay current even when interactions are informal (texts, calls) rather than calendar meetings.
+
+Prepare all updates in memory — writes happen in Step 10.
+
 ### 7. Sync Action Items to Todoist
 
 After meeting notes are finalized (including transcript-extracted action items from Step 6), sweep today's meeting notes for action items assigned to the user and create corresponding Todoist tasks.
@@ -300,8 +310,9 @@ Write a 5-8 sentence reflection covering:
 2. **What didn't go as planned** — incomplete items, interruptions, context switching
 3. **Pattern observation** — connect to broader trends if possible (e.g., "This is the third day this week where afternoon focus time got eaten by unplanned meetings")
 4. **Tomorrow suggestion** — one concrete, actionable thing to try tomorrow
+5. **Work-life balance signal** — compare today's [Work] meeting hours vs [Personal] events. If the ratio is heavily skewed (4:0 or worse) for 3+ consecutive days, name it. Reference the user's anti-goals from `Goals/2026.md` and their decision filter ("Does this ground me or scatter me?"). Connect to mood trend if mood has been below 5 for 2+ days. Frame as observation, not judgment.
 
-Tone: honest and constructive, like a thoughtful coach. Not overly positive or negative.
+Tone: honest and constructive, like a thoughtful life coach — not just a work coach. Not overly positive or negative.
 
 **This is Claude's perspective only.** Present it in the terminal, then proceed to Step 8 to get the user's own reflection.
 
@@ -317,7 +328,23 @@ Tone: honest and constructive, like a thoughtful coach. Not overly positive or n
 >
 > **Check-In scores (1-10):** Energy, Focus, Impact, Balance, Mood
 >
-> **Personal wins:** Anything outside work worth noting? Workout, family time, networking call, personal project progress? (type or skip)
+> **Lead indicator check (y/n, 30 seconds):**
+>
+> Before asking, auto-detect what you can from today's data:
+> - Check Todoist completed tasks for keywords: "lift", "gym", "trainer", "yoga", "mobility", "meditation", "breathwork", "walk", "run", "hike", "outdoor"
+> - Check today's calendar for personal events matching fitness, social, or family activities
+> - Check iMessage data for conversations with family members (Bonnie, parents, sisters)
+>
+> Present auto-detected data first, then ask for corrections:
+>
+> "I detected: [e.g., 1 lift session (APT at 3:15 PM), no meditation, 1 outdoor walk]. Quick check on the rest:"
+> - Couple time with Bonnie? (y/n)
+> - Reach out to a friend or family member today? (Who?)
+> - Anything I missed?
+>
+> Generate these questions dynamically from the current quarter's lead indicators (`Goals/YYYY-QX.md`) that have daily or weekly frequency. Only ask indicators relevant to the day. If user says "skip", respect it.
+>
+> **Personal wins:** Anything outside work worth noting? (type or skip)
 
 **Wait for the user's response.** Do NOT fill in Highlight, Adjustments, or Check-In scores yourself. Do NOT write to Obsidian until the user provides their input. If the user says "skip" or doesn't want to fill these in, leave the sections with placeholder comments in Obsidian.
 
@@ -345,7 +372,19 @@ Create or update `~/Documents/PersonalOS/Daily/YYYY-MM-DD.md`:
     - `### Highlight` — user's response (or placeholder comment if skipped)
     - `### Adjustments` — user's response (or placeholder comment if skipped)
     - `### Check-In` — table with 5 scores from user (or blank if skipped)
-  - `## Personal` — user's personal wins from Step 8 (only if provided; omit section entirely if skipped)
+  - `## Lead Indicators` — table with today's lead indicator responses and running weekly totals:
+    ```markdown
+    ## Lead Indicators
+    | Indicator | Today | Week Total |
+    |-----------|-------|------------|
+    | Lift session | y | 2/3-4 |
+    | Meditation | n | 1/5 |
+    | Couple time | n | 0/1 |
+    | Outdoor time | y | 2/2 |
+    | Friend/family outreach | — | 0/2 (monthly) |
+    ```
+    To calculate Week Total: read all daily notes from the current week (Monday through today), tally each indicator's "y" responses. Compare against targets from the quarterly goals file. If no prior daily notes have Lead Indicators sections yet, start fresh with today as the first data point.
+  - `## Personal` — user's personal wins from Step 9 (only if provided; omit section entirely if skipped)
 
 - **Frontmatter scores:** Only write scores to YAML frontmatter if the user provided them in Step 8. Never fill in scores from Claude's perspective. Leave blank if user hasn't provided scores.
 

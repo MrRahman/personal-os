@@ -278,7 +278,11 @@ Wait for confirmation before proceeding.
 
 **Todoist:** Create confirmed tasks for next week. Assign appropriate priorities and due dates (generally Monday of next week unless specific).
 
-After all weekly review content is written and confirmed, prompt:
+After all weekly review content is written and confirmed:
+
+**Coaching nudge:** Glob `~/Documents/PersonalOS/Coaching/*.md` for the most recent coaching session. If the most recent session is more than 16 days ago (or no sessions exist), add a single line: "It's been [N] days since your last coaching session. Run `/coach`?" If a session exists within 16 days, skip this entirely.
+
+Then prompt:
 
 > "Run `/plan-week` now to set up next week's blocks?"
 

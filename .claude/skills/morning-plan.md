@@ -170,7 +170,7 @@ Also fetch any tasks due in the next 3 days for awareness.
 
 **Otter (if available):** Use `otter_list_transcripts` to check for any transcripts from yesterday that haven't been processed into Obsidian Meeting notes yet. Flag them as needing `/reflect` processing.
 
-**iMessage (if available):** Use `extract_action_items(hours=24)` to scan the last 24 hours of messages for potential requests, commitments, or action items. This is awareness only — present what's found, do not auto-create tasks.
+**iMessage (if available):** Use `extract_action_items(hours=24)` to scan the last 24 hours of messages for potential requests, commitments, or action items. Feed results into Action Detection (Step 4a) alongside Gmail and Slack results. For messages from wife (Bonnie), route proposed tasks to Todoist "Us" project at P2. For messages from parents, route to "Personal" project at P2. For messages from friends, route to "Personal" project at P3.
 
 **Yesterday's Missed Actions:** Glob yesterday's meeting notes (`~/Documents/PersonalOS/Meetings/YYYY-MM-DD-*.md` using yesterday's date).
 For each file, scan for uncompleted checkboxes (`- [ ]`) containing the user's People wikilink (e.g., `[[People/First-Last]]` or `@[[People/First-Last]]`) or the user's short name (see CLAUDE.md Identity section).
@@ -192,6 +192,14 @@ If all items have Todoist matches: skip — no missed items to report.
 - Read the `This Week` section for any targets proposed by last week's `/weekly-review`
 - Extract Lead Indicators section — display each indicator with its target in the Active Goals output
 - Match goals to today's meetings via their linked Projects
+
+**Lead Indicator Pulse (personal goals):** For each personal/health/family/growth goal's lead indicators in the quarterly file, gather current-week data:
+- **Relationship indicators:** Read People notes for core family members (Bonnie-Rahman, Asiya-Rahman, Malik-Rahman, Sadia-Rahman, Zakia-Rahman) and check `last_interaction` dates. Fetch these regardless of whether family members appear in today's meetings.
+- **Habit indicators:** Query Todoist `find-completed-tasks` for the current week (Monday through today) with keyword search for: "lift", "gym", "trainer", "meditation", "breathwork", "yoga", "mobility", "couple", "date night", "outdoor", "walk", "run", "hike". Count matches per indicator.
+- **Outreach indicators:** Check iMessage data (already fetched) for conversations with known friends/family. Count unique contacts reached this week.
+- Compare counts against Q2 targets from the goals file. Cache results for Life Pulse display in Step 6.
+
+**Coaching Notes (if any):** Glob `~/Documents/PersonalOS/Coaching/*.md` for the most recent coaching session. Extract: commitments made, goals discussed, date of session. This feeds the "Around the Corner" alerts in Step 5.
 
 #### 4a. Action Detection
 
@@ -285,6 +293,24 @@ STRATEGIC QBR Tuesday — Brad expects execution proof. Your slides?
 
 Present Flags immediately after Schedule in the terminal output. If no flags, omit the section entirely.
 
+**Around the Corner (proactive alerts):** After generating Flags, run these 5 checks. Output 0-3 alerts max — skip if nothing is flagged. These are goal-trajectory and coaching-related signals that complement the task-level Flags above.
+
+1. **Milestone lookahead** — For each goal milestone due within 21 days, check if there's meaningful progress (related Todoist tasks completed, lead indicators trending). If a milestone has <50% progress with <3 weeks remaining, alert: "[Goal]: [milestone] due [date] — [progress assessment]. [Specific suggestion]."
+2. **Lead indicator streak detection** — For each lead indicator in the quarterly goals file, check the last 3 weekly reviews. If an indicator was missed 3+ consecutive weeks, alert: "[Indicator]: missed [N] consecutive weeks (target: [X]). Consider `/coach [persona]`."
+3. **Coaching commitment follow-up** — If a coaching note exists from the last 14 days, check each commitment against Todoist tasks and calendar events. If a commitment has no matching task or block, alert: "Coaching follow-up: You committed to [action] ([date] session). No task or calendar block found."
+4. **Cross-goal energy alert** — If daily note Check-In scores (energy, mood) have trended down for 3+ consecutive days AND any health-related lead indicator (exercise, sleep, meditation) was missed this week, alert: "Energy trending down [N] days. [missed indicator] might be the bottleneck."
+5. **Calendar-goal conflict** — If the next 7 days have >25 hours of meetings AND a goal milestone is due within 14 days, alert: "Heavy week ahead ([X]h meetings) + [milestone] due [date]. Where's the focus time?"
+
+Format in the terminal output:
+```
+## Around the Corner
+- Career milestone at risk: 0/3 external conversations with 7 weeks to deadline. Schedule one this week.
+- Wellness pattern: Energy down 3 days + 0 meditation sessions this month. Sleep or anxiety may be upstream.
+- Coaching follow-up: You committed to booking a financial advisor (4/6 session). No task or calendar block found.
+```
+
+Present "Around the Corner" immediately after Flags in the terminal output. If no alerts triggered, omit the section entirely — don't add noise.
+
 **Meeting → Project linking:** When creating meeting notes in Step 7, check if each meeting's title/attendees/description match an active project. If so, pre-populate the `project:` frontmatter field: `project: "[[Projects/slug]]"`.
 
 **Uncaptured Actions:** From Step 4a/4b, compile the list of detected actions classified as "Uncaptured." For each, prepare a proposed Todoist task with:
@@ -324,6 +350,11 @@ MISSED    2 action items from Every.to meeting not in Todoist
 STRATEGIC QBR Tuesday — leadership expects execution proof. Your slides?
 [Only show if flags exist. Omit section entirely if none. See Step 5 for detection rules.]
 
+## Around the Corner
+- Career milestone at risk: 0/3 external conversations with 7 weeks to deadline.
+- Coaching follow-up: You committed to booking a financial advisor (4/6 session). No task found.
+[Only show if alerts triggered. Omit section entirely if none. See Step 5 for detection rules.]
+
 ## Must Do
 - [ ] Task description [label]
 - [ ] Task with inline details — phone number, link, etc. [label, due today]
@@ -357,6 +388,7 @@ The full plan written to `~/Documents/PersonalOS/Daily/YYYY-MM-DD.md` includes a
 
 - `## Should Do` — P2-P3 tasks + items due in next 3 days
 - `## Active Goals` — goal name, next milestone, stale flags, linked projects, lead indicator targets for the week (from Lead Indicators section)
+- `## Around the Corner` — proactive goal-trajectory and coaching alerts (only include if alerts were triggered in Step 5)
 - `## Active Projects` — project name, target date, status, today's related meeting
 - `## Free Slots` — gaps of 30+ minutes with suggested use
 - `## Coming Up (Next 3 Days)` — upcoming deadlines and events
