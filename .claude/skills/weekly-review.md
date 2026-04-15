@@ -81,6 +81,15 @@ Merge both result sets into a single timeline. Tag every event **[Work]** or **[
 
 **Energy patterns:** Based on reflections and completion data, note which days felt most/least productive.
 
+**Balance Analysis:**
+- Calculate total work meeting hours for the week (from calendar data)
+- Calculate total personal event hours for the week
+- Calculate average mood score for the week (from daily note frontmatter)
+- If mood average is below 5 AND work meeting hours exceed 20: flag "High work load + low mood correlation detected"
+- Compare this week's lead indicator completion rate vs last week's. If declining, note the trend.
+- Check anti-goals from `Goals/2026.md` and flag any that appeared this week (e.g., "Working 10-12 hour days regularly")
+- Present the decision filter question: "Reviewing this week through 'Does this ground me or scatter me?' — which days grounded you? Which scattered you?"
+
 **Decisions this week:** Scan all meeting notes from this week (glob `~/Documents/PersonalOS/Meetings/` for this week's dates). For each note that has a `## Decisions` section, extract the decisions. Aggregate into a list for the output.
 
 ### 5. KB Review
@@ -107,6 +116,8 @@ If uncaptured items exist, offer: "Run `/capture` to import remaining items?"
 **Obsidian Resources (if available):** Scan `~/Documents/PersonalOS/Resources/` for notes created this week (by filename date prefix). Group by topic for the KB Highlights section.
 
 ### 5.5 Relationship Radar
+
+**Relationship Radar is always included in the weekly review output**, even if no one is flagged (in that case, write "All relationships active — no flags."). This ensures the user sees the section every week.
 
 Scan all People notes in `~/Documents/PersonalOS/People/`. For each, read the `last_interaction` frontmatter field and `relationship` field. Flag people who are going cold based on relationship type:
 
@@ -137,7 +148,13 @@ Scan all People notes in `~/Documents/PersonalOS/People/`. For each, read the `l
 
 If no one is flagged in a category, omit that category. If no one is flagged at all, write: "All relationships active — no flags."
 
-After presenting, ask: "Want to draft a quick message to anyone? Or add a Todoist reminder to reach out?"
+For each flagged person, connect to Q2 goals:
+- Parents flagged + Family Roots goal → suggest: "Schedule a visit this weekend. Q2 target: 2x/month."
+- Sister flagged + Family Roots goal → suggest: "Send a text today. Q2 target: 1 touchpoint/month per sister."
+- Friend flagged + Friendships goal → suggest: "Reach out to [name]. Q2 target: 2 hangouts/month."
+- Bonnie interaction low + Marriage & Home goal → suggest: "Plan this week's couple night. Q2 target: 1/week."
+
+After presenting, offer: "Want me to create Todoist tasks for any of these? I'll set them as P2 in 'Personal' or 'Us' project."
 
 ### 5.6 People Note Reconciliation
 
@@ -214,21 +231,23 @@ Last week: A% | Trend: ↑/↓/→
 - Below 70%: Flag as concern. If below 70% for 2 consecutive weeks, flag as **SYSTEMIC** — the issue isn't effort, it's how targets are being set or how time is being allocated.
 - Below 50%: Urgent. Propose: "Reduce active goals to top 5 next week?" or "Are targets too ambitious?"
 
-**Lead Indicator Summary** (new addition to Goal Progress output):
-
-For each goal, also extract and display its Lead Indicators from the quarterly goals file:
+**Lead Indicator Summary (auto-populated):** Read all daily notes from the review week (`~/Documents/PersonalOS/Daily/YYYY-MM-DD.md` for each day Mon-Sun). For each day, read the `## Lead Indicators` section. Tally weekly totals per indicator. Compare against targets from the quarterly goals file. Present:
 
 ```
 ### Lead Indicators This Week
-| Goal | Indicator | Target | This Week |
-|------|-----------|--------|-----------|
-| Physical Health | Lift sessions | 3-4/week | |
-| Physical Health | Mobility sessions | 1/week | |
-| Inner Life | Meditation days | 5/week | |
-| ... | ... | ... | |
+| Goal | Indicator | Target | Actual | Status |
+|------|-----------|--------|--------|--------|
+| Physical Health | Lift sessions | 3-4/week | 3 | On track |
+| Physical Health | Mobility | 1/week | 0 | MISSED |
+| Inner Life | Meditation | 5/week | 2 | Behind |
+| Marriage & Home | Couple night | 1/week | 1 | On track |
+| Family Roots | Parent visits | 2/month | 0 (MTD: 1) | Behind |
+| Friendships | Friend hangouts | 2/month | 0 (MTD: 0) | Behind |
+| Inner Life | Outdoor sessions | 2/week | 3 | On track |
+| Inner Life | Pages read | 50+/week | 0 | Behind |
 ```
 
-After presenting, ask: "Want me to fill in this week's lead indicator actuals? (I can check Todoist + calendar for data.)"
+If daily notes don't have Lead Indicators sections yet (first week of tracking), note: "Lead indicator tracking starts this week — no prior data to tally."
 
 After presenting Goal Progress, ask: **"Update 'This Week' section in each goal note with proposed targets? (y/n)"**
 

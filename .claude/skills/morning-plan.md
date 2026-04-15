@@ -157,7 +157,7 @@ Also fetch any tasks due in the next 3 days for awareness.
 
 **Gmail (Work):** Use `gmail_search_messages` to find work messages since the last `/morning-plan` run. Default to `newer_than:24h` if no prior run date is known, but prefer `is:unread` to catch anything missed. Limit to 10 messages. **For any thread with an actionable subject (action requested, review, update tracker, etc.), use `gmail_read_thread` to read the full thread and extract action items** — don't rely solely on the snippet. When reading threads with `gmail_read_thread`, focus on the most recent 5 messages. For threads with 10+ messages, note 'long thread' and focus on the last 5. Tag all results `[Work]`.
 
-**Gmail (Personal):** Use `manage_email(operation: "search")` via the `google-personal` MCP server to find personal messages since the last run. Limit to 5 messages. For actionable threads, use `manage_email(operation: "read")` to get full context. Tag all results `[Personal]`. Personal email actions route to Todoist "Personal" project.
+**Gmail (Personal):** Use `manage_email(operation: "search")` via the `google-personal` MCP server to find personal messages since the last run. Limit to 10 messages. For actionable threads, use `manage_email(operation: "read")` to get full context. Tag all results `[Personal]`. Apply the same action detection categories from Step 4a to personal email threads. Personal email actions route to Todoist "Personal" project.
 
 **Slack — Mentions:** Use `slack_search_public_and_private(response_format="concise", include_context=false)` to find mentions and DMs since the last run. Only fetch full context for items that appear actionable. Default to `after:YYYY-MM-DD` using yesterday's date. Limit to 10 results.
 
@@ -171,6 +171,8 @@ Also fetch any tasks due in the next 3 days for awareness.
 **Otter (if available):** Use `otter_list_transcripts` to check for any transcripts from yesterday that haven't been processed into Obsidian Meeting notes yet. Flag them as needing `/reflect` processing.
 
 **iMessage (if available):** Use `extract_action_items(hours=24)` to scan the last 24 hours of messages for potential requests, commitments, or action items. Feed results into Action Detection (Step 4a) alongside Gmail and Slack results. For messages from wife (Bonnie), route proposed tasks to Todoist "Us" project at P2. For messages from parents, route to "Personal" project at P2. For messages from friends, route to "Personal" project at P3.
+
+**Family Pulse (always runs):** After fetching iMessage data, specifically check for recent messages with core family contacts: Bonnie, parents (Asiya/Malik Rahman), sisters (Sadia, Zakia). For each, note last message date and whether user was sender or recipient. This feeds the Life Pulse section and enriches People note `last_interaction` tracking in `/reflect`.
 
 **Yesterday's Missed Actions:** Glob yesterday's meeting notes (`~/Documents/PersonalOS/Meetings/YYYY-MM-DD-*.md` using yesterday's date).
 For each file, scan for uncompleted checkboxes (`- [ ]`) containing the user's People wikilink (e.g., `[[People/First-Last]]` or `@[[People/First-Last]]`) or the user's short name (see CLAUDE.md Identity section).
@@ -255,6 +257,14 @@ From the gathered data:
 
 **Free slots:** Look at today's calendar and find gaps of 30 minutes or more that are not occupied by meetings OR plan-week blocks. Only report truly unscheduled time. If /plan-week blocks fill most gaps, the free slot list will be shorter — this is intentional. List them with start/end times.
 
+When suggesting uses for free slots, include personal items tied to Q2 goals alongside work suggestions:
+- If no couple time logged this week and there's an evening free → suggest: "Date night with Bonnie (7-9 PM)"
+- If parents not visited in 14+ days and weekend is approaching → suggest: "Visit parents (Saturday afternoon)"
+- If no outdoor time this week and there's a lunch gap → suggest: "Walk / outdoor time (30 min)"
+- If lift sessions behind target and a morning slot is free → suggest: "Gym / lift session"
+- If meditation not started yet (Q2 milestone: start by Apr 30) → suggest: "Meditation — even 5 min"
+- If friend outreach behind monthly target → suggest: "Reach out to [name] — text or coffee"
+
 **Task categories:**
 - **Must Do:** P1 tasks + anything due today + urgent email/Slack items
 - **Should Do:** P2-P3 tasks + items due in next 3 days
@@ -281,6 +291,12 @@ From the gathered data:
 - After gathering all data, evaluate: "Based on executive priorities (execution over process, accountability, decisions not coordination — see CLAUDE.md Executive Contacts section if present), what from today's schedule, open tasks, or recent meeting context would leadership ask about or expect to see progress on?"
 - Frame as a question or prompt, not a task: "QBR is Tuesday — leadership expects execution proof points. Where are your slides?"
 - Only generate if genuinely warranted. Skip if nothing rises to this level.
+
+**BALANCE flags (automatic, max 1):**
+- If today's calendar has 5+ hours of [Work] meetings AND zero [Personal] events: "All-work day — no personal time on calendar. Protect evening."
+- If the last 3 daily notes show mood at or below 4: "Mood trend: X, Y, Z over last 3 days. The grind-to-ground ratio is off."
+- If this week's Lead Indicator Pulse shows 3+ indicators behind target: "Personal goals falling behind — 3 lead indicators off-track this week."
+- If today's calendar shows 10+ hours of scheduled events: "Anti-goal alert: 10+ hours scheduled today. Does this ground you or scatter you?" (from user's decision filter in Goals/2026.md)
 
 **Format:**
 ```
@@ -354,6 +370,13 @@ STRATEGIC QBR Tuesday — leadership expects execution proof. Your slides?
 - Career milestone at risk: 0/3 external conversations with 7 weeks to deadline.
 - Coaching follow-up: You committed to booking a financial advisor (4/6 session). No task found.
 [Only show if alerts triggered. Omit section entirely if none. See Step 5 for detection rules.]
+
+## Life Pulse
+PARENT VISIT  Last saw parents 20 days ago — target 2x/month [Family Roots]
+COUPLE NIGHT  No ritual logged this week — target 1/week [Marriage & Home]
+LIFT          2 of 3-4 sessions this week [Physical Health]
+[Only show indicators behind target or time-sensitive. Max 4 lines. Omit entirely if all on track.
+Data from Lead Indicator Pulse in Step 4. Use UPPERCASE PREFIX format matching Flags.]
 
 ## Must Do
 - [ ] Task description [label]
@@ -616,7 +639,11 @@ In the Meetings section, include wikilinks to any meeting notes created in Step 
 
 Only link meetings where notes were created — skipped meetings are not linked.
 
-4. **"Block focus time?"** — If plan-week blocks already exist for today (detected in Step 4), change the prompt to: "You have N focus blocks from /plan-week today. Adjust any, or add more?" If no plan-week blocks exist, offer to create calendar events in free slots for deep work using gcal_create_event. Use 30-minute minimum blocks. Name them "Focus: [suggested task]".
+4. **"Block time?"** — Offer both work focus blocks AND personal calendar items based on Lead Indicator Pulse data:
+   - Work blocks → create on work calendar via `gcal_create_event`. Name: "Focus: [task]"
+   - Personal blocks → create on personal calendar via `manage_calendar(operation: "create")` on google-personal MCP, or on "Bonnie + Sul Calendar" for shared events. Name: "[activity]" (not "Focus:" prefix for personal items)
+   - Present both types together: "Block time? I see opportunities for work and personal: [list]. Create calendar events? (all / select / skip)"
+   - If plan-week blocks already exist for today (detected in Step 4), change the prompt to: "You have N focus blocks from /plan-week today. Adjust any, or add more?"
 
 ## Notes
 - All times in America/Los_Angeles
