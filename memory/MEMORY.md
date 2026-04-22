@@ -10,14 +10,19 @@
 - [feedback_completed_tasks.md](feedback_completed_tasks.md) — Always fetch completed tasks with correct params during /reflect — never estimate from incomplete list
 - [feedback_slack_saved_later.md](feedback_slack_saved_later.md) — Slack is:saved returns ALL bookmarks, not just "Later" items with reminders — API limitation
 - [feedback_readwise_capture.md](feedback_readwise_capture.md) — Always execute Readwise→Notion capture during morning-plan, never just report counts
+- [feedback_notion_triage_write.md](feedback_notion_triage_write.md) — Notion API-patch-page during /morning-plan triage is synchronous, not deferred — Obsidian notes ≠ Notion updated
 - [project_release_strategy.md](project_release_strategy.md) — Semver: major=milestones, minor=feature batches, patch=fixes. Batch enhancements before releasing.
 - [feedback_prep_blocks.md](feedback_prep_blocks.md) — User wants prep blocks before executive meetings AND 1:1s, not just exec meetings
 - [project_google_personal_integration.md](project_google_personal_integration.md) — Personal Gmail+Calendar via @aaronsb/google-workspace-mcp, work via claude.ai integration
+- [feedback_google_work_vs_personal.md](feedback_google_work_vs_personal.md) — Work Google = claude.ai connector ONLY; personal = google-personal MCP ONLY. Never cross them — Ripple blocks the Breezy OAuth app (403)
 - [feedback_todoist_mcp_fix.md](feedback_todoist_mcp_fix.md) — Todoist MCP uses @doist/todoist-ai with permanent API key, not OAuth
 - [feedback_mcp_npm_registry.md](feedback_mcp_npm_registry.md) — All npx-based MCP servers need NPM_CONFIG_REGISTRY=https://registry.npmjs.org due to corporate .npmrc
 - [project_goal_system.md](project_goal_system.md) — 2026 goal system: 8 goals, WOOP, lead indicators, execution scoring, monthly/quarterly review cadences
 - [user_family_context.md](user_family_context.md) — Family: wife Bonnie, parents aging (legacy interviews), sisters Sadia (injury) and Zakia (connection), nephews
 - [user_career_context.md](user_career_context.md) — Career crossroads: 6yrs at Ripple, stay-or-go by Q2 2026, wants growth not grind, building professional brand
 - [user_health_wellness.md](user_health_wellness.md) — Health: lifts 3x/wk, tight mobility, high cholesterol, sleep/anxiety issues, wants meditation + alcohol 1x/month max
+- [user_therapy.md](user_therapy.md) — Kim Wylder is individual therapist since 2022-06; "Wylder Appointment" events are therapy — handle with discretion, don't cross-post to work
 - [feedback_github_releases.md](feedback_github_releases.md) — Always use `gh release create`, NEVER `git tag` alone — user corrected this multiple times
 - [project_coaching_system.md](project_coaching_system.md) — /coach skill with 3 personas + "Around the Corner" proactive alerts in morning-plan
+- [feedback_proactive_merge_prompts.md](feedback_proactive_merge_prompts.md) — Staged agent work must be proactively surfaced at SessionStart / morning-plan / weekly-review. Never silent.
+- [feedback_fewer_skills.md](feedback_fewer_skills.md) — Prefer fewer new slash commands; consolidate into existing skills or shared utilities.

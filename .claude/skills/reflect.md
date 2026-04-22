@@ -25,11 +25,25 @@ Test access to these services:
 | Google Calendar (Personal) | `manage_calendar(operation: "agenda")` via google-personal MCP | Yes |
 | Todoist | List tasks | Yes |
 | Obsidian vault | Read `~/Documents/PersonalOS/` | Yes |
-| Otter.ai | `otter_list_transcripts` (limit 1) | Yes — if unavailable, suggest `python3 mcp-servers/refresh-otter-cookie.py` |
+| Otter.ai | `otter_list_transcripts` (limit 1) — see Otter cookie diagnosis below | Yes |
 | iMessage | `list_conversations` (limit 1) | Yes |
 | Readwise | `reader_list_documents` (limit 1) | Yes |
 
-**All services are required.** If any service is unavailable, stop and tell the user how to fix it before proceeding. Do not degrade gracefully or skip unavailable services. See CLAUDE.md Google Account Mapping for tool details.
+**All services are required.** Preflight output rule (matches `/morning-plan`):
+- If every required service passes: print a single-line footer at the top: `✓ preflight ok (7/7 services + vault)`. Do not itemize.
+- If any required service fails: STOP and print an `[ASK]` prompt with a one-sentence fix (e.g., `[ASK] Otter unreachable — run python3 mcp-servers/refresh-otter-cookie.py + restart Claude Code, then re-run /reflect.`).
+- See CLAUDE.md Google Account Mapping for tool details.
+
+**Otter cookie diagnosis (when `otter_list_transcripts` returns 401):**
+
+The Otter MCP server reads `OTTER_SESSION_COOKIE` from `.mcp.json` once at session spawn. Mid-session refresh updates the file but not the running process. `/mcp reconnect otter` re-establishes the stdio pipe but does NOT restart the process. Distinguish the two failure modes before telling the user what to do:
+
+1. Run `python3 /Users/sulaimanrahman/projects/personal-os/mcp-servers/refresh-otter-cookie.py --validate` via Bash. This validates the cookie currently in `.mcp.json` against the Otter API directly.
+2. **If `--validate` exits 0 (cookie in config is valid) but MCP still 401s** → MCP process holds a stale env. Stop and tell the user exactly this:
+   > The Otter cookie in `.mcp.json` is fresh, but the MCP server process hasn't picked it up. Exit Claude Code fully and restart — `/mcp reconnect` won't help. No refresh needed, just the restart.
+3. **If `--validate` exits non-zero (cookie itself is expired)** → refresh is needed. Stop and tell the user:
+   > Otter cookie expired. Run `python3 mcp-servers/refresh-otter-cookie.py`, then exit Claude Code fully and restart.
+4. Otter is required for `/reflect` (transcript sync is a core step). STOP preflight and wait for the user to restart — do not proceed without it.
 
 ### 1b. Otter Transcript Freshness Gate
 
@@ -178,12 +192,12 @@ Match the task to quarterly goals via: Todoist label → Obsidian Project (CLAUD
 
 | Condition | Recommendation |
 |-----------|---------------|
-| Rolled 3+ times in 14 days | 🛑 Drop or Break Down |
-| Goal milestone within 7 days | ⬆ Escalate + Reschedule to [date] |
-| Hard deadline within 3 days | → Tomorrow (or next free day) |
-| Tomorrow has capacity + aligns with priorities | → Tomorrow |
-| Tomorrow packed, capacity day+2/+3 | → [Specific date] |
-| No goal alignment, no deadline, P3/P4 | ↓ Deprioritize |
+| Rolled 3+ times in 14 days | Drop or Break Down |
+| Goal milestone within 7 days | Escalate + Move: [date] |
+| Hard deadline within 3 days | Move: Tomorrow (or next free day) |
+| Tomorrow has capacity + aligns with priorities | Move: Tomorrow |
+| Tomorrow packed, capacity day+2/+3 | Move: [Specific date] |
+| No goal alignment, no deadline, P3/P4 | Deprioritize |
 
 #### 5c. Present Recommendations
 
@@ -196,12 +210,12 @@ Tomorrow (Fri 4/11): ~3h free, 2 tasks already due
 
 | Task | P | Rec | Reason |
 |------|---|-----|--------|
-| Submit expenses | 1 | → Tomorrow (Fri) | Hard deadline Mon, 2h free block available |
-| Draft metrics | 2 | → Mon 4/14 | Tomorrow packed; AI goal milestone 4/15 |
-| Review slides | 2 | ⬆ Escalate + Tomorrow | QBR goal milestone 4/8, 3 days away |
-| Organize photos | 3 | ↓ Deprioritize | No goal alignment, no deadline |
-| Update CRM | 4 | 🛑 Break down or drop | Rescheduled 4x in 14 days |
-| Call dentist | 4 | → Wed 4/16 | Personal task, tomorrow all-work — balance |
+| Submit expenses | 1 | Move: Tomorrow (Fri) | Hard deadline Mon, 2h free block available |
+| Draft metrics | 2 | Move: Mon 4/14 | Tomorrow packed; AI goal milestone 4/15 |
+| Review slides | 2 | Escalate + Move: Tomorrow | QBR goal milestone 4/8, 3 days away |
+| Organize photos | 3 | Deprioritize | No goal alignment, no deadline |
+| Update CRM | 4 | Drop or Break Down | Rescheduled 4x in 14 days |
+| Call dentist | 4 | Move: Wed 4/16 | Personal task, tomorrow all-work — balance |
 
 Confirm all, adjust per task, or skip?
 ```
@@ -318,43 +332,24 @@ Tone: honest and constructive, like a thoughtful life coach — not just a work 
 
 ### 9. Interactive Check-In (User's Reflection)
 
-**STOP and ask the user before writing anything to Obsidian.** Present Claude's reflection from Step 8, then prompt:
+**STOP and ask the user before writing anything to Obsidian.** Present Claude's reflection from Step 8, then the compressed prompt below.
 
-> "That's my read on the day. Now yours —"
+**Auto-detect before prompting** (silent; used to pre-fill lead-indicator answers):
+- Todoist completed tasks for keywords: "lift", "gym", "trainer", "yoga", "mobility", "meditation", "breathwork", "walk", "run", "hike", "outdoor"
+- Today's calendar for personal events matching fitness, social, or family activities
+- iMessage data for conversations with family members (Bonnie, parents, sisters)
+
+**Single-line compressed prompt:**
+
+> **[ASK] Your turn** — Highlight (one thing proud of / grateful for), Adjustments (one thing to do differently tomorrow), scores 1-10 for Energy / Focus / Impact / Balance / Mood, and any Personal wins (skip if none).
 >
-> **Highlight:** What's the one thing you're most proud of or grateful for today?
->
-> **Adjustments:** What would you do differently tomorrow?
->
-> **Check-In scores (1-10):** Energy, Focus, Impact, Balance, Mood
->
-> **Lead indicator check (y/n, 30 seconds):**
->
-> Before asking, auto-detect what you can from today's data:
-> - Check Todoist completed tasks for keywords: "lift", "gym", "trainer", "yoga", "mobility", "meditation", "breathwork", "walk", "run", "hike", "outdoor"
-> - Check today's calendar for personal events matching fitness, social, or family activities
-> - Check iMessage data for conversations with family members (Bonnie, parents, sisters)
->
-> Present auto-detected data first, then ask for corrections:
->
-> "I detected: [e.g., 1 lift session (APT at 3:15 PM), no meditation, 1 outdoor walk]. Quick check on the rest:"
-> - Couple time with Bonnie? (y/n)
-> - Reach out to a friend or family member today? (Who?)
-> - Anything I missed?
->
-> Generate these questions dynamically from the current quarter's lead indicators (`Goals/YYYY-QX.md`) that have daily or weekly frequency. Only ask indicators relevant to the day. If user says "skip", respect it.
->
-> **Personal wins:** Anything outside work worth noting? (type or skip)
->
-> **Sunday micro-planning (Sunday only):** If today is Sunday, add after the standard check-in:
->
-> "It's Sunday evening. Quick personal week preview:"
-> - Family: When are you seeing your parents this week? Any sister outreach planned?
-> - Marriage: What's the couple night this week?
-> - Health: Lift schedule set? Meditation app downloaded/used?
-> - Social: Anyone you want to reach out to this week?
->
-> Capture responses as Todoist tasks in "Personal" or "Us" projects (P2, due to specific days the user names). This adds ~2 min to Sunday's reflect on the one day with bandwidth for personal planning.
+> **Auto-detected from today:** [e.g., "1 lift session (APT 3:15 PM), no meditation, 1 outdoor walk, couple time detected (Big Fish dinner)"]. Correct any errors; otherwise I'll use these for lead indicators.
+
+Generate the auto-detected summary dynamically from current quarter's lead indicators (`Goals/YYYY-QX.md`) — daily/weekly frequency indicators only. The goal: user answers one prompt, not a multi-part questionnaire.
+
+**Sunday micro-planning (Sunday only)** — add this after the standard check-in, as a separate `[ASK]` block:
+
+> **[ASK] Sunday preview** — Family (parents + sisters this week?), Marriage (couple night when?), Health (lift schedule? meditation?), Social (who to reach out to?). Capture as Todoist tasks in "Personal" / "Us" at P2.
 
 **Wait for the user's response.** Do NOT fill in Highlight, Adjustments, or Check-In scores yourself. Do NOT write to Obsidian until the user provides their input. If the user says "skip" or doesn't want to fill these in, leave the sections with placeholder comments in Obsidian.
 
@@ -408,8 +403,15 @@ Display the reflection in two tiers: a compact terminal view and a full Obsidian
 
 **Terminal output (Quick View):**
 
+<!-- Output order: header stats → Completed (progress) → Flags for Tomorrow (decisions) → Reflection (Claude's take) → Check-In (user response) → summary line. Do not reorder. -->
+
+Legend for the one-line header at the top of output:
+`[ASK] needs you to respond now. [TODO] = something to act on later. Everything else is context.`
+
 ```
 # Daily Reflection — YYYY-MM-DD
+✓ preflight ok (N/N services + vault)
+[ASK] needs you to respond now. [TODO] = something to act on later. Everything else is context.
 
 Meetings: X (Yh) [W work / P personal]  |  Tasks: A/B completed (Z%)  |  Unplanned: X
 
@@ -442,6 +444,12 @@ Mood      ███████░░░ 7
 ---
 Transcripts: X | People: X | Tasks: X created | Full → Obsidian
 ```
+
+**Marker usage rules** (apply across output above):
+- `[ASK]` tag prefixes any line that needs the user to respond now (e.g., the compressed check-in prompt in Step 9, Smart Reschedule `confirm all / adjust / skip`, action-item Todoist creation).
+- `[TODO]` tag prefixes any line representing a deferred action item surfaced from the reflection (rare in terminal output — Obsidian daily note is where TODO items land).
+- Do not introduce `[INFO]`, `[DECISION]`, `[QUESTION]`, `[ACTION]` — only two markers. Unadorned prose = reference.
+- `/reflect` preflight behavior matches `/morning-plan`: print single-line footer on pass, loud prompt on fail (`[ASK] Todoist unreachable — continue with calendar data only?`).
 
 **Obsidian daily note gets EVERYTHING:**
 

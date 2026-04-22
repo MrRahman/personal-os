@@ -7,6 +7,8 @@ description: Prep for any conversation — generates a one-pager from People not
 
 Generate a one-pager to prepare for any conversation — a scheduled meeting, networking call, interview, or personal catch-up. Works with a person name or company name.
 
+**Output conventions:** Follows `.claude/skills/_conventions.md` — two-marker system (`[ASK]` / `[TODO]`), brief-on-pass preflight footer, decisions-before-reference ordering. Use `## Decisions` structure when extracting from past meeting notes.
+
 ## Instructions
 
 ### 1. Parse Input

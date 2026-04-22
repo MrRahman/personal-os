@@ -7,6 +7,8 @@ description: Scan next week's calendar, allocate focus/prep/admin blocks based o
 
 Scan next week's calendar and create focused time blocks (focus, prep, admin, catch-up) based on weekly review priorities, energy patterns, and task durations. Designed to run after `/weekly-review` to eliminate daily block creation overhead.
 
+**Output conventions:** Follows `.claude/skills/_conventions.md` — two-marker system (`[ASK]` / `[TODO]`), brief-on-pass preflight footer, decisions-before-reference ordering.
+
 ## Instructions
 
 ### 1. Preflight Check

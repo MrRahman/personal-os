@@ -24,7 +24,10 @@ Test access to:
 
 See CLAUDE.md Google Account Mapping for tool-to-account details.
 
-Report availability. Continue with what works, noting any gaps.
+**Preflight output rule** (matches `/morning-plan`):
+- If every required service passes: single-line footer at the top: `✓ preflight ok (N/N services + vault)`. Do not itemize.
+- If any required service fails: STOP with `[ASK] <service> unreachable — <one-sentence fix>. Continue with what works (y/n)?`
+- Skills use `[ASK]` for user prompts that need a response now, `[TODO]` for deferred action items. No other markers (per v1.7 convention).
 
 ### 2. Determine Week Range
 

@@ -7,6 +7,8 @@ description: Generate personal brand content from vault material — LinkedIn po
 
 Generate a first draft of personal brand content by pulling from the Obsidian vault. Turns your meetings, resources, reflections, and ideas into publishable content.
 
+**Output conventions:** Follows `.claude/skills/_conventions.md` — two-marker system (`[ASK]` / `[TODO]`). Use `[ASK]` when prompting for tone / format / length confirmation before generating; `[TODO]` when surfacing post-draft follow-ups.
+
 ## Instructions
 
 ### 1. Capture Intent

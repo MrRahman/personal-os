@@ -7,6 +7,10 @@ description: Pull Otter transcripts, match to meeting notes, fill in summaries +
 
 Pull Otter.ai transcripts, match them to existing meeting notes (or create new ones), extract summaries and action items, store full transcripts, and update People notes. Default: today. Accepts a date parameter.
 
+**Output conventions:** Follows `.claude/skills/_conventions.md` — two-marker system (`[ASK]` / `[TODO]`), brief-on-pass preflight footer, decisions-before-reference ordering.
+
+**Meeting note structure:** The updated meeting note template (Templates/Meeting Note.md) includes `## Decisions` as a first-class section alongside `## Action Items`. When extracting from a transcript, populate both separately — decisions are distinct from discussion topics (Key Points) and from tasks (Action Items). If no explicit decision was made, write "None recorded."
+
 ## Instructions
 
 ### 1. Preflight Check

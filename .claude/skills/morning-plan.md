@@ -22,12 +22,27 @@ Test access to each service. For each, make one lightweight call:
 | Gmail | `gmail_search_messages` (limit 1) | No |
 | Slack | `slack_search_public_and_private` (limit 1) | No |
 | Notion | `search_objects` (limit 1) | No |
-| Otter.ai | `otter_list_transcripts` (limit 1) | No |
+| Otter.ai | `otter_list_transcripts` (limit 1) — see Otter cookie diagnosis below | No |
 | Obsidian vault | Read `~/Documents/PersonalOS/Templates/Meeting Note.md` | Yes |
 | Readwise | `reader_list_documents` (limit 1) | No |
 | iMessage | `list_conversations` (limit 1) | No |
 
-Report which services are available. If Calendar, Todoist, or Obsidian vault fail, STOP and report — these are required for a complete morning plan. Continue with whatever works for optional services.
+**Output — brief-on-pass, loud-on-fail:**
+- If every required service passes AND every optional service passes: print a single-line footer at the top of the morning plan: `✓ preflight ok (N/N services + vault)`. Do not itemize — the footer alone proves the check ran.
+- If a REQUIRED service fails (Calendar, Todoist, or Obsidian vault): STOP. Print `[ASK]` prompt with the specific failure and one-sentence fix: `[ASK] Todoist unreachable (401 — token expired). Fix with ./mcp-servers/healthcheck.sh and restart Claude Code, then re-run /morning-plan.`
+- If an OPTIONAL service fails: continue silently, but note in a single line: `⚠ preflight: Gmail unreachable — email scan skipped. See .claude/state/health.json for details.`
+- Users should only see a full itemized list of services when at least one failed.
+
+**Otter cookie diagnosis (when `otter_list_transcripts` returns 401):**
+
+The MCP server reads `OTTER_SESSION_COOKIE` from `.mcp.json` once at session spawn. Refreshing the cookie mid-session updates the file but not the running process. Two failure modes exist — distinguish them before telling the user what to do:
+
+1. Run `python3 /Users/sulaimanrahman/projects/personal-os/mcp-servers/refresh-otter-cookie.py --validate` via Bash. This reads the cookie from `.mcp.json` and hits the Otter API directly.
+2. **If `--validate` exits 0 (cookie in config is valid) but MCP still 401s** → the MCP process holds a stale env. Stop and tell the user exactly this:
+   > The Otter cookie in `.mcp.json` is fresh, but the MCP server process hasn't picked it up. Exit Claude Code fully and restart — `/mcp reconnect` won't help. No action on your end beyond the restart.
+3. **If `--validate` exits non-zero (cookie itself is expired)** → refresh is needed. Stop and tell the user:
+   > Otter cookie expired. Run `python3 mcp-servers/refresh-otter-cookie.py`, then exit Claude Code fully and restart.
+4. Continue the morning plan without Otter either way — don't block the rest of the preflight on this.
 
 ### 2. Gap Detection (Yesterday's Missed Reflection)
 
@@ -79,7 +94,7 @@ Skip if Notion is unavailable. Otherwise:
    - **Summarize** (2-3 sentences, under 2000 chars)
    - **Extract insights** (2-4 key takeaways). If Key Insights field already has content from highlights, append under `**Claude's insights:**` header.
    - **Determine Action Required**: true for tools to try, techniques to implement, workflows to build, concepts to study. False for general interest.
-3. Update each Notion item: Type, Topics, Tags, Summary, Key Insights, Action Required, Status ("Processed" or "Action Items"), Date Reviewed (today).
+3. **Apply Notion updates NOW — synchronous write, NOT deferred.** For each triaged item, call `API-patch-page` to update: Type, Topics, Tags, Summary, Key Insights, Action Required, Status ("Processed" or "Action Items"), Date Reviewed (today). This is the ONLY write performed inside Phase B — all vault writes are deferred to Step 8, but Notion must be updated here. **Do not skip or defer this step.** After patching, re-query each item and verify Tags, Topics, Key Insights, and Date Reviewed are populated. If any item still has empty Tags or null Date Reviewed, retry the patch immediately. Leaving items stuck in Status="Inbox" with empty fields silently breaks the pipeline — the Obsidian Resource note looks complete but Notion is the source of truth for the KB.
 4. **Prepare Obsidian Resource note** for each triaged item (do NOT write files yet — all vault writes happen in Step 8). Prepare the content for `~/Documents/PersonalOS/Resources/slug.md` (title-only slug, no date prefix — date is in frontmatter):
 
 ```markdown
@@ -340,22 +355,17 @@ Display the morning plan in two tiers: a compact terminal view and a full Obsidi
 
 **Terminal output (Quick View — default, 30-40 lines max):**
 
-Only show these sections in the terminal:
+<!-- Output order: [ASK] first (things needing a response now), [TODO] items next, schedule + reference last. Do not reorder. -->
+
+Legend for the one-line header at the top of output:
+`[ASK] needs you to respond now. [TODO] = something to act on later. Everything else is context.`
+
+Terminal layout:
 
 ```
 # Morning Plan — YYYY-MM-DD (Day of Week)
-
-## Today's Schedule
-  7:30    You/[exec] || monthly skip level .......... [Exec], [EA]  [Work]
-  9:00    AI priority sync up ...................... [team]  [Work]
-  9:30    Staff Weekly ............................. [team]  [Work]
- 10:00    ---- Building Time (3h) ----
- 12:00    Lunch with Dad .......................... [Personal]
-  2:00    1:1 || [Manager] & You ................... [Manager]  [Work]
-  5:00    Dentist appointment ..................... [Personal]
-[Use left-aligned monospace times. Dotted leaders connect meeting title to attendees.
-Focus time uses ---- dashes ----. Show attendee count for large meetings.
-Tag every event [Work] or [Personal] at the end of the line.]
+✓ preflight ok (9/9 services + vault)
+[ASK] needs you to respond now. [TODO] = something to act on later. Everything else is context.
 
 ## Flags
 DEADLINE  CEO proposal due tomorrow — no draft exists
@@ -363,18 +373,6 @@ STALE     Jon milestone conversation — 4 days, no follow-up
 MISSED    2 action items from Every.to meeting not in Todoist
 STRATEGIC QBR Tuesday — leadership expects execution proof. Your slides?
 [Only show if flags exist. Omit section entirely if none. See Step 5 for detection rules.]
-
-## Around the Corner
-- Career milestone at risk: 0/3 external conversations with 7 weeks to deadline.
-- Coaching follow-up: You committed to booking a financial advisor (4/6 session). No task found.
-[Only show if alerts triggered. Omit section entirely if none. See Step 5 for detection rules.]
-
-## Life Pulse
-PARENT VISIT  Last saw parents 20 days ago — target 2x/month [Family Roots]
-COUPLE NIGHT  No ritual logged this week — target 1/week [Marriage & Home]
-LIFT          2 of 3-4 sessions this week [Physical Health]
-[Only show indicators behind target or time-sensitive. Max 4 lines. Omit entirely if all on track.
-Data from Lead Indicator Pulse in Step 4. Use UPPERCASE PREFIX format matching Flags.]
 
 ## Must Do
 - [ ] Task description [label]
@@ -395,6 +393,30 @@ Data from Lead Indicator Pulse in Step 4. Use UPPERCASE PREFIX format matching F
   - Sender (iMessage): "message preview"
 [Urgent inbox items only — needs action today. Split by Work/Personal source.]
 
+## Today's Schedule
+  7:30    You/[exec] || monthly skip level .......... [Exec], [EA]  [Work]
+  9:00    AI priority sync up ...................... [team]  [Work]
+  9:30    Staff Weekly ............................. [team]  [Work]
+ 10:00    ---- Building Time (3h) ----
+ 12:00    Lunch with Dad .......................... [Personal]
+  2:00    1:1 || [Manager] & You ................... [Manager]  [Work]
+  5:00    Dentist appointment ..................... [Personal]
+[Use left-aligned monospace times. Dotted leaders connect meeting title to attendees.
+Focus time uses ---- dashes ----. Show attendee count for large meetings.
+Tag every event [Work] or [Personal] at the end of the line.]
+
+## Around the Corner
+- Career milestone at risk: 0/3 external conversations with 7 weeks to deadline.
+- Coaching follow-up: You committed to booking a financial advisor (4/6 session). No task found.
+[Only show if alerts triggered. Omit section entirely if none. See Step 5 for detection rules.]
+
+## Life Pulse
+PARENT VISIT  Last saw parents 20 days ago — target 2x/month [Family Roots]
+COUPLE NIGHT  No ritual logged this week — target 1/week [Marriage & Home]
+LIFT          2 of 3-4 sessions this week [Physical Health]
+[Only show indicators behind target or time-sensitive. Max 4 lines. Omit entirely if all on track.
+Data from Lead Indicator Pulse in Step 4. Use UPPERCASE PREFIX format matching Flags.]
+
 ## Slack Later (X new)
   Check Slack app — X saved items pending triage
 [Count only, no per-item listing in terminal]
@@ -402,6 +424,11 @@ Data from Lead Indicator Pulse in Step 4. Use UPPERCASE PREFIX format matching F
 ---
 Should Do (N) + Coming Up + Free Slots → Obsidian | Readwise: X | Otter: X
 ```
+
+**Marker usage rules** (apply across all output above):
+- `[ASK]` tag prefixes any line that needs the user to respond now (e.g., action-item confirmation prompts, uncaptured-action dismissal, deep-mode opt-in).
+- `[TODO]` tag prefixes any line representing a deferred action item (e.g., surfacing a staged agent unit that is not yet merged).
+- Use only two markers. Do not introduce `[INFO]`, `[DECISION]`, `[QUESTION]`, `[ACTION]`, or color-coded variants — they add cognitive load (clig.dev + alert-fatigue research). Unadorned prose = reference.
 
 **Obsidian daily note gets EVERYTHING:**
 
@@ -610,6 +637,8 @@ Skip this section entirely for non-exec meetings.
 4. Daily note — `Daily/YYYY-MM-DD.md`
 
 If any write fails, report which files succeeded and which failed. Do not silently skip.
+
+**Notion sync check (reminder):** By this step, Notion has already been updated inline in Step 3 Phase B item 3. Before finishing, re-query the triaged items once and confirm Tags, Topics, Key Insights, and Date Reviewed are populated. If any item is missing these fields, the Phase B write was skipped — retry the `API-patch-page` call for those items now. Never leave items in Status="Inbox" with empty Tags.
 
 After presenting the plan, ask the user:
 

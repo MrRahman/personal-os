@@ -7,6 +7,8 @@ description: Bi-weekly coaching conversation with persona-specific guidance — 
 
 Socratic coaching conversation that diagnoses stuck goals using longitudinal data, asks persona-appropriate questions, and helps you troubleshoot obstacles and make decisions. Takes 20-30 minutes.
 
+**Output conventions:** Follows `.claude/skills/_conventions.md` — two-marker system (`[ASK]` / `[TODO]`), decisions-before-reference ordering. Each signature question from a persona should prefix with `[ASK]` when the skill is waiting for a user response before proceeding.
+
 Three coaching personas auto-selected by goal domain:
 - **Executive Coach** → Career, Personal Brand
 - **Life Coach** → Marriage, Family, Friendships, Finances
