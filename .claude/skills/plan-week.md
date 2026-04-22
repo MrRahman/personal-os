@@ -153,6 +153,54 @@ Scan the meeting grid. For each meeting, determine if it warrants prep time:
 - If known gym patterns exist from Step 3F, auto-anchor them
 - If no pattern but goal exists, propose blocks based on the target (e.g., "4 lift sessions → Mon/Tue/Thu/Fri")
 
+### 4b. Goal Decomposition (v2.0+)
+
+After the standard week planning, decompose goals into per-project work units that can be dispatched to agents via `/dispatch`.
+
+For each active goal in `Goals/YYYY-QX.md`, for each linked project in its `Projects:` field:
+1. Read the project's Obsidian note (`~/Documents/PersonalOS/Projects/<slug>.md`). Check frontmatter for `agent_dispatch: enabled` — skip if disabled or if `repo:` is missing for code-touching work.
+2. Review the goal's `## This Week` section + current milestone.
+3. Propose 2-4 concrete work units for this week that advance the goal via this project. Each unit:
+   - **id**: short slug, e.g. `draft-homepage-hero-copy`, `implement-rss-feed`
+   - **description**: one line, action-oriented
+   - **type**: `autonomous` (research, drafting, docs, planning — can run in background) or `supervised` (code changes — terminal session)
+   - **estimated_time**: minutes
+4. Append to the project note's `## Proposed Work Units (Week YYYY-WXX)` section:
+   ```
+   ## Proposed Work Units (Week 2026-W17)
+   - [ ] draft-homepage-hero-copy: Draft homepage hero copy for sulaiman.co landing — autonomous — est 10m
+   - [ ] review-seo-keywords: Review SEO keyword candidates — autonomous — est 8m
+   - [ ] implement-rss-feed: Add RSS feed generator to sulaiman.co — supervised — est 20m
+   ```
+
+**Decision rule for type:**
+- Touches source code / git diff? → **supervised**
+- Pure content / research / docs? → **autonomous**
+- When unclear: default to **supervised** (safer).
+
+**Present the decomposition as `[ASK]`:**
+```
+## Goal Decomposition
+
+Proposed work units (6 across 3 projects):
+
+personal-brand-system (Goal: Personal Brand)
+  - [ ] 1. draft-homepage-hero-copy — autonomous, 10m
+  - [ ] 2. review-seo-keywords — autonomous, 8m
+  - [ ] 3. implement-rss-feed — supervised, 20m
+
+job-search (Goal: Career — From Grind to Growth)
+  - [ ] 4. update-resume-bullets-for-april — autonomous, 8m
+  - [ ] 5. draft-linkedin-post-ai-transformation — autonomous, 12m
+
+ai-transformation (Goal: Career)
+  - [ ] 6. research-anthropic-enterprise-pricing — autonomous, 12m
+
+[ASK] Approve all work units? (y / select subset e.g. "1,3,4" / edit / skip)
+```
+
+On `y` or selected subset: append the approved units to each project's note (above). They are now eligible for `/dispatch` during the week.
+
 ### 5. Present Proposed Week
 
 Display a day-by-day grid:

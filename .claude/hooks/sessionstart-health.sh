@@ -28,19 +28,48 @@ HEALTH_JSON="${REPO_ROOT}/.claude/state/health.json"
 ROUTING_REMINDER="Google routing rule: work (srahman@ripple.com) uses mcp__claude_ai_Google_Calendar__* and mcp__claude_ai_Gmail__* (pre-scoped to work, no email arg). Personal (1srahman@gmail.com) uses mcp__google-personal__manage_*. Never cross them — Ripple blocks the Breezy OAuth app with 403."
 
 # Project orchestration (v2.0+): scan all active projects for staged agent work.
-# For v1.8 we just stub this — Batch 4 fills it in with actual directory scanning.
+# Parses each Obsidian Project note's `repo:` frontmatter, checks the repo's
+# .claude/staging/ dir for pending items. Surfaces as [ASK] at the top of
+# Claude's context — before everything else per user's hard requirement.
 STAGED_WORK_NOTE=""
-# TODO v2.0: iterate ~/Documents/PersonalOS/Projects/*.md, read `repo:` frontmatter,
-# check <repo>/.claude/staging/ for pending items, surface as [ASK] at top.
+VAULT="${PERSONALOS_VAULT:-$HOME/Documents/PersonalOS}"
+if [ -d "$VAULT/Projects" ]; then
+  declare -a STAGED_PROJECTS=()
+  for project_note in "$VAULT/Projects"/*.md; do
+    [ -f "$project_note" ] || continue
+    # Read `repo:` from frontmatter (top YAML block)
+    REPO=$(awk '/^---$/{f++; next} f==1 && /^repo:/{sub(/^repo:[ \t]*/,""); gsub(/[\"'"'"']/,""); print; exit}' "$project_note")
+    [ -z "$REPO" ] && continue
+    [ ! -d "$REPO/.claude/staging" ] && continue
+    # Count non-empty staging dirs
+    STAGED_COUNT=$(find "$REPO/.claude/staging" -maxdepth 1 -mindepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
+    if [ "${STAGED_COUNT:-0}" -gt 0 ]; then
+      PROJECT_SLUG=$(basename "$project_note" .md)
+      STAGED_PROJECTS+=("${PROJECT_SLUG}: ${STAGED_COUNT} unit(s)")
+    fi
+  done
+  if [ "${#STAGED_PROJECTS[@]:-0}" -gt 0 ]; then
+    TOTAL=${#STAGED_PROJECTS[@]}
+    STAGED_WORK_NOTE="[ASK] ${TOTAL} project(s) have pending agent output to review:
+"
+    for line in "${STAGED_PROJECTS[@]}"; do
+      STAGED_WORK_NOTE="${STAGED_WORK_NOTE}  - ${line}
+"
+    done
+    STAGED_WORK_NOTE="${STAGED_WORK_NOTE}Run /dispatch --status to see details, or /dispatch --merge <project>/<unit-id> to merge.
+
+"
+  fi
+fi
 
 if [ $EXIT_CODE -eq 0 ]; then
   # All required services pass — minimal context
-  CONTEXT="$OUTPUT
+  CONTEXT="${STAGED_WORK_NOTE}$OUTPUT
 
 $ROUTING_REMINDER"
 else
   # Required service failed — verbose panel
-  CONTEXT="⚠ MCP preflight found failures. Next /morning-plan or /reflect may surface issues.
+  CONTEXT="${STAGED_WORK_NOTE}⚠ MCP preflight found failures. Next /morning-plan or /reflect may surface issues.
 
 $OUTPUT
 
