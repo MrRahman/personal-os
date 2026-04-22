@@ -26,3 +26,4 @@
 - [project_coaching_system.md](project_coaching_system.md) — /coach skill with 3 personas + "Around the Corner" proactive alerts in morning-plan
 - [feedback_proactive_merge_prompts.md](feedback_proactive_merge_prompts.md) — Staged agent work must be proactively surfaced at SessionStart / morning-plan / weekly-review. Never silent.
 - [feedback_fewer_skills.md](feedback_fewer_skills.md) — Prefer fewer new slash commands; consolidate into existing skills or shared utilities.
+- [project_proactive_system.md](project_proactive_system.md) — v1.9+ proactive surfacing: drift types, budgets, anti-nag tuning, observability. Where the config lives.

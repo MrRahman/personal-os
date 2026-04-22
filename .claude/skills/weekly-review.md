@@ -29,6 +29,27 @@ See CLAUDE.md Google Account Mapping for tool-to-account details.
 - If any required service fails: STOP with `[ASK] <service> unreachable — <one-sentence fix>. Continue with what works (y/n)?`
 - Skills use `[ASK]` for user prompts that need a response now, `[TODO]` for deferred action items. No other markers (per v1.7 convention).
 
+### 1c. Systems Health (v1.9+)
+
+Read `.claude/state/drift.json` (populated by SessionStart hook). Render a 5-line status block that summarizes the system's state. Goes at the TOP of the weekly-review output so degradation is visible within 7 days.
+
+```
+## Systems Health
+MCP        ✓ 6/6      (or ✗ notion 401 — fix: regenerate token)
+Releases   ✓ 0 drift  (or ⚠ 4 commits since v1.8 — [ASK] propose release?)
+Goals      ✓ 8/8 fresh (or ⚠ 2 stale: Personal Brand, Finances)
+Waiting-on ✓ 0 aged   (or ⚠ 3 tasks idle 3+d: Jon milestone, Amanda training, Kim follow-up)
+Memory     ✓ 0 drift  (or ⚠ 3 files > 30d old)
+```
+
+**Also grep skill run-logs** (`.claude/logs/YYYY-MM-DD-*.jsonl`) for the past 7 days:
+- Count `skipped` and `error` entries per skill per step
+- If `morning-plan` has 5+ `skipped` entries on the Slack step in the last 7 days, surface: `[ASK] Slack integration has silently skipped 5 times this week. Refresh tokens?`
+- If any skill has `error` entries, surface: `[ASK] <skill> errored on <step> N times this week. Investigate?`
+- This catches silent degradation that preflight misses (e.g., a step that swallows its own exceptions).
+
+If everything is green, print the one-line footer only (`Systems Health: all green`). Don't itemize — that's the week's signal-to-noise compromise.
+
 ### 2. Determine Week Range
 
 Use the current ISO week (Monday to Sunday). Calculate:

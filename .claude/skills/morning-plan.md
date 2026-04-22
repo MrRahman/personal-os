@@ -322,23 +322,72 @@ STRATEGIC QBR Tuesday — Brad expects execution proof. Your slides?
 
 Present Flags immediately after Schedule in the terminal output. If no flags, omit the section entirely.
 
-**Around the Corner (proactive alerts):** After generating Flags, run these 5 checks. Output 0-3 alerts max — skip if nothing is flagged. These are goal-trajectory and coaching-related signals that complement the task-level Flags above.
+**Around the Corner (proactive alerts):** After generating Flags, run these checks. Output **max 2 alerts** per morning (tight budget prevents nudge fatigue — see `feedback_proactive_merge_prompts.md` reasoning). Skip if nothing rises to this bar.
 
-1. **Milestone lookahead** — For each goal milestone due within 21 days, check if there's meaningful progress (related Todoist tasks completed, lead indicators trending). If a milestone has <50% progress with <3 weeks remaining, alert: "[Goal]: [milestone] due [date] — [progress assessment]. [Specific suggestion]."
-2. **Lead indicator streak detection** — For each lead indicator in the quarterly goals file, check the last 3 weekly reviews. If an indicator was missed 3+ consecutive weeks, alert: "[Indicator]: missed [N] consecutive weeks (target: [X]). Consider `/coach [persona]`."
-3. **Coaching commitment follow-up** — If a coaching note exists from the last 14 days, check each commitment against Todoist tasks and calendar events. If a commitment has no matching task or block, alert: "Coaching follow-up: You committed to [action] ([date] session). No task or calendar block found."
-4. **Cross-goal energy alert** — If daily note Check-In scores (energy, mood) have trended down for 3+ consecutive days AND any health-related lead indicator (exercise, sleep, meditation) was missed this week, alert: "Energy trending down [N] days. [missed indicator] might be the bottleneck."
-5. **Calendar-goal conflict** — If the next 7 days have >25 hours of meetings AND a goal milestone is due within 14 days, alert: "Heavy week ahead ([X]h meetings) + [milestone] due [date]. Where's the focus time?"
+**First, read the drift cache** (`.claude/state/drift.json`, populated by the `sessionstart-drift.sh` hook at SessionStart):
+- `releases.should_surface` → if true, surface an `[ASK]` release proposal (see Release Drift section below)
+- `memory.should_surface` → if true, surface `[TODO]` memory-audit reminder (max once per week)
+- `goals`, `waiting_on` → enriched in this step (drift-check left placeholders)
+
+**Goal-trajectory checks (enrich drift cache `.goals`):**
+
+1. **Stale goals** — any goal in `Goals/YYYY-QX.md` with empty `This Week` + no milestone check-in in 14+ days. Surface `[TODO]` with specific goal name.
+2. **Milestone lookahead** — For each goal milestone due within 21 days, check for meaningful progress. If <50% progress with <3 weeks remaining, alert with specific suggestion.
+3. **Lead indicator streak** — Missed 3+ consecutive weeks on a lead indicator → `[TODO] Consider /coach <persona>`.
+4. **Coaching commitment follow-up** — Coaching note in last 14 days with a commitment that has no matching Todoist task or calendar block → `[TODO]`.
+5. **Cross-goal energy alert** — Check-In scores (energy, mood) trending down 3+ days AND health-related lead indicator missed this week → `[TODO]`.
+
+**Waiting-on aging (enrich drift cache `.waiting_on`):** Query Todoist for tasks with `waiting-on` label. Any task with no activity in 3+ days → `[TODO]` for follow-up.
+
+**Release drift proposal (when `releases.should_surface` is true):**
+
+Read `releases` from drift.json. Format an inline `[ASK]` with a draft `gh release create` command:
+
+```
+[ASK] Release drift: 4 commits unreleased since v1.8 (2 feat, 1 fix, 1 chore).
+Suggested: v1.9. Draft notes:
+  ## Highlights
+  - feat: add drift-check caching to skills
+  - feat: add skill observability logs
+  - fix: handle missing Goals file gracefully
+  - chore: update README
+
+Run release now? (y / adjust / skip)
+```
+
+On `y`: execute `gh release create v1.9 --title "..." --notes "..."` (never `git tag` alone — see `memory/feedback_github_releases.md`). Surface dismissal options:
+- `snooze 7d` — suppress release drift alert for 7 days; write to `memory/nudge_feedback.jsonl`
+- `not-applicable` — commits aren't release-worthy (doc-only, WIP). Skip permanently for these commits; re-arm after next release.
+- `wrong-heuristic` — user thinks 3 commits is too aggressive. Write feedback for next monthly-review tuning.
+
+**Dismissal mechanics** — append to `memory/nudge_feedback.jsonl`:
+```json
+{"timestamp": "2026-04-22T09:00:00Z", "source": "morning-plan", "alert_type": "release_drift", "dismissed_as": "wrong-heuristic", "context": {"count": 3, "since": "v1.8"}}
+```
+Monthly-review reads this file and proposes threshold tuning.
+
+**Budget: max 2 surfaced per morning, in priority order:**
+1. Release drift (if surfacing)
+2. Cross-goal energy alert (health-critical)
+3. Stale goals (quarterly trajectory)
+4. Waiting-on aging (blocking others)
+5. Coaching follow-up
+6. Memory drift (lowest priority — quarterly cadence)
 
 Format in the terminal output:
 ```
 ## Around the Corner
-- Career milestone at risk: 0/3 external conversations with 7 weeks to deadline. Schedule one this week.
-- Wellness pattern: Energy down 3 days + 0 meditation sessions this month. Sleep or anxiety may be upstream.
-- Coaching follow-up: You committed to booking a financial advisor (4/6 session). No task or calendar block found.
+[ASK] Release drift: 4 commits unreleased since v1.8. Suggested: v1.9. Release now? (y / adjust / snooze 7d / not-applicable / wrong-heuristic)
+[TODO] Career milestone at risk: 0/3 external conversations with 7 weeks to deadline.
 ```
 
 Present "Around the Corner" immediately after Flags in the terminal output. If no alerts triggered, omit the section entirely — don't add noise.
+
+**Agent staging surfacing (v2.0+, ready for wiring):** If any project's `.claude/staging/` directory has pending content (see Batch 4 / `/dispatch` skill), prepend a high-priority `[ASK]` BEFORE the drift alerts:
+```
+[ASK] 3 projects have pending agent output to review (personal-brand-system: 2 units; job-search: 1). Review now? (yes / skip until tomorrow)
+```
+This surfaces above the 2-item budget because staged work review is a user-stated hard requirement (see `feedback_proactive_merge_prompts.md`).
 
 **Meeting → Project linking:** When creating meeting notes in Step 7, check if each meeting's title/attendees/description match an active project. If so, pre-populate the `project:` frontmatter field: `project: "[[Projects/slug]]"`.
 

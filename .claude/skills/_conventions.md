@@ -54,3 +54,31 @@ Do not reorder. Add a `<!-- Output order: ... -->` comment at the top of each sk
 ## When to introduce a new skill
 
 Default: don't. Consolidate into existing skills or into a shared utility (`mcp-servers/*.sh`). Per `memory/feedback_fewer_skills.md`, user has limited bandwidth to remember command surface. Only add a new slash command for a genuinely distinct lifecycle with its own budget + safety contract (e.g., `/dispatch` in v2.0 — agent orchestration is its own thing).
+
+## Run logs (v1.9+)
+
+Every skill invocation writes a structured run log to `.claude/logs/YYYY-MM-DD-<skill>.jsonl` (append-only JSONL). Captures silent degradation — a step that catches its own exception and skips is invisible to the user, but weekly-review can grep logs and surface the pattern.
+
+**Schema per log line:**
+```json
+{
+  "timestamp": "2026-04-22T09:15:00-07:00",
+  "skill": "morning-plan",
+  "step": "Slack triage",
+  "status": "ok",      // or "skipped", "error"
+  "reason": "",         // optional; use for skip/error explanation
+  "ms": 1240            // optional; duration in ms
+}
+```
+
+**When to emit:**
+- `ok` — every major data-gather step (calendar fetch, email triage, etc.) and every write step (Obsidian writes, Notion patches, Todoist task creation).
+- `skipped` — any step intentionally bypassed (preflight says the service is down; user answered "skip"; precondition not met).
+- `error` — caught exception. Must include `reason`.
+
+**When weekly-review greps these:**
+- `morning-plan` step `Slack` with `status: skipped` ≥5× in the last 7 days → `[ASK]` refresh Slack tokens
+- `reflect` step `sync-meetings` with `status: error` ≥2× → `[ASK]` investigate
+- Budget: surface at most 2 observability alerts per weekly-review to keep noise down.
+
+**Implementation:** append a JSON line to the log file. Shell: `echo "$(jq -nc ...)" >> "$CLAUDE_PROJECT_DIR/.claude/logs/$(date +%Y-%m-%d)-<skill>.jsonl"`. In-skill: use the same one-liner; Claude should emit it silently alongside actual work.
