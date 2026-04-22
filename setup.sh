@@ -3,6 +3,10 @@ set -euo pipefail
 
 # Personal OS — Setup Script
 # Run this after cloning to configure your instance.
+#
+# Subcommands:
+#   ./setup.sh             Full interactive setup (first-time)
+#   ./setup.sh --verify    Non-interactive verification of hooks + launchd + state dirs
 
 REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
 BOLD='\033[1m'
@@ -11,6 +15,112 @@ GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 RED='\033[0;31m'
 NC='\033[0m'
+
+# ─────────────────────────────────────────────
+# --verify subcommand (v1.8+)
+# ─────────────────────────────────────────────
+
+if [ "${1:-}" = "--verify" ]; then
+  echo ""
+  echo -e "${BOLD}Personal OS — Setup Verify${NC}"
+  echo ""
+
+  FAIL_COUNT=0
+  HOSTNAME=$(uname -n)
+
+  # 1. Check .mcp.json exists
+  if [ -f "$REPO_DIR/.mcp.json" ]; then
+    echo -e "  ${GREEN}✓${NC} .mcp.json present"
+  else
+    echo -e "  ${RED}✗${NC} .mcp.json missing — run ./setup.sh (without --verify) to configure"
+    FAIL_COUNT=$((FAIL_COUNT + 1))
+  fi
+
+  # 2. Check state + hooks + logs dirs
+  for dir in ".claude/state" ".claude/hooks" ".claude/logs"; do
+    if [ -d "$REPO_DIR/$dir" ]; then
+      echo -e "  ${GREEN}✓${NC} $dir present"
+    else
+      echo -e "  ${YELLOW}⚠${NC} $dir missing — creating..."
+      mkdir -p "$REPO_DIR/$dir"
+      echo -e "  ${GREEN}✓${NC} $dir created"
+    fi
+  done
+
+  # 3. Check hook scripts are executable
+  for hook in "sessionstart-health.sh" "sessionstart-drift.sh"; do
+    if [ -x "$REPO_DIR/.claude/hooks/$hook" ]; then
+      echo -e "  ${GREEN}✓${NC} hook $hook executable"
+    elif [ -f "$REPO_DIR/.claude/hooks/$hook" ]; then
+      echo -e "  ${YELLOW}⚠${NC} hook $hook not executable — fixing..."
+      chmod +x "$REPO_DIR/.claude/hooks/$hook"
+      echo -e "  ${GREEN}✓${NC} fixed"
+    else
+      echo -e "  ${RED}✗${NC} hook $hook missing — check repo state"
+      FAIL_COUNT=$((FAIL_COUNT + 1))
+    fi
+  done
+
+  # 4. Check settings.json has hooks wired
+  if jq -e '.hooks.SessionStart' "$REPO_DIR/.claude/settings.json" >/dev/null 2>&1; then
+    echo -e "  ${GREEN}✓${NC} settings.json wires SessionStart hooks"
+  else
+    echo -e "  ${RED}✗${NC} settings.json missing hook configuration — pull latest from origin/main"
+    FAIL_COUNT=$((FAIL_COUNT + 1))
+  fi
+
+  # 5. Check launchd plist loaded
+  if launchctl list 2>/dev/null | grep -q "com.personalos.otter-cookie-refresh"; then
+    echo -e "  ${GREEN}✓${NC} launchd: otter-cookie-refresh loaded"
+  else
+    PLIST="$HOME/Library/LaunchAgents/com.personalos.otter-cookie-refresh.plist"
+    if [ -f "$PLIST" ]; then
+      echo -e "  ${YELLOW}⚠${NC} launchd plist present but not loaded — loading..."
+      launchctl load "$PLIST"
+      echo -e "  ${GREEN}✓${NC} loaded"
+    else
+      echo -e "  ${YELLOW}⚠${NC} launchd plist not installed. Otter cookie won't auto-refresh."
+      echo -e "       To install: cp $REPO_DIR/launchd/com.personalos.otter-cookie-refresh.plist $PLIST && launchctl load $PLIST"
+    fi
+  fi
+
+  # 6. Check git pre-push hook
+  if [ -x "$REPO_DIR/.git/hooks/pre-push" ]; then
+    echo -e "  ${GREEN}✓${NC} git pre-push secret scanner installed"
+  else
+    echo -e "  ${YELLOW}⚠${NC} git pre-push hook missing. Secrets won't be scanned on push."
+  fi
+
+  # 7. Machine identity tracking
+  KNOWN_MACHINES="$REPO_DIR/memory/known_machines.json"
+  if [ -f "$KNOWN_MACHINES" ]; then
+    if jq -e --arg h "$HOSTNAME" '.machines | index($h)' "$KNOWN_MACHINES" >/dev/null 2>&1; then
+      echo -e "  ${GREEN}✓${NC} machine '$HOSTNAME' already registered"
+    else
+      echo -e "  ${YELLOW}⚠${NC} new machine detected: '$HOSTNAME'"
+      echo -e "       Adding to known_machines.json..."
+      TMP=$(mktemp)
+      jq --arg h "$HOSTNAME" '.machines += [$h] | .machines |= unique' "$KNOWN_MACHINES" > "$TMP"
+      mv "$TMP" "$KNOWN_MACHINES"
+      echo -e "  ${GREEN}✓${NC} registered"
+    fi
+  fi
+
+  # 8. Run healthcheck
+  echo ""
+  echo -e "${BOLD}Running healthcheck...${NC}"
+  "$REPO_DIR/mcp-servers/healthcheck.sh" || true
+
+  echo ""
+  if [ $FAIL_COUNT -eq 0 ]; then
+    echo -e "${GREEN}${BOLD}Setup verified — all hooks + state dirs + plists in place.${NC}"
+  else
+    echo -e "${RED}${BOLD}$FAIL_COUNT issue(s) found. Fix and re-run ./setup.sh --verify${NC}"
+    exit 1
+  fi
+  echo ""
+  exit 0
+fi
 
 echo ""
 echo -e "${BOLD}Personal OS — Setup${NC}"

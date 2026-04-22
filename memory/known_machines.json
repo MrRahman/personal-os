@@ -1,0 +1,6 @@
+{
+  "machines": [
+    "sulaimanrahman-LF346-MBP"
+  ],
+  "note": "Tracks hostnames Personal OS has been set up on. Populated by setup.sh --verify on first run per machine. Used by SessionStart hook to surface [ASK] when a new machine is detected without verified hooks."
+}
