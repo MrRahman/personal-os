@@ -172,12 +172,17 @@ Also fetch any tasks due in the next 3 days for awareness.
 
 **Gmail (Personal):** Use `manage_email(operation: "search")` via the `google-personal` MCP server to find personal messages since the last run. Limit to 10 messages. For actionable threads, use `manage_email(operation: "read")` to get full context. Tag all results `[Personal]`. Apply the same action detection categories from Step 4a to personal email threads. Personal email actions route to Todoist "Personal" project.
 
-**Slack — Mentions:** Use `slack_search_public_and_private(response_format="concise", include_context=false)` to find mentions and DMs since the last run. Only fetch full context for items that appear actionable. Default to `after:YYYY-MM-DD` using yesterday's date. Limit to 10 results.
+**Slack — Priority-Channel Mentions (single scoped call, graceful on failure):**
 
-**Slack — Saved for Later:** Use `slack_search_public_and_private(query="is:saved", sort="timestamp", sort_dir="desc", limit=20, include_context=false, response_format="concise")` to find messages the user marked "Save for later." Filter to items saved in the last 7 days. For each:
-- Extract: sender name, channel/DM context, message text (truncated to 100 chars), permalink
-- Dedup: search Todoist for existing tasks containing the permalink in their description. Skip matches.
-- These will be presented in the Inbox section for user to confirm as Todoist tasks.
+Run exactly **ONE** Slack MCP call per morning-plan. Never more. Legitimate client patterns (scoped mentions, `conversations_unreads`) are tolerated by Ripple Enterprise Grid anti-abuse; unscoped searches and `is:saved` queries get flagged as third-party-client activity. See `memory/project_slack_auth_fix.md` Problem B.
+
+1. **Read the priority-channel list** from `CLAUDE.md` (section `## Slack Priority Channels`). If the list is missing or empty, skip this entire Slack block with a single line: `⚠ Slack: priority-channel list not configured — run setup (see CLAUDE.md). Mentions section skipped.`
+2. **Construct the query:** `(to:me OR @Sulaiman) in:#priority1 in:#priority2 … after:YYYY-MM-DD` using yesterday's date (or last run date, if known). Include every channel from the whitelist, space-separated.
+3. **Call once, concise, no context:** `slack_search_public_and_private(query=<above>, after:<last_run>, limit=15, response_format="concise", include_context=false)`. If the MCP exposes `conversations_unreads`, prefer it — native client pattern, lower detection signal. Confirm at runtime; if not available, fall back to the scoped search above.
+4. **Graceful degradation — REQUIRED:** wrap the call. If it errors (401, timeout, network, any exception), print exactly: `⚠ Slack: MCP unavailable — mentions section skipped. Todoist-captured actions from Quick Add still surfaced in Must Do / Respond.` and continue the morning plan. Do NOT retry. Do NOT abort. Do NOT ask the user to fix Slack mid-flow.
+5. **Cap at 15 results.** Only fetch full context (via `slack_read_thread`) for items classified as actionable in Step 4a — never proactively.
+
+**REMOVED:** `is:saved` / "Save for Later" scraping. The behavioral shift is documented in `memory/feedback_slack_todoist_capture.md` — user now captures actionable Slack items via Todoist Quick Add (Cmd+Shift+A, paste Slack permalink) during the day. Those tasks surface through the Todoist query in Step 4 (not through any Slack API call). `is:saved` was unreliable anyway (see `memory/feedback_slack_saved_later.md`) and its scraping pattern is the primary Enterprise Grid detection trigger.
 
 **Notion:** Use `API-query-data-source` with the Data Source ID from CLAUDE.md to count items where Status = "Action Items" (items with pending Todoist tasks from triage). Use `{ "property": "Status", "select": { "equals": "Action Items" } }` (Status is a **select** field). Use `page_size: 1` — you only need the count from the response's `has_more` flag, not full page content.
 
@@ -466,13 +471,11 @@ LIFT          2 of 3-4 sessions this week [Physical Health]
 [Only show indicators behind target or time-sensitive. Max 4 lines. Omit entirely if all on track.
 Data from Lead Indicator Pulse in Step 4. Use UPPERCASE PREFIX format matching Flags.]
 
-## Slack Later (X new)
-  Check Slack app — X saved items pending triage
-[Count only, no per-item listing in terminal]
-
 ---
 Should Do (N) + Coming Up + Free Slots → Obsidian | Readwise: X | Otter: X
 ```
+
+Note: The "Slack Later" terminal section was removed in the Slack redesign. Actionable Slack items are now captured during the day via Todoist Quick Add (see `memory/feedback_slack_todoist_capture.md`) and surface in Must Do / Respond through the Todoist query — no Slack API call needed. Slack Save for Later is reserved for read-later content only; the user processes that in-app on their own time. See `CLAUDE.md` → `## Slack MCP` for the full workflow.
 
 **Marker usage rules** (apply across all output above):
 - `[ASK]` tag prefixes any line that needs the user to respond now (e.g., action-item confirmation prompts, uncaptured-action dismissal, deep-mode opt-in).
@@ -489,7 +492,7 @@ The full plan written to `~/Documents/PersonalOS/Daily/YYYY-MM-DD.md` includes a
 - `## Active Projects` — project name, target date, status, today's related meeting
 - `## Free Slots` — gaps of 30+ minutes with suggested use
 - `## Coming Up (Next 3 Days)` — upcoming deadlines and events
-- `## Inbox & Notifications` — full Respond/FYI/Slack Saved listing with per-item confirm
+- `## Inbox & Notifications` — full Respond/FYI listing from Gmail + iMessage + priority-channel Slack mentions (if Slack available). No "Slack Saved" subsection — that capture mechanism was retired; see `memory/feedback_slack_todoist_capture.md`.
 - `## Uncaptured Actions` — table with Source/From/Ask/Proposed Task
 - `## Waiting On` — table with Who/What/Age/Source
 - `## KB Sync` — Captured/Triaged/Resources counts and actionable items
@@ -507,11 +510,13 @@ If no → skip to Step 7 with vault-based Suggested Topics only.
 
 Only runs if the user confirms. For each unique attendee from Step 4c:
 
-1. **Slack search**: `slack_search_public_and_private` for messages involving this person (last 7 days). Look for unresolved threads — open questions, pending decisions, no clear conclusion.
-2. **Gmail search**: `gmail_search_messages` for threads with this person's email (last 7 days). For actionable threads, use `gmail_read_thread` to get full context.
-3. **Stale thread detection**: Flag any thread involving you that went quiet 3+ days without resolution.
+1. **Slack search (scoped + graceful):** `slack_search_public_and_private` for messages involving this person (last 7 days), scoped to priority channels from `CLAUDE.md` → `## Slack Priority Channels`. Query format: `from:@person in:#priority1 in:#priority2 … after:YYYY-MM-DD`. **Never run an unscoped search** — that's the detection-trigger pattern (see `memory/project_slack_auth_fix.md` Problem B). If priority-channel list is empty or Slack MCP fails (401, timeout, any exception), skip Slack for this attendee silently; do not retry. Gmail + vault lookups still run.
+2. **Gmail search**: `gmail_search_messages` for threads with this person's email (last 7 days). For actionable threads, use `gmail_read_thread` to get full context. Gmail is reliable — always run.
+3. **Stale thread detection**: Flag any Gmail thread (or priority-channel Slack thread if step 1 succeeded) involving you that went quiet 3+ days without resolution.
 
 Cache results by person name alongside Step 4c results. These will enrich Suggested Topics in Step 7.
+
+**API budget:** Deep Mode adds up to 2 API calls per attendee (1 Slack + 1 Gmail). For meetings with 5+ attendees, warn the user before running: "Deep Mode will run ~{N} API calls. Continue? (y/n)". This limit protects against rate-limit + detection-risk surges.
 
 Use 12-hour time format for display (e.g., 9:00 AM). Keep descriptions concise — one line per item.
 

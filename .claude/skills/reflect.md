@@ -124,10 +124,10 @@ Check whether uncaptured actions surfaced by this morning's `/morning-plan` were
 
 1. **Read today's daily note** (`~/Documents/PersonalOS/Daily/YYYY-MM-DD.md`) and find the Uncaptured Actions section from the morning plan.
 2. **For each uncaptured action that was surfaced**, check for evidence of follow-through:
-   - **Todoist**: Search for tasks matching keywords from the proposed task title. If found → "Task created."
-   - **Slack**: Search for replies or messages from the user related to this action (after morning-plan timestamp). If found → "Resolved via Slack."
+   - **Todoist**: Search for tasks matching keywords from the proposed task title. If found → "Task created." Todoist is the authoritative source for "what was actioned" — if a Slack-origin item became a task (via Todoist Quick Add or confirmation in morning-plan), it shows up here.
    - **Gmail**: Search sent folder for replies to the original thread. If found → "Resolved via email."
    - **Meeting notes**: Check today's meeting notes for related action items or decisions. If found → "Addressed in [meeting name]."
+   - **Do NOT search Slack** for evidence — action items captured via Todoist Quick Add already surface in the Todoist check above. Searching Slack for every uncaptured item is high-API-cost / low-signal and risks triggering Enterprise Grid third-party-client detection. See `memory/feedback_slack_todoist_capture.md`.
 3. **Classify each action** as:
    - **Resolved**: Clear evidence of follow-through found
    - **Task created, not done**: Todoist task exists but still open (this is normal — it may not be due today)

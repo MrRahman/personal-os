@@ -123,6 +123,26 @@ PersonalOS/
 | iMessage | stdio MCP (local) | Built by setup.sh, requires Full Disk Access |
 | Otter.ai | stdio MCP (Python) | Session cookie in .mcp.json (optional) |
 
+## Troubleshooting
+
+### Otter.ai tools returning 401
+The Otter MCP server reads `OTTER_SESSION_COOKIE` from `.mcp.json` **once at session spawn**. Mid-session cookie refresh won't take effect until Claude Code restarts — `/mcp reconnect` does not help.
+
+```bash
+# Diagnose: is the cookie in .mcp.json still valid?
+python3 mcp-servers/refresh-otter-cookie.py --validate
+```
+
+- **Prints "Valid."** → the MCP process is holding a stale cookie. Exit Claude Code fully and restart.
+- **Prints "Expired or invalid."** → refresh it, then restart:
+  ```bash
+  # Log into otter.ai in Chrome first, then:
+  python3 mcp-servers/refresh-otter-cookie.py
+  # Then exit Claude Code and restart.
+  ```
+
+The SessionStart hook at `~/.claude/hooks/otter-cookie-preflight.sh` auto-validates on every new session and prints a warning banner if a refresh happened. `launchd` runs the same refresh every Monday and Thursday at 9 AM as a safety net. See [CLAUDE.md](CLAUDE.md) → "Otter Cookie Lifecycle" for the full picture.
+
 ## Customization
 
 ### Todoist Labels

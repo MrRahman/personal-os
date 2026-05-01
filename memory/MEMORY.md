@@ -8,7 +8,8 @@
 - [feedback_reflect_checkin.md](feedback_reflect_checkin.md) — Never write Check-In scores, Highlight, or Adjustments for the user — always prompt and wait
 - [feedback_sync_meetings_in_reflect.md](feedback_sync_meetings_in_reflect.md) — Auto-run /sync-meetings inside /reflect without asking — user considers it part of the flow
 - [feedback_completed_tasks.md](feedback_completed_tasks.md) — Always fetch completed tasks with correct params during /reflect — never estimate from incomplete list
-- [feedback_slack_saved_later.md](feedback_slack_saved_later.md) — Slack is:saved returns ALL bookmarks, not just "Later" items with reminders — API limitation
+- [feedback_slack_saved_later.md](feedback_slack_saved_later.md) — Slack is:saved query retired from daily skills (semantic mismatch + detection-trigger on Enterprise Grid)
+- [feedback_slack_todoist_capture.md](feedback_slack_todoist_capture.md) — Capture actionable Slack messages via Todoist Quick Add (paste permalink); Slack Save for Later = read-later only
 - [feedback_readwise_capture.md](feedback_readwise_capture.md) — Always execute Readwise→Notion capture during morning-plan, never just report counts
 - [feedback_notion_triage_write.md](feedback_notion_triage_write.md) — Notion API-patch-page during /morning-plan triage is synchronous, not deferred — Obsidian notes ≠ Notion updated
 - [project_release_strategy.md](project_release_strategy.md) — Semver: major=milestones, minor=feature batches, patch=fixes. Batch enhancements before releasing.
@@ -27,3 +28,5 @@
 - [feedback_proactive_merge_prompts.md](feedback_proactive_merge_prompts.md) — Staged agent work must be proactively surfaced at SessionStart / morning-plan / weekly-review. Never silent.
 - [feedback_fewer_skills.md](feedback_fewer_skills.md) — Prefer fewer new slash commands; consolidate into existing skills or shared utilities.
 - [project_proactive_system.md](project_proactive_system.md) — v1.9+ proactive surfacing: drift types, budgets, anti-nag tuning, observability. Where the config lives.
+- [project_slack_auth_fix.md](project_slack_auth_fix.md) — Two-problem Slack model: Problem A (token extraction, solved via Playwright profile) vs Problem B (third-party-client detection, mitigated by API-surface reduction + UA masking; xoxp is the permanent fix)
+- [feedback_design_question_style.md](feedback_design_question_style.md) — When user says "take time and think this through," propose one reasoned plan with tradeoffs in prose; don't ask multi-choice questions that pass design work back to them

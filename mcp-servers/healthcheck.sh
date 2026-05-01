@@ -115,7 +115,7 @@ if [ -n "$SLACK_XOXC" ] && [ -n "$SLACK_XOXD" ]; then
     check "slack" "false" "ok" ""
   else
     ERR=$(echo "$RESP" | jq -r '.error // "unknown"')
-    check "slack" "false" "fail" "Auth failed ($ERR). Slack tokens rotated — refresh xoxc + xoxd in .mcp.json from Slack browser session."
+    check "slack" "false" "fail" "Auth failed ($ERR). Run: ~/.local/venvs/slack-refresh/bin/python mcp-servers/refresh-slack-tokens.py (add --login if the dedicated profile needs re-auth), then restart Claude Code."
   fi
 else
   check "slack" "false" "skip" "Slack not configured"

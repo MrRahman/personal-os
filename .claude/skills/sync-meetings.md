@@ -212,18 +212,31 @@ For each person mentioned across all processed transcripts:
   - Add the meeting to `## Meeting History`
   - Leave other fields empty for manual fill
 
-### 7. Slack Cross-Check (optional, if Slack available)
+### 7. Slack Cross-Check (opt-in only, scoped to priority channels)
 
-Before presenting action items, cross-reference them against recent Slack activity to avoid creating tasks for things already resolved:
+**Default: skip.** Slack cross-check is opt-in per run because every Slack API call risks triggering Enterprise Grid third-party-client detection (see `memory/project_slack_auth_fix.md` Problem B). The main workflow does not depend on it — Todoist state from Step 4 Todoist search is authoritative for "already resolved."
 
-For each action item owned by the user:
-1. Search Slack using `slack_search_public_and_private` with keywords from the action item + attendee names, filtered to `after:TARGET_DATE`
-2. If a matching Slack message indicates the action was completed (e.g., "sent", "done", "shared", "updated"), mark it as **resolved** and note the Slack evidence
-3. If Slack shows additional context (e.g., someone responded with more info), append that context to the action item description
+**Prompt the user once, explicitly:**
 
-Present resolved items separately: "These action items appear resolved based on Slack activity: [list with evidence]"
+```
+[ASK] Cross-check action items against Slack? Adds 1 API call per action item
+owner in priority channels only. Skip recommended unless you specifically saw
+someone resolve something in Slack that this skill might duplicate.
+(y / skip — default skip)
+```
 
-Skip this step if Slack is unavailable.
+If the user skips (default): proceed to Step 8 with action items as-extracted. No Slack calls.
+
+If the user opts in, for each action item owned by the user:
+1. Read the priority-channel list from `CLAUDE.md` (under `## Slack Priority Channels`). If no list is configured, tell the user and skip Slack cross-check.
+2. Search Slack using `slack_search_public_and_private` with the query scoped to priority channels only: `in:#priority1 in:#priority2 ... <keywords from action> after:TARGET_DATE`. Never run an unscoped search (broad search is the detection-trigger pattern).
+3. Wrap the call in graceful degradation: if the Slack call errors (401, timeout, anything), print `[Slack unavailable — cross-check skipped. Action items presented as-extracted from transcript.]` and continue to Step 8. Do not retry.
+4. If a matching Slack message indicates the action was completed (e.g., "sent", "done", "shared", "updated"), mark it as **resolved** and note the Slack evidence.
+5. If Slack shows additional context, append that context to the action item description.
+
+Present resolved items separately: "These action items appear resolved based on Slack activity: [list with evidence]".
+
+**Why this changed:** previously this step ran implicitly on every transcript sync. After Problem B was identified (Enterprise Grid signed user out mid-session on 2026-04-22), Slack API surface is minimized. Todoist Quick Add is the canonical action-capture mechanism now; if an action already landed in Todoist during the day, the dedup search in Step 8 will find it without any Slack call.
 
 ### 8. Todoist (optional, user-confirmed)
 

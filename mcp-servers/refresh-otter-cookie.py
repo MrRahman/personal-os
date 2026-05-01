@@ -3,10 +3,10 @@
 
 Reads the encrypted 'sessionid' cookie for .otter.ai from Chrome's
 SQLite DB, decrypts it using the macOS Keychain, and updates
-otter-wrapper.sh.
+the project's .mcp.json OTTER_SESSION_COOKIE env value.
 
 Usage:
-    python3 refresh-otter-cookie.py                        # extract + update wrapper
+    python3 refresh-otter-cookie.py                        # extract + update .mcp.json
     python3 refresh-otter-cookie.py --list                 # show all otter.ai cookies
     python3 refresh-otter-cookie.py --dry-run              # extract but don't write
     python3 refresh-otter-cookie.py --validate             # test if current cookie works
@@ -30,6 +30,7 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
 CHROME_DIR = Path.home() / "Library/Application Support/Google/Chrome"
 WRAPPER_SCRIPT = Path(__file__).parent / "otter-wrapper.sh"
+MCP_JSON = Path(__file__).resolve().parent.parent / ".mcp.json"
 OTTER_DOMAIN = "otter.ai"
 COOKIE_NAME = "sessionid"
 OTTER_USER_URL = "https://otter.ai/forward/api/v1/user"
@@ -248,11 +249,29 @@ def extract_cookie(profile: str | None = None) -> str:
 
 
 def update_wrapper(cookie: str) -> bool:
-    """Replace the session cookie in otter-wrapper.sh. Returns True if changed."""
+    """Replace the session cookie in .mcp.json. Returns True if changed.
+
+    Historically lived in otter-wrapper.sh; migrated to .mcp.json env. Falls
+    back to the wrapper if .mcp.json has no OTTER_SESSION_COOKIE entry (for
+    backwards compat).
+    """
+    if MCP_JSON.exists():
+        content = MCP_JSON.read_text()
+        if re.search(r'"OTTER_SESSION_COOKIE"\s*:\s*"[^"]*"', content):
+            new_content = re.sub(
+                r'"OTTER_SESSION_COOKIE"\s*:\s*"[^"]*"',
+                f'"OTTER_SESSION_COOKIE": "{cookie}"',
+                content,
+            )
+            if new_content == content:
+                return False
+            MCP_JSON.write_text(new_content)
+            return True
+
     content = WRAPPER_SCRIPT.read_text()
     if not re.search(r'OTTER_SESSION_COOKIE="[^"]*"', content):
         raise RuntimeError(
-            f"Could not find OTTER_SESSION_COOKIE in {WRAPPER_SCRIPT}"
+            f"Could not find OTTER_SESSION_COOKIE in {MCP_JSON} or {WRAPPER_SCRIPT}"
         )
     new_content = re.sub(
         r'export OTTER_SESSION_COOKIE="[^"]*"',
@@ -290,7 +309,13 @@ def notify(title: str, message: str):
 
 
 def get_current_cookie() -> str | None:
-    """Read the current cookie from the wrapper script."""
+    """Read the current cookie from .mcp.json, falling back to the wrapper."""
+    if MCP_JSON.exists():
+        m = re.search(
+            r'"OTTER_SESSION_COOKIE"\s*:\s*"([^"]+)"', MCP_JSON.read_text()
+        )
+        if m:
+            return m.group(1)
     if not WRAPPER_SCRIPT.exists():
         return None
     m = re.search(
