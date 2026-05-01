@@ -84,6 +84,58 @@ if [ "${1:-}" = "--verify" ]; then
     fi
   fi
 
+  # 5b. Slack token refresh: launchd + venv + global hook
+  if launchctl list 2>/dev/null | grep -q "com.personalos.slack-token-refresh"; then
+    echo -e "  ${GREEN}✓${NC} launchd: slack-token-refresh loaded"
+  else
+    SLACK_PLIST="$HOME/Library/LaunchAgents/com.personalos.slack-token-refresh.plist"
+    if [ -f "$SLACK_PLIST" ]; then
+      echo -e "  ${YELLOW}⚠${NC} slack-token-refresh plist present but not loaded — loading..."
+      launchctl load "$SLACK_PLIST"
+      echo -e "  ${GREEN}✓${NC} loaded"
+    else
+      echo -e "  ${YELLOW}⚠${NC} slack-token-refresh plist not installed. Slack tokens won't auto-refresh."
+    fi
+  fi
+
+  SLACK_VENV="$HOME/.local/venvs/slack-refresh/bin/python"
+  if [ -x "$SLACK_VENV" ]; then
+    if "$SLACK_VENV" -c "import playwright" >/dev/null 2>&1; then
+      echo -e "  ${GREEN}✓${NC} Slack refresh venv present with Playwright"
+    else
+      echo -e "  ${YELLOW}⚠${NC} Slack refresh venv exists but Playwright missing"
+      echo -e "       Run: $HOME/.local/venvs/slack-refresh/bin/pip install playwright && $HOME/.local/venvs/slack-refresh/bin/playwright install chromium"
+    fi
+  else
+    echo -e "  ${YELLOW}⚠${NC} Slack refresh venv missing. Slack tokens can't auto-refresh."
+    echo -e "       One-time setup:"
+    echo -e "         python3 -m venv ~/.local/venvs/slack-refresh"
+    echo -e "         ~/.local/venvs/slack-refresh/bin/pip install playwright"
+    echo -e "         ~/.local/venvs/slack-refresh/bin/playwright install chromium"
+    echo -e "         ~/.local/venvs/slack-refresh/bin/python $REPO_DIR/mcp-servers/refresh-slack-tokens.py --login"
+  fi
+
+  if [ -x "$HOME/.claude/hooks/slack-token-preflight.sh" ]; then
+    echo -e "  ${GREEN}✓${NC} global hook slack-token-preflight.sh installed"
+  else
+    echo -e "  ${YELLOW}⚠${NC} global hook slack-token-preflight.sh missing at ~/.claude/hooks/"
+  fi
+
+  # 5c. Project refresh launchd (v2.1+) — pulls live repo state into Obsidian Project notes daily
+  if launchctl list 2>/dev/null | grep -q "com.personalos.project-refresh"; then
+    echo -e "  ${GREEN}✓${NC} launchd: project-refresh loaded (daily 7:55am)"
+  else
+    PROJECT_REFRESH_PLIST="$HOME/Library/LaunchAgents/com.personalos.project-refresh.plist"
+    if [ -f "$PROJECT_REFRESH_PLIST" ]; then
+      echo -e "  ${YELLOW}⚠${NC} project-refresh plist present but not loaded — loading..."
+      launchctl load "$PROJECT_REFRESH_PLIST"
+      echo -e "  ${GREEN}✓${NC} loaded"
+    else
+      echo -e "  ${YELLOW}⚠${NC} project-refresh plist not installed. Obsidian project notes won't auto-sync recent commits/PRs."
+      echo -e "       To install: cp $REPO_DIR/launchd/com.personalos.project-refresh.plist $PROJECT_REFRESH_PLIST && launchctl load $PROJECT_REFRESH_PLIST"
+    fi
+  fi
+
   # 6. Check git pre-push hook
   if [ -x "$REPO_DIR/.git/hooks/pre-push" ]; then
     echo -e "  ${GREEN}✓${NC} git pre-push secret scanner installed"

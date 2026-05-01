@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.personalos.project-refresh</string>
+
+	<key>ProgramArguments</key>
+	<array>
+		<string>/bin/bash</string>
+		<string>-lc</string>
+		<string>/Users/sulaimanrahman/projects/personal-os/mcp-servers/project-buildout.sh --refresh --all</string>
+	</array>
+
+	<!-- Run daily at 7:55am — 5 min before SessionStart hooks pick up the cache for /morning-plan -->
+	<key>StartCalendarInterval</key>
+	<dict>
+		<key>Hour</key>
+		<integer>7</integer>
+		<key>Minute</key>
+		<integer>55</integer>
+	</dict>
+
+	<key>StandardOutPath</key>
+	<string>/tmp/project-refresh.log</string>
+	<key>StandardErrorPath</key>
+	<string>/tmp/project-refresh.log</string>
+</dict>
+</plist>

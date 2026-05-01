@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
-# project-buildout.sh — v2.0
+# project-buildout.sh — v2.0+
 #
-# Scaffolds v2.0 agent-dispatch frontmatter into existing Obsidian Project notes.
-# Run once per project after user confirms repo paths + context files.
+# Manages Obsidian Project notes for the v2.0 agent-dispatch system:
+#   --audit        List every Projects/*.md and v2.0 frontmatter status
+#   --init         Scaffold v2.0 frontmatter for a project (one-time)
+#   --refresh      (v2.1+) Pull live repo state into managed sections of the note
 #
 # Usage:
 #   ./mcp-servers/project-buildout.sh --audit
@@ -18,6 +20,14 @@
 #         --max-minutes <N>          Default: 15
 #         --context-files <comma-list>    Paths agents should read
 #         --goals <comma-list>       [[Goals/YYYY-QX#Name]] wikilinks
+#
+#   ./mcp-servers/project-buildout.sh --refresh <slug | --all>
+#       Pull live repo state into the project note. Replaces a managed block
+#       between <!-- BEGIN/END:project-buildout-refresh --> markers with:
+#         - Recent Activity (last 10 commits)
+#         - Open PRs (if git_url set)
+#         - Repo README mirror (first 30 lines)
+#       Idempotent. Only acts on projects with non-empty `repo:` frontmatter.
 
 set -u
 
@@ -153,6 +163,118 @@ case "$CMD" in
     mv "$TMP" "$PROJECT_FILE"
 
     echo "✓ Added v2.0 frontmatter to $SLUG"
+    exit 0
+    ;;
+
+  --refresh)
+    [ $# -lt 1 ] && { echo "ERROR: --refresh requires <slug> or --all"; exit 2; }
+    TARGET="$1"
+
+    refresh_project() {
+      local slug="$1"
+      local file="$PROJECTS_DIR/${slug}.md"
+
+      if [ ! -f "$file" ]; then
+        echo "  ✗ $slug: file not found"
+        return 1
+      fi
+
+      # Extract repo from frontmatter (between --- delimiters)
+      local repo
+      repo=$(awk '/^---$/{f++; next} f==1 && /^repo:[ \t]/{sub(/^repo:[ \t]*/,""); gsub(/["'"'"']/,""); print; exit}' "$file")
+
+      if [ -z "$repo" ]; then
+        echo "  ⊘ $slug: no repo (Tier 1) — skipping"
+        return 0
+      fi
+
+      if [ ! -d "$repo" ]; then
+        echo "  ✗ $slug: repo path does not exist ($repo)"
+        return 1
+      fi
+
+      # Build Recent Activity section
+      local activity=""
+      if [ -d "$repo/.git" ]; then
+        activity=$(git -C "$repo" log --pretty=format:'- `%h` %ad — %s' --date=short -10 2>/dev/null || echo "")
+      fi
+      [ -z "$activity" ] && activity="(no commits)"
+
+      # Build Open PRs section (only if git_url present)
+      local git_url
+      git_url=$(awk '/^---$/{f++; next} f==1 && /^git_url:[ \t]/{sub(/^git_url:[ \t]*/,""); gsub(/["'"'"']/,""); print; exit}' "$file")
+      local pr_section=""
+      if [ -n "$git_url" ]; then
+        local owner_repo
+        owner_repo=$(echo "$git_url" | sed -E 's|.*[:/]([^/]+/[^/.]+)(\.git)?$|\1|')
+        local pr_list
+        pr_list=$(gh pr list --repo "$owner_repo" --state open --json number,title,url --jq '.[] | "- [#\(.number)](\(.url)) — \(.title)"' 2>/dev/null || echo "")
+        if [ -n "$pr_list" ]; then
+          pr_section=$'\n\n## Open PRs\n\n'"$pr_list"
+        else
+          pr_section=$'\n\n## Open PRs\n\n(none)'
+        fi
+      fi
+
+      # Build README mirror (first 30 lines)
+      local readme_section=""
+      if [ -f "$repo/README.md" ]; then
+        local readme_content
+        readme_content=$(head -30 "$repo/README.md")
+        readme_section=$'\n\n## Repo README (mirrored)\n\n```markdown\n'"$readme_content"$'\n```'
+      fi
+
+      # Build full managed block
+      local block_start='<!-- BEGIN:project-buildout-refresh -->'
+      local block_end='<!-- END:project-buildout-refresh -->'
+      local now
+      now=$(date +"%Y-%m-%d %H:%M %Z")
+
+      local managed_content
+      managed_content="${block_start}
+<!-- Last refreshed: ${now}. Auto-managed by project-buildout.sh --refresh — DO NOT edit by hand. -->
+
+## Recent Activity
+
+${activity}${pr_section}${readme_section}
+
+${block_end}"
+
+      # Replace block (if markers present) or append at end of file
+      local start_line end_line
+      start_line=$(grep -n "^${block_start}\$" "$file" | head -1 | cut -d: -f1)
+      end_line=$(grep -n "^${block_end}\$" "$file" | head -1 | cut -d: -f1)
+
+      local tmp
+      tmp=$(mktemp)
+      if [ -n "$start_line" ] && [ -n "$end_line" ]; then
+        head -n $((start_line - 1)) "$file" > "$tmp"
+        printf '%s\n' "$managed_content" >> "$tmp"
+        tail -n +$((end_line + 1)) "$file" >> "$tmp"
+      else
+        cat "$file" > "$tmp"
+        echo "" >> "$tmp"
+        printf '%s\n' "$managed_content" >> "$tmp"
+      fi
+      mv "$tmp" "$file"
+
+      echo "  ✓ $slug refreshed"
+      return 0
+    }
+
+    if [ "$TARGET" = "--all" ]; then
+      echo "Refreshing all projects with repo: set..."
+      echo ""
+      for f in "$PROJECTS_DIR"/*.md; do
+        [ -f "$f" ] || continue
+        slug=$(basename "$f" .md)
+        refresh_project "$slug"
+      done
+      echo ""
+      echo "Done."
+    else
+      refresh_project "$TARGET"
+    fi
     exit 0
     ;;
 
