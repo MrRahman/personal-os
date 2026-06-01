@@ -25,13 +25,14 @@ Test access to these services:
 | Google Calendar (Personal) | `manage_calendar(operation: "agenda")` via google-personal MCP | Yes |
 | Todoist | List tasks | Yes |
 | Obsidian vault | Read `~/Documents/PersonalOS/` | Yes |
-| Otter.ai | `otter_list_transcripts` (limit 1) — see Otter cookie diagnosis below | Yes |
-| iMessage | `list_conversations` (limit 1) | Yes |
-| Readwise | `reader_list_documents` (limit 1) | Yes |
+| Otter.ai | `otter_list_transcripts` (limit 1) — see Otter cookie diagnosis below | No — degrade |
+| iMessage | `list_conversations` (limit 1) | No — degrade |
+| Readwise | `reader_list_documents` (limit 1) | No — degrade |
 
-**All services are required.** Preflight output rule (matches `/morning-plan`):
-- If every required service passes: print a single-line footer at the top: `✓ preflight ok (7/7 services + vault)`. Do not itemize.
-- If any required service fails: STOP and print an `[ASK]` prompt with a one-sentence fix (e.g., `[ASK] Otter unreachable — run python3 mcp-servers/refresh-otter-cookie.py + restart Claude Code, then re-run /reflect.`).
+**Required: Calendar (Work + Personal), Todoist, Obsidian vault. Optional — degrade gracefully, NEVER block: Otter, iMessage, Readwise.** Preflight output rule (matches `/morning-plan`):
+- If every required service passes: print a single-line footer: `✓ preflight ok`. Do not itemize. Append any optional service that's down (e.g., `✓ preflight ok — Otter unavailable, transcript sync skipped`).
+- If a *required* service fails: STOP and print an `[ASK]` prompt with a one-sentence fix.
+- If only *optional* services fail: never stop — note what's skipped and proceed. (Phase 0.5: `/reflect` no longer blocks on Otter/iMessage/Readwise.)
 - See CLAUDE.md Google Account Mapping for tool details.
 
 **Otter cookie diagnosis (when `otter_list_transcripts` returns 401):**
@@ -43,49 +44,38 @@ The Otter MCP server reads `OTTER_SESSION_COOKIE` from `.mcp.json` once at sessi
    > The Otter cookie in `.mcp.json` is fresh, but the MCP server process hasn't picked it up. Exit Claude Code fully and restart — `/mcp reconnect` won't help. No refresh needed, just the restart.
 3. **If `--validate` exits non-zero (cookie itself is expired)** → refresh is needed. Stop and tell the user:
    > Otter cookie expired. Run `python3 mcp-servers/refresh-otter-cookie.py`, then exit Claude Code fully and restart.
-4. Otter is required for `/reflect` (transcript sync is a core step). STOP preflight and wait for the user to restart — do not proceed without it.
+4. Otter is **optional** for the lighter `/reflect`: if it 401s, print the one-line fix above as a note and **proceed without transcript sync** — background `otter-sync` owns meeting capture now (Phase 0.5+). Never block `/reflect` on Otter.
 
-### 1b. Otter Transcript Freshness Gate
+### 1b. Otter Transcript Check (non-blocking — Phase 0.5)
 
-Hard gate — ensures all meeting recordings are uploaded before processing transcripts.
+Was a hard gate; now informational only. **Never wait for "ready."**
 
-1. **Fetch today's calendars** (both work + personal, same dual-query pattern as Step 2). Cache these results for reuse in Step 2 — do not re-fetch later.
-2. **Fetch today's Otter transcripts:** `otter_list_transcripts` filtered to today's date.
-3. **Identify meetings that should have transcripts:** From calendar events, filter to meetings only (2+ human attendees, or has a conferencing link). Exclude blocks per CLAUDE.md Block Conventions. Exclude meetings that haven't happened yet (start time in the future). Exclude meetings shorter than 5 minutes.
-4. **Compare:** For each qualifying meeting, check if a matching Otter transcript exists (match by title similarity + time proximity within 30 minutes).
-5. **If gaps exist**, present them and wait:
+1. **Fetch today's calendars** (both work + personal, same dual-query pattern as Step 2). Cache for reuse in Step 2 — do not re-fetch.
+2. **Fetch today's Otter transcripts:** `otter_list_transcripts` filtered to today's date (skip silently if Otter is unavailable).
+3. **Identify meetings that should have transcripts:** meetings only (2+ human attendees or a conferencing link), excluding blocks, future meetings, and meetings shorter than 5 minutes.
+4. **Compare** by title similarity + time proximity (within 30 minutes).
+5. **If gaps exist:** note them in one line and proceed — do NOT wait. e.g. `ℹ 2 meetings have no transcript yet (Q1 Treasury Review, 1:1 Sarah Lee) — they'll sync automatically as Otter finishes; reflecting on what's available.` Background `otter-sync` captures them when ready.
+6. **If no gaps:** proceed silently.
+
+### 1c. Todoist Completion Check (non-blocking — Phase 0.5)
+
+Was a hard gate; now a gentle, optional nudge. **Never wait for "ready."**
+
+1. **Fetch tasks due today that are still open:** `find-tasks-by-date` for today, excluding prior-day overdue.
+2. **If open tasks exist:** list them once as a *non-blocking* nudge and immediately continue with the current Todoist state — do NOT wait for confirmation:
    ```
-   These meetings don't have Otter transcripts yet:
-   - 10:00 AM — Q1 Treasury Review (3 attendees)
-   - 2:00 PM — 1:1 with Sarah Lee
-
-   Upload the recordings to Otter, then type "ready" to continue.
-   ```
-   Wait for the user to confirm "ready", then re-fetch Otter transcripts and re-check. Repeat until all gaps are resolved or the user explicitly says to proceed without them.
-6. **If no gaps** (all meetings have transcripts, or no qualifying meetings today): proceed silently.
-
-### 1c. Todoist Completion Freshness Gate
-
-Hard gate — ensures Todoist reflects actual completions before calculating stats.
-
-1. **Fetch tasks due today that are still open:** Use `find-tasks-by-date` for today, excluding overdue tasks from prior days.
-2. **If open tasks exist**, present them and wait:
-   ```
-   These tasks are still marked open in Todoist:
+   ℹ Still open in Todoist (mark any done now if you like — I'll use whatever's current):
    - [ ] Submit expenses [exec-ops, p1]
    - [ ] Draft metrics framework [AI Transformation, p2]
-   - [ ] Call dentist [health, p4]
-
-   Mark any completed tasks in Todoist, then type "ready".
    ```
-   Wait for the user to confirm "ready", then re-fetch completed and incomplete tasks for today. This refreshed data replaces what Step 2 would otherwise fetch for Todoist.
-3. **If no open tasks due today**: proceed silently.
+   Then proceed using the current completed/incomplete data from Step 2. If the user happens to mark some done and asks to refresh, re-fetch — but never block waiting.
+3. **If no open tasks due today:** proceed silently.
 
 ### 2. Gather Data
 
 Run in parallel:
 
-**Cross-step caching:** If Step 1b already fetched today's calendar events, reuse them — do not re-fetch. If Step 1c already fetched and re-fetched Todoist data (user said "ready"), reuse that — do not re-fetch.
+**Cross-step caching:** If Step 1b already fetched today's calendar events, reuse them — do not re-fetch. Reuse any Todoist data already fetched in Step 1c — do not re-fetch.
 
 **Calendar (Work):** Get today's work events using `gcal_list_events` (srahman@ripple.com). Timezone: America/Los_Angeles. Tag all results **[Work]**.
 
