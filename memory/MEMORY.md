@@ -30,3 +30,8 @@
 - [project_proactive_system.md](project_proactive_system.md) — v1.9+ proactive surfacing: drift types, budgets, anti-nag tuning, observability. Where the config lives.
 - [project_slack_auth_fix.md](project_slack_auth_fix.md) — Two-problem Slack model: Problem A (token extraction, solved via Playwright profile) vs Problem B (third-party-client detection, mitigated by API-surface reduction + UA masking; xoxp is the permanent fix)
 - [feedback_design_question_style.md](feedback_design_question_style.md) — When user says "take time and think this through," propose one reasoned plan with tradeoffs in prose; don't ask multi-choice questions that pass design work back to them
+- [feedback_rest_days.md](feedback_rest_days.md) — On reflection days framed as rest/disconnect (Balance≥9 + low Impact/Focus, or "didn't work much"), skip the action-items sweep and reframe Claude's reflection to honor the rest, not moralize missed plan items as shipping failures
+- [project_cognition_application.md](project_cognition_application.md) — Active Cognition AI BizOps application (2026-05-28); resume positioned "operator who builds"; handoff doc at ~/Downloads
+- [user_ai_builds.md](user_ai_builds.md) — Canonical list of 4 AI builds with stable metrics — Personal OS, AI Transformation @ Ripple, Comp Intel Agency, Breezy (breezy.xyz)
+- [project_pos_v3_redesign.md](project_pos_v3_redesign.md) — ACTIVE: Personal OS v3.0 "chief-of-staff" rebuild (branch v3.0-chief-of-staff). Status + next steps + cost finding. Resume here.
+- [feedback_work_readonly_personal_ok.md](feedback_work_readonly_personal_ok.md) — Background automation: NEVER send/delete/modify Ripple (work) items; personal-account mutations are OK
