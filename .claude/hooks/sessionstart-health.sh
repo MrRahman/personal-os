@@ -11,6 +11,10 @@
 
 set -u
 
+# Skip inside the unattended daily-brief subprocess (it exports this). No point
+# running a healthcheck inside a headless brief, and it avoids wasted API calls.
+[ "${PERSONAL_OS_HEADLESS:-0}" = "1" ] && exit 0
+
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 HEALTHCHECK="${REPO_ROOT}/mcp-servers/healthcheck.sh"
 

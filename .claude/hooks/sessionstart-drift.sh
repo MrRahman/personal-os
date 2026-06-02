@@ -9,6 +9,9 @@
 
 set -u
 
+# Skip inside the unattended daily-brief subprocess (it exports this).
+[ "${PERSONAL_OS_HEADLESS:-0}" = "1" ] && exit 0
+
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 DRIFT_CHECK="${REPO_ROOT}/mcp-servers/drift-check.sh"
 DRIFT_FILE="${REPO_ROOT}/.claude/state/drift.json"

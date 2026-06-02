@@ -5,6 +5,8 @@ description: Generate a comprehensive morning plan by pulling data from Calendar
 
 # Morning Plan
 
+> **v3.0:** `/day` is the primary daily surface now — it reviews the draft the background `daily-brief` job already wrote, with no live multi-service wait. **Prefer `/day`.** This skill still works standalone, and its gather logic is what the brief reuses; reach for it when you want to (re)build the plan interactively from scratch.
+
 Generate a structured morning plan by gathering data from all connected services, then optionally create meeting notes for the day.
 
 ## Instructions

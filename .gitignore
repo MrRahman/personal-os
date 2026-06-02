@@ -16,9 +16,9 @@ __pycache__/
 .conductor/
 .claude/settings.local.json
 
-# Runtime state + logs (v1.8 hooks)
+# Runtime state + logs (v1.8 hooks; logs broadened in v3.0 to cover .err sidecars)
 .claude/state/*.json
-.claude/logs/*.jsonl
+.claude/logs/*
 
 # Confidential
 commercialize.md

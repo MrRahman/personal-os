@@ -96,7 +96,7 @@ Pull only what the brief needs. Batch independent calls together. Skip any sourc
 
 ### 2e. KB inputs (cheap, read-only — do NOT run the capture/triage pipeline)
 The interactive morning-plan *writes* to Notion/Readwise/Obsidian during KB sync. **The unattended brief must NOT** create Notion pages, tag Readwise items, archive documents, or write Resource/Topic notes — those are interactive, confirmation-gated writes. Instead, just COUNT for the highlights line:
-- Notion KB inbox: `mcp__notion-local__API-query-data-source` (Data Source ID `32873b7c-bcd4-8167-a01c-000b91db06d7`) filtered `Status = "Inbox"`, `page_size: 1` — you only need a count/has_more. Also optionally `Status = "Action Items"` count.
+- Notion KB inbox: `mcp__notion-local__API-query-data-source` (Data Source ID `32873b7c-bcd4-8167-a01c-000b91db06d7`), `page_size: 1` — you only need a count/has_more. The `Status` property is a Notion **`select`** (not a `status` property), so filter with the select form `{"property": "Status", "select": {"equals": "Inbox"}}` — the `status` filter type errors with a type mismatch. Optionally repeat for `"Action Items"`.
 - Readwise: `mcp__readwise__reader_list_documents(location:"new", limit 10)` — count items not yet tagged `synced-to-notion`.
 - The `### KB Highlights` body becomes a status line (see synthesis), e.g. `*Readwise: N new items pending capture; Notion inbox: M items — capture deferred to interactive /morning-plan.*` Do NOT perform the capture.
 
@@ -115,7 +115,7 @@ The interactive morning-plan *writes* to Notion/Readwise/Obsidian during KB sync
 
 ## STEP 3 — Yesterday's factual close-out (SECONDARY — include only if cheap & available)
 
-This is the secondary win. If the data is readily available, write yesterday's factual close-out into **yesterday's** note is **NOT** your job — you write only TODAY's note. Instead, fold a short close-out of yesterday into TODAY's `## Completed` and `## Reflection` **only when** doing so is cheap and clearly correct. Be conservative: it's better to leave `## Completed`/`## Reflection` empty than to fabricate.
+This is the secondary win. Writing into **yesterday's** note is **NOT** your job — you write only TODAY's note. Instead, fold a short close-out of yesterday into TODAY's `## Completed` and `## Reflection` **only when** doing so is cheap and clearly correct. Be conservative: it's better to leave `## Completed`/`## Reflection` empty than to fabricate.
 
 Specifically:
 - **Completed:** `mcp__todoist-local__find-completed-tasks` for YESTERDAY (correct params — never estimate from the open list; this is a standing user rule). If available, list them in `## Completed` as `- [x] <task> [label]`. If the source is down or returns nothing, leave `## Completed` empty (just the template comment).
@@ -150,6 +150,7 @@ Produce these pieces (each maps to a section in the managed block):
   - `### Respond — Work` — actionable work email threads as awareness lines: `**<Sender>** (<date/time>): *<subject>* — <one-line ask or "informational; no action">`.
   - `### Respond — Personal` — personal email + iMessage awareness lines. If personal Google is down, the single line is the skip note (e.g., `**Personal Gmail unavailable** — token revoked; re-auth via manage_accounts → authenticate`).
   - `### Slack` — the fixed skip note from Rule 8.
+- **Proposed Captures:** the *actionable subset* of what you gathered, staged as ready-to-create Todoist tasks for `/day` to confirm (all/select/skip). Include a line ONLY for a genuine action — a direct ask awaiting your reply, a commitment you made, a deadline-bearing item, or a `MISSED` meeting-note action (from 2g) with no existing Todoist task. Exclude FYIs and anything already in Todoist. Each line: `- [ ] <imperative task> — <source ref> — →<Project> [P<n>]`, routing Work-email→`Work`, personal-email/iMessage→`Personal`, and meeting/project actions→the project's name (per `CLAUDE.md` Todoist Label → Obsidian Project Map); P-level reflects urgency (due today/tomorrow → P1/P2). **Cap at ~8**, most urgent first. You are STAGING text only — do NOT create the tasks (Rule 1 stands); `/day` creates the confirmed ones. Omit the section entirely if there are no genuine actions.
 - **Coming Up (Next 3 Days):** per-day bullets of notable meetings + deadlines from 2h. `- **<Dow M/D>** — <items>`.
 - **Skipped / Unavailable:** render `skipped[]` as bullets, each naming the source + the actionable fix (mirror the example's lines, e.g. Otter cookie, personal Google re-auth, Slack note, "yesterday's daily note absent — not auto-backfilled").
 
@@ -182,14 +183,15 @@ Inside the managed block, in this order:
 3. `## Active Goals`
 4. `## Active Projects`
 5. `## Inbox & Notifications` — `### Respond — Work`, `### Respond — Personal`, `### Slack`
-6. `## Coming Up (Next 3 Days)`
-7. `## Skipped / Unavailable`
-8. `---`
-9. `## Completed` — populated from Step 3 if available, else just `<!-- Filled by /reflect -->`
-10. `## Reflection` — Claude's analysis from Step 3 if available (with `<!-- Claude's analysis -->` marker), else `<!-- Auto-generated by /reflect -->`
+6. `## Proposed Captures` — the actionable subset staged as `- [ ]` task lines for `/day` to confirm into Todoist (omit the whole section if there are no genuine actions)
+7. `## Coming Up (Next 3 Days)`
+8. `## Skipped / Unavailable`
+9. `---`
+10. `## Completed` — populated from Step 3 if available, else just `<!-- Filled by /day -->`
+11. `## Reflection` — Claude's analysis from Step 3 if available (with `<!-- Claude's analysis -->` marker), else `<!-- Auto-generated by /day -->`
 
 ### 5c. OUTSIDE / AFTER the managed block (never overwrite these)
-After `<!-- END:auto-draft -->`, the human-owned sections — left as **empty template** so the user fills them during `/reflect`:
+After `<!-- END:auto-draft -->`, the human-owned sections — left as **empty template** so the user fills them during `/day`. **Reproduce the two blocks below EXACTLY as written** — identical headings, identical comment text, and the Check-In columns in this exact order: **Energy | Focus | Impact | Balance | Mood**. This is a fixed template to copy verbatim, NOT content to synthesize: never reorder, rename, add, or drop a column or row, and never paraphrase the comments. (A prior run silently swapped Impact/Balance — verbatim copying prevents the recurrence.)
 ```
 ## My Reflection
 

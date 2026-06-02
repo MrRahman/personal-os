@@ -108,7 +108,10 @@ except Exception as e:
 with open(runlog, "a") as f:
     f.write(json.dumps(rec) + "\n")
 with open(state, "w") as f:
-    json.dump({"last_run": rec["ts"], "status": rec.get("status"),
-               "cost_usd": rec.get("cost_usd"), "denials": rec.get("denials")}, f, indent=2)
+    # `day` is LOCAL date (America/Los_Angeles) so the SessionStart hook + /day can
+    # compare "did a run happen today?" against local time. `last_run` stays UTC.
+    json.dump({"last_run": rec["ts"], "day": datetime.datetime.now().strftime("%Y-%m-%d"),
+               "status": rec.get("status"), "cost_usd": rec.get("cost_usd"),
+               "denials": rec.get("denials")}, f, indent=2)
 print("daily-brief:", rec.get("status"), "| cost", rec.get("cost_usd"), "| turns", rec.get("turns"))
 PY

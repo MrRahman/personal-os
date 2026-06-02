@@ -136,6 +136,19 @@ if [ "${1:-}" = "--verify" ]; then
     fi
   fi
 
+  # 5d. Daily-brief launchd (v3.0) — OPT-IN eager morning pre-build of the daily note.
+  # The SessionStart-ensures hook (.claude/hooks/sessionstart-ensure-brief.sh) is always on
+  # and builds the brief lazily on first open. This plist just makes the draft ready BEFORE
+  # you wake. It runs a real LLM brief (~$0.84/run, sonnet) every weekday 6am, so unlike the
+  # cheap token refreshers it is NOT auto-loaded — enable it deliberately.
+  if launchctl list 2>/dev/null | grep -q "com.personalos.daily-brief"; then
+    echo -e "  ${GREEN}✓${NC} launchd: daily-brief loaded (weekday 6:00am eager pre-build)"
+  else
+    DAILY_BRIEF_PLIST="$HOME/Library/LaunchAgents/com.personalos.daily-brief.plist"
+    echo -e "  ${DIM}○${NC} daily-brief eager pre-build not enabled (optional — the SessionStart hook builds it lazily)."
+    echo -e "       To enable an instant morning (≈\$0.84/weekday): cp $REPO_DIR/launchd/com.personalos.daily-brief.plist $DAILY_BRIEF_PLIST && launchctl load $DAILY_BRIEF_PLIST"
+  fi
+
   # 6. Check git pre-push hook
   if [ -x "$REPO_DIR/.git/hooks/pre-push" ]; then
     echo -e "  ${GREEN}✓${NC} git pre-push secret scanner installed"

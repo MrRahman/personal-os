@@ -5,6 +5,8 @@ description: End-of-day reflection that compares planned vs actual, reschedules 
 
 # Daily Reflection
 
+> **v3.0:** `/day` now folds in this close-out — it reads the brief's factual yesterday-recap and collects your check-in in one frictionless step. **Prefer `/day`.** This skill still works standalone (full reschedule + sync-meetings logic) for an interactive end-of-day pass.
+
 End-of-day review that compares your morning plan against what actually happened, reschedules incomplete tasks, and writes a reflection to Obsidian.
 
 ## Instructions
