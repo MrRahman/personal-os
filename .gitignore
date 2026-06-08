@@ -1,0 +1,25 @@
+# Generated exports
+*.html
+!diagrams/*.html
+*.pdf
+!diagrams/*.pdf
+
+# Secrets and personal config
+.mcp.json
+.claude.json
+CLAUDE.md
+
+# System files
+.DS_Store
+__pycache__/
+.auto-redesign/
+.conductor/
+.claude/settings.local.json
+
+# Runtime state + logs (v1.8 hooks; logs broadened in v3.0 to cover .err sidecars)
+.claude/state/*.json
+.claude/logs/*
+
+# Confidential
+commercialize.md
+

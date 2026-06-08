@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.personalos.cadence-quarterly</string>
+
+	<key>ProgramArguments</key>
+	<array>
+		<string>/bin/bash</string>
+		<string>-lc</string>
+		<string>/Users/sulaimanrahman/projects/personal-os/mcp-servers/cadence-draft.sh quarterly</string>
+	</array>
+
+	<!-- 1st of Jan/Apr/Jul/Oct, 06:00 — drafts the quarter scores + retrospective + next-quarter skeleton. -->
+	<!-- Opt-in: NOT auto-loaded. Enable on the ONE designated host only:                                    -->
+	<!--   cp launchd/com.personalos.cadence-quarterly.plist ~/Library/LaunchAgents/                         -->
+	<!--   launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.personalos.cadence-quarterly.plist     -->
+	<key>StartCalendarInterval</key>
+	<array>
+		<dict><key>Month</key><integer>1</integer><key>Day</key><integer>1</integer><key>Hour</key><integer>6</integer><key>Minute</key><integer>0</integer></dict>
+		<dict><key>Month</key><integer>4</integer><key>Day</key><integer>1</integer><key>Hour</key><integer>6</integer><key>Minute</key><integer>0</integer></dict>
+		<dict><key>Month</key><integer>7</integer><key>Day</key><integer>1</integer><key>Hour</key><integer>6</integer><key>Minute</key><integer>0</integer></dict>
+		<dict><key>Month</key><integer>10</integer><key>Day</key><integer>1</integer><key>Hour</key><integer>6</integer><key>Minute</key><integer>0</integer></dict>
+	</array>
+
+	<key>StandardOutPath</key>
+	<string>/tmp/personalos-cadence-quarterly.log</string>
+	<key>StandardErrorPath</key>
+	<string>/tmp/personalos-cadence-quarterly.log</string>
+</dict>
+</plist>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.personalos.cadence-monthly</string>
+
+	<key>ProgramArguments</key>
+	<array>
+		<string>/bin/bash</string>
+		<string>-lc</string>
+		<string>/Users/sulaimanrahman/projects/personal-os/mcp-servers/cadence-draft.sh monthly</string>
+	</array>
+
+	<!-- 1st of the month, 06:00 — drafts the month's RAG/trend/anti-goal review. -->
+	<!-- Opt-in: NOT auto-loaded. Enable on the ONE designated host only:          -->
+	<!--   cp launchd/com.personalos.cadence-monthly.plist ~/Library/LaunchAgents/ -->
+	<!--   launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.personalos.cadence-monthly.plist -->
+	<key>StartCalendarInterval</key>
+	<array>
+		<dict><key>Day</key><integer>1</integer><key>Hour</key><integer>6</integer><key>Minute</key><integer>0</integer></dict>
+	</array>
+
+	<key>StandardOutPath</key>
+	<string>/tmp/personalos-cadence-monthly.log</string>
+	<key>StandardErrorPath</key>
+	<string>/tmp/personalos-cadence-monthly.log</string>
+</dict>
+</plist>

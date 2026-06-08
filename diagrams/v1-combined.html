@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Personal OS V1</title>
+<style>
+  @page { size: letter; margin: 0; }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --label: #1D1D1F;
+    --secondary: #6E6E73;
+    --tertiary: #AEAEB2;
+    --separator: #D2D2D7;
+    --bg: #FBFBFD;
+    --card: #FFFFFF;
+    --grouped: #F5F5F7;
+    --blue: #007AFF;
+    --indigo: #5856D6;
+    --purple: #AF52DE;
+    --orange: #FF9500;
+    --green: #34C759;
+    --teal: #30B0C7;
+    --pink: #FF2D55;
+    --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --mono: 'SF Mono', SFMono-Regular, ui-monospace, Menlo, monospace;
+  }
+
+  body {
+    font-family: var(--font);
+    background: white;
+    color: var(--label);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-size: 11px;
+    line-height: 1.4;
+  }
+
+  .sheet {
+    width: 8.5in;
+    height: 11in;
+    padding: 0.55in 0.65in;
+    position: relative;
+    overflow: hidden;
+    page-break-after: always;
+    display: flex;
+    flex-direction: column;
+  }
+  .sheet:last-child { page-break-after: auto; }
+
+  /* Page number */
+  .pg {
+    position: absolute;
+    bottom: 0.45in;
+    right: 0.65in;
+    font-size: 9px;
+    color: var(--tertiary);
+    font-weight: 500;
+  }
+  .pg-left {
+    right: auto;
+    left: 0.65in;
+  }
+
+  /* ══════════════════════════════════════════
+     PAGE 1 · COVER
+     ══════════════════════════════════════════ */
+  .cover {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background: var(--bg);
+  }
+  .cover-badge {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--blue);
+    background: rgba(0,122,255,0.08);
+    padding: 5px 16px;
+    border-radius: 100px;
+    margin-bottom: 28px;
+    display: inline-block;
+  }
+  .cover h1 {
+    font-size: 72px;
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    line-height: 1;
+    margin-bottom: 10px;
+  }
+  .cover-sub {
+    font-size: 20px;
+    color: var(--secondary);
+    font-weight: 400;
+    margin-bottom: 48px;
+  }
+  .cover-stats {
+    display: flex;
+    justify-content: center;
+    gap: 36px;
+    margin-bottom: 48px;
+  }
+  .c-stat .c-val {
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+  .c-stat .c-lbl {
+    font-size: 10px;
+    color: var(--secondary);
+    margin-top: 2px;
+  }
+  .cover-rule {
+    width: 40px;
+    height: 1px;
+    background: var(--separator);
+    margin: 0 auto 40px;
+  }
+  .cover-desc {
+    font-size: 13px;
+    color: var(--secondary);
+    line-height: 1.6;
+    max-width: 480px;
+    margin: 0 auto 48px;
+  }
+  .cover-toc {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+  }
+  .cover-toc li {
+    font-size: 11px;
+    color: var(--secondary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .cover-toc .n {
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--tertiary);
+    background: var(--grouped);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ══════════════════════════════════════════
+     PAGE 2 · ARCHITECTURE
+     ══════════════════════════════════════════ */
+  .sec-head {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .sec-badge {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--blue);
+    background: rgba(0,122,255,0.08);
+    padding: 4px 12px;
+    border-radius: 100px;
+    display: inline-block;
+    margin-bottom: 12px;
+  }
+  .sec-head h2 {
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+    margin-bottom: 4px;
+  }
+  .sec-head p {
+    font-size: 14px;
+    color: var(--secondary);
+  }
+
+  .layer-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .layer-num {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--secondary);
+    background: var(--grouped);
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .layer-name {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--secondary);
+  }
+
+  .pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    justify-content: center;
+  }
+  .pill {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    padding: 7px 16px;
+    background: var(--card);
+    border: 1px solid var(--separator);
+    border-radius: 100px;
+    color: var(--indigo);
+  }
+
+  .connector {
+    display: flex;
+    justify-content: center;
+    padding: 10px 0;
+  }
+
+  .claude-bar {
+    background: var(--label);
+    color: #fff;
+    border-radius: 16px;
+    padding: 24px 32px;
+    text-align: center;
+  }
+  .claude-bar h3 {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 3px;
+  }
+  .claude-bar p {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+  }
+
+  .svc-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .svc-group-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .svc {
+    background: var(--card);
+    border-radius: 10px;
+    padding: 10px 12px;
+    border-left: 3px solid transparent;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    margin-bottom: 6px;
+  }
+  .svc:last-child { margin-bottom: 0; }
+  .svc-name { font-size: 12px; font-weight: 600; }
+  .svc-desc { font-size: 10px; color: var(--secondary); margin-top: 1px; }
+  .svc-transport { font-size: 9px; color: var(--tertiary); font-family: var(--mono); margin-top: 3px; }
+
+  .b-orange { border-left-color: var(--orange); }
+  .b-purple { border-left-color: var(--purple); }
+  .b-blue { border-left-color: var(--blue); }
+  .b-green { border-left-color: var(--green); }
+  .t-orange { color: var(--orange); }
+  .t-purple { color: var(--purple); }
+  .t-blue { color: var(--blue); }
+  .t-green { color: var(--green); }
+
+  .mobile-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    max-width: 340px;
+    margin: 0 auto;
+  }
+  .mobile-card {
+    background: var(--card);
+    border-radius: 10px;
+    padding: 10px 12px;
+    border-left: 3px solid var(--green);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    text-align: center;
+  }
+  .mobile-card .svc-name { font-size: 11px; }
+  .mobile-card .svc-desc { font-size: 9px; }
+
+  /* ══════════════════════════════════════════
+     PAGE 3 · RUNNING YOUR DAY
+     ══════════════════════════════════════════ */
+  .timeline {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+    padding-left: 80px;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 33px;
+    top: 8px;
+    bottom: 24px;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--blue), var(--indigo), var(--green), var(--purple), var(--indigo));
+    border-radius: 1px;
+  }
+  .tl-item {
+    position: relative;
+    padding-bottom: 18px;
+  }
+  .tl-item:last-child { padding-bottom: 0; }
+  .tl-dot {
+    position: absolute;
+    left: -52px;
+    top: 2px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 0 0 1px var(--separator);
+  }
+  .tl-time {
+    position: absolute;
+    left: -80px;
+    top: 0;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--tertiary);
+    width: 42px;
+    text-align: right;
+    font-family: var(--mono);
+  }
+  .tl-card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 14px 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  .tl-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .tl-cmd {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--indigo);
+    background: rgba(88,86,214,0.07);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+  .tl-body {
+    font-size: 11px;
+    color: var(--secondary);
+    line-height: 1.5;
+    margin-top: 4px;
+  }
+  .tl-sources {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 8px;
+  }
+  .tl-src {
+    font-size: 9px;
+    font-weight: 500;
+    color: var(--tertiary);
+    background: var(--grouped);
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+
+  /* ══════════════════════════════════════════
+     PAGE 4 · WORKFLOW
+     ══════════════════════════════════════════ */
+  .rhythm-section { margin-bottom: 20px; }
+  .rhythm-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .r-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+  .r-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--secondary);
+  }
+
+  .day-row {
+    display: grid;
+    grid-template-columns: 1fr 36px 1fr;
+    align-items: stretch;
+    gap: 0;
+  }
+  .day-card {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 18px 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .day-card h4 {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin-bottom: 2px;
+  }
+  .day-card .cmd {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--indigo);
+    margin-bottom: 8px;
+  }
+  .day-card .lbl {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--tertiary);
+    margin-top: 10px;
+    margin-bottom: 4px;
+  }
+  .day-card .lbl:first-of-type { margin-top: 0; }
+  .day-card ul {
+    list-style: none;
+  }
+  .day-card ul li {
+    font-size: 11px;
+    color: var(--secondary);
+    padding: 2px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .day-card ul li .d {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .arrow-mid {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--separator);
+  }
+
+  .week-card {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 18px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .week-card h4 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+  .week-card .cmd {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--indigo);
+    margin-bottom: 12px;
+  }
+  .week-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  .w-stat {
+    text-align: center;
+    background: var(--grouped);
+    border-radius: 10px;
+    padding: 12px 6px;
+  }
+  .w-stat .v {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .w-stat .l {
+    font-size: 9px;
+    color: var(--secondary);
+    margin-top: 2px;
+  }
+  .week-note {
+    font-size: 10px;
+    color: var(--tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 600;
+    margin-top: 12px;
+  }
+
+  .pipe-section { margin-top: 4px; }
+  .pipe-label {
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--tertiary);
+    text-align: center;
+    margin-bottom: 6px;
+  }
+  .pipe-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 10px;
+  }
+  .pipe-node {
+    background: var(--card);
+    border-radius: 10px;
+    padding: 10px 14px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    text-align: center;
+    min-width: 110px;
+  }
+  .pipe-node .pn { font-size: 11px; font-weight: 600; }
+  .pipe-node .ps { font-size: 9px; color: var(--secondary); }
+  .pipe-node .pc { font-family: var(--mono); font-size: 9px; color: var(--indigo); margin-top: 4px; }
+  .pipe-arrow {
+    padding: 0 8px;
+    color: var(--separator);
+    font-size: 14px;
+  }
+
+  /* ══════════════════════════════════════════
+     PAGE 5 · FEATURES
+     ══════════════════════════════════════════ */
+  .stat-bar {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    padding: 16px 0;
+    margin-bottom: 24px;
+    border-top: 1px solid var(--separator);
+    border-bottom: 1px solid var(--separator);
+  }
+  .sb-val {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    text-align: center;
+  }
+  .sb-lbl {
+    font-size: 9px;
+    color: var(--secondary);
+    text-align: center;
+    margin-top: 1px;
+  }
+
+  .cat { margin-bottom: 16px; }
+  .cat-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .cat-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+  }
+  .cat-name {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--secondary);
+  }
+
+  .feat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .feat-grid.two { grid-template-columns: repeat(2, 1fr); max-width: 480px; }
+  .feat {
+    background: var(--card);
+    border-radius: 10px;
+    padding: 12px 14px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    display: flex;
+    flex-direction: column;
+  }
+  .feat-name {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 3px;
+  }
+  .feat-desc {
+    font-size: 10px;
+    color: var(--secondary);
+    line-height: 1.4;
+    flex: 1;
+  }
+  .feat-tags {
+    display: flex;
+    gap: 4px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+  .f-cmd {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--indigo);
+    background: rgba(88,86,214,0.07);
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+  .f-tag {
+    font-size: 9px;
+    color: var(--tertiary);
+    background: var(--grouped);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  /* Footer line */
+  .sheet-footer {
+    text-align: center;
+    padding-top: 12px;
+    border-top: 1px solid var(--separator);
+    font-size: 9px;
+    color: var(--tertiary);
+    margin-top: auto;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE 1 · COVER
+     ═══════════════════════════════════════════════════════════ -->
+<div class="sheet cover">
+  <div>
+    <div class="cover-badge">V1 Complete &middot; March 2026</div>
+    <h1>Personal OS</h1>
+    <p class="cover-sub">An AI-powered life operating system built on Claude Code</p>
+
+    <div class="cover-stats">
+      <div class="c-stat">
+        <div class="c-val" style="color: var(--indigo);">7</div>
+        <div class="c-lbl">Skills</div>
+      </div>
+      <div class="c-stat">
+        <div class="c-val" style="color: var(--blue);">10</div>
+        <div class="c-lbl">Services</div>
+      </div>
+      <div class="c-stat">
+        <div class="c-val" style="color: var(--purple);">87</div>
+        <div class="c-lbl">Auto-Tags</div>
+      </div>
+      <div class="c-stat">
+        <div class="c-val" style="color: var(--orange);">4</div>
+        <div class="c-lbl">Templates</div>
+      </div>
+      <div class="c-stat">
+        <div class="c-val" style="color: var(--green);">2</div>
+        <div class="c-lbl">Shortcuts</div>
+      </div>
+    </div>
+
+    <div class="cover-rule"></div>
+
+    <p class="cover-desc">Personal OS connects your calendar, tasks, email, Slack, reading list, meeting transcripts, and notes into a single intelligence layer. Seven slash commands automate your entire day &mdash; from morning planning to evening reflection.</p>
+
+    <ul class="cover-toc">
+      <li><span class="n">1</span>Architecture</li>
+      <li><span class="n">2</span>Workflow</li>
+      <li><span class="n">3</span>Features</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE 2 · SYSTEM ARCHITECTURE
+     ═══════════════════════════════════════════════════════════ -->
+<div class="sheet">
+  <div class="sec-head">
+    <div class="sec-badge">Architecture</div>
+    <h2>System Architecture</h2>
+    <p>Three layers connecting 7 skills to 10 services</p>
+  </div>
+
+  <div class="layer-label">
+    <div class="layer-num">1</div>
+    <div class="layer-name">Interface &mdash; 7 Skills</div>
+  </div>
+  <div class="pills">
+    <div class="pill">/morning-plan</div>
+    <div class="pill">/reflect</div>
+    <div class="pill">/weekly-review</div>
+    <div class="pill">/triage</div>
+    <div class="pill">/capture</div>
+    <div class="pill">/kb</div>
+    <div class="pill">/sync-meetings</div>
+  </div>
+
+  <div class="connector">
+    <svg width="2" height="28" viewBox="0 0 2 28"><line x1="1" y1="0" x2="1" y2="28" stroke="#D2D2D7" stroke-width="1.5" stroke-dasharray="4 4"/></svg>
+  </div>
+
+  <div class="layer-label">
+    <div class="layer-num">2</div>
+    <div class="layer-name">Intelligence</div>
+  </div>
+  <div class="claude-bar">
+    <h3>Claude</h3>
+    <p>Central intelligence layer &mdash; orchestrates every service through natural language skills</p>
+  </div>
+
+  <div class="connector">
+    <svg width="2" height="28" viewBox="0 0 2 28"><line x1="1" y1="0" x2="1" y2="28" stroke="#D2D2D7" stroke-width="1.5" stroke-dasharray="4 4"/></svg>
+  </div>
+
+  <div class="layer-label">
+    <div class="layer-num">3</div>
+    <div class="layer-name">Infrastructure &mdash; 10 Services</div>
+  </div>
+  <div class="svc-grid">
+    <div>
+      <div class="svc-group-label t-orange">Communication</div>
+      <div class="svc b-orange"><div class="svc-name">Gmail</div><div class="svc-desc">Email triage &amp; action items</div><div class="svc-transport">claude.ai</div></div>
+      <div class="svc b-orange"><div class="svc-name">Slack</div><div class="svc-desc">Mentions, DMs &amp; threads</div><div class="svc-transport">claude.ai</div></div>
+      <div class="svc b-orange"><div class="svc-name">iMessage</div><div class="svc-desc">Message search &amp; actions</div><div class="svc-transport">stdio mcp</div></div>
+    </div>
+    <div>
+      <div class="svc-group-label t-purple">Knowledge</div>
+      <div class="svc b-purple"><div class="svc-name">Notion</div><div class="svc-desc">Knowledge base &amp; pipeline</div><div class="svc-transport">http mcp</div></div>
+      <div class="svc b-purple"><div class="svc-name">Readwise</div><div class="svc-desc">Reading highlights &amp; articles</div><div class="svc-transport">stdio mcp</div></div>
+      <div class="svc b-purple"><div class="svc-name">Otter.ai</div><div class="svc-desc">Meeting transcripts</div><div class="svc-transport">stdio mcp</div></div>
+    </div>
+    <div>
+      <div class="svc-group-label t-blue">Productivity</div>
+      <div class="svc b-blue"><div class="svc-name">Todoist</div><div class="svc-desc">Task management</div><div class="svc-transport">http mcp</div></div>
+      <div class="svc b-blue"><div class="svc-name">Google Calendar</div><div class="svc-desc">Schedule &amp; time blocks</div><div class="svc-transport">claude.ai</div></div>
+      <div class="svc b-blue"><div class="svc-name">Obsidian</div><div class="svc-desc">Notes &amp; second brain</div><div class="svc-transport">local filesystem</div></div>
+    </div>
+  </div>
+
+  <div style="margin-top: 12px;">
+    <div class="svc-group-label t-green" style="text-align: center;">Mobile Capture</div>
+    <div class="mobile-row">
+      <div class="mobile-card"><div class="svc-name">Quick Task</div><div class="svc-desc">Share Sheet &rarr; Todoist</div></div>
+      <div class="mobile-card"><div class="svc-name">Save to KB</div><div class="svc-desc">Share Sheet &rarr; Notion</div></div>
+    </div>
+  </div>
+
+  <div class="sheet-footer">Personal OS V1 &middot; Architecture &middot; Page 2</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE 3 · WORKFLOW
+     ═══════════════════════════════════════════════════════════ -->
+<div class="sheet">
+  <div class="sec-head">
+    <div class="sec-badge">Workflow</div>
+    <h2>System Workflow</h2>
+    <p>Three rhythms that keep everything in sync</p>
+  </div>
+
+  <!-- Daily -->
+  <div class="rhythm-section">
+    <div class="rhythm-head">
+      <div class="r-dot" style="background: var(--blue);"></div>
+      <div class="r-label">Every Day</div>
+    </div>
+    <div class="day-row">
+      <div class="day-card">
+        <h4>Morning Plan</h4>
+        <div class="cmd">/morning-plan</div>
+        <div class="lbl">Reads from</div>
+        <ul>
+          <li><span class="d" style="background: var(--blue);"></span>Google Calendar</li>
+          <li><span class="d" style="background: var(--blue);"></span>Todoist tasks</li>
+          <li><span class="d" style="background: var(--orange);"></span>Gmail &amp; Slack &amp; iMessage</li>
+          <li><span class="d" style="background: var(--purple);"></span>Notion KB &amp; Readwise</li>
+        </ul>
+        <div class="lbl">Creates</div>
+        <ul>
+          <li><span class="d" style="background: var(--green);"></span>Prioritized daily plan</li>
+          <li><span class="d" style="background: var(--green);"></span>Meeting notes in Obsidian</li>
+        </ul>
+      </div>
+      <div class="arrow-mid">
+        <svg width="36" height="24" viewBox="0 0 36 24"><line x1="0" y1="12" x2="28" y2="12" stroke="#D2D2D7" stroke-width="1.5"/><polyline points="24,7 30,12 24,17" fill="none" stroke="#D2D2D7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="day-card">
+        <h4>Evening Reflect</h4>
+        <div class="cmd">/reflect</div>
+        <div class="lbl">Reviews</div>
+        <ul>
+          <li><span class="d" style="background: var(--blue);"></span>Morning plan vs actual</li>
+          <li><span class="d" style="background: var(--blue);"></span>Completed &amp; incomplete tasks</li>
+          <li><span class="d" style="background: var(--purple);"></span>Otter.ai transcripts</li>
+        </ul>
+        <div class="lbl">Creates</div>
+        <ul>
+          <li><span class="d" style="background: var(--green);"></span>Reflection in daily note</li>
+          <li><span class="d" style="background: var(--green);"></span>Rescheduled tasks</li>
+          <li><span class="d" style="background: var(--green);"></span>People profile updates</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Weekly -->
+  <div class="rhythm-section">
+    <div class="rhythm-head">
+      <div class="r-dot" style="background: var(--indigo);"></div>
+      <div class="r-label">Every Week</div>
+    </div>
+    <div class="week-card">
+      <h4>Weekly Review</h4>
+      <div class="cmd">/weekly-review</div>
+      <div class="week-stats">
+        <div class="w-stat"><div class="v">5</div><div class="l">Daily reflections</div></div>
+        <div class="w-stat"><div class="v">87</div><div class="l">Tags &middot; 18 topics</div></div>
+        <div class="w-stat"><div class="v">4</div><div class="l">Projects reviewed</div></div>
+        <div class="w-stat"><div class="v">1</div><div class="l">Weekly note</div></div>
+      </div>
+      <div class="week-note">Completion stats &middot; Time allocation &middot; KB gap analysis &middot; Next week&rsquo;s priorities</div>
+    </div>
+  </div>
+
+  <!-- Pipelines -->
+  <div class="rhythm-section">
+    <div class="rhythm-head">
+      <div class="r-dot" style="background: var(--green);"></div>
+      <div class="r-label">Always Running</div>
+    </div>
+
+    <div class="pipe-section">
+      <div class="pipe-label">Knowledge Pipeline</div>
+      <div class="pipe-row">
+        <div class="pipe-node"><div class="pn">Readwise</div><div class="ps">Highlights &amp; articles</div></div>
+        <div class="pipe-arrow">&rarr;</div>
+        <div class="pipe-node"><div class="pn">Capture</div><div class="ps">Sync to Notion</div><div class="pc">/capture</div></div>
+        <div class="pipe-arrow">&rarr;</div>
+        <div class="pipe-node"><div class="pn">Triage</div><div class="ps">Classify &amp; tag</div><div class="pc">/triage</div></div>
+        <div class="pipe-arrow">&rarr;</div>
+        <div class="pipe-node"><div class="pn">Todoist</div><div class="ps">Action items</div></div>
+      </div>
+
+      <div class="pipe-label">Meeting Pipeline</div>
+      <div class="pipe-row">
+        <div class="pipe-node"><div class="pn">Otter.ai</div><div class="ps">Transcripts</div></div>
+        <div class="pipe-arrow">&rarr;</div>
+        <div class="pipe-node"><div class="pn">Sync</div><div class="ps">Match &amp; extract</div><div class="pc">/sync-meetings</div></div>
+        <div class="pipe-arrow">&rarr;</div>
+        <div class="pipe-node"><div class="pn">Obsidian</div><div class="ps">Notes &amp; profiles</div></div>
+      </div>
+
+      <div class="pipe-label">On-Demand</div>
+      <div class="pipe-row">
+        <div class="pipe-node" style="min-width: 280px;"><div class="pn">Knowledge Search</div><div class="ps">Notion KB + Readwise &mdash; by topic, tag, type, or free text</div><div class="pc">/kb</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sheet-footer">Personal OS V1 &middot; Workflow &middot; Page 3</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE 5 · FEATURES
+     ═══════════════════════════════════════════════════════════ -->
+<div class="sheet">
+  <div class="sec-head" style="margin-bottom: 16px;">
+    <div class="sec-badge">Features</div>
+    <h2>Everything Included</h2>
+    <p>Every capability across 6 categories</p>
+  </div>
+
+  <div class="stat-bar">
+    <div><div class="sb-val" style="color: var(--indigo);">7</div><div class="sb-lbl">Skills</div></div>
+    <div><div class="sb-val" style="color: var(--blue);">10</div><div class="sb-lbl">Integrations</div></div>
+    <div><div class="sb-val" style="color: var(--purple);">87</div><div class="sb-lbl">Auto-Tags</div></div>
+    <div><div class="sb-val" style="color: var(--orange);">4</div><div class="sb-lbl">Templates</div></div>
+    <div><div class="sb-val" style="color: var(--green);">2</div><div class="sb-lbl">Shortcuts</div></div>
+  </div>
+
+  <div class="cat">
+    <div class="cat-head"><div class="cat-dot" style="background: var(--blue);"></div><div class="cat-name">Daily Operations</div></div>
+    <div class="feat-grid">
+      <div class="feat"><div class="feat-name">Morning Planning</div><div class="feat-desc">6-source daily plan with meeting notes</div><div class="feat-tags"><span class="f-cmd">/morning-plan</span></div></div>
+      <div class="feat"><div class="feat-name">Evening Reflection</div><div class="feat-desc">Plan vs actual comparison &amp; reschedule</div><div class="feat-tags"><span class="f-cmd">/reflect</span></div></div>
+      <div class="feat"><div class="feat-name">Weekly Review</div><div class="feat-desc">Completion stats, gaps, next priorities</div><div class="feat-tags"><span class="f-cmd">/weekly-review</span></div></div>
+    </div>
+  </div>
+
+  <div class="cat">
+    <div class="cat-head"><div class="cat-dot" style="background: var(--purple);"></div><div class="cat-name">Knowledge Management</div></div>
+    <div class="feat-grid">
+      <div class="feat"><div class="feat-name">KB Triage</div><div class="feat-desc">Auto-classify, tag, and summarize content</div><div class="feat-tags"><span class="f-cmd">/triage</span><span class="f-tag">87 tags</span></div></div>
+      <div class="feat"><div class="feat-name">Readwise Capture</div><div class="feat-desc">One-way sync with dedup and highlights</div><div class="feat-tags"><span class="f-cmd">/capture</span></div></div>
+      <div class="feat"><div class="feat-name">Knowledge Search</div><div class="feat-desc">Cross-service search by any dimension</div><div class="feat-tags"><span class="f-cmd">/kb</span></div></div>
+    </div>
+  </div>
+
+  <div class="cat">
+    <div class="cat-head"><div class="cat-dot" style="background: var(--teal);"></div><div class="cat-name">Meeting Intelligence</div></div>
+    <div class="feat-grid">
+      <div class="feat"><div class="feat-name">Transcript Sync</div><div class="feat-desc">Match Otter transcripts to calendar events</div><div class="feat-tags"><span class="f-cmd">/sync-meetings</span></div></div>
+      <div class="feat"><div class="feat-name">People Profiles</div><div class="feat-desc">Auto-generated contact notes with history</div><div class="feat-tags"><span class="f-tag">auto-generated</span></div></div>
+      <div class="feat"><div class="feat-name">Meeting Notes</div><div class="feat-desc">Pre-filled from calendar with context lookup</div><div class="feat-tags"><span class="f-tag">template-driven</span></div></div>
+    </div>
+  </div>
+
+  <div class="cat">
+    <div class="cat-head"><div class="cat-dot" style="background: var(--orange);"></div><div class="cat-name">Task &amp; Time</div></div>
+    <div class="feat-grid">
+      <div class="feat"><div class="feat-name">4-Project Structure</div><div class="feat-desc">Inbox, Personal, Work, Us (shared)</div><div class="feat-tags"><span class="f-tag">Todoist</span></div></div>
+      <div class="feat"><div class="feat-name">19 Smart Labels</div><div class="feat-desc">Personal (7), Work (7), Shared (5)</div><div class="feat-tags"><span class="f-tag">auto-assigned</span></div></div>
+      <div class="feat"><div class="feat-name">Priority Planning</div><div class="feat-desc">P1 through P4 with auto-triage</div><div class="feat-tags"><span class="f-tag">4 levels</span></div></div>
+    </div>
+  </div>
+
+  <div class="cat">
+    <div class="cat-head"><div class="cat-dot" style="background: var(--green);"></div><div class="cat-name">Second Brain &amp; Mobile</div></div>
+    <div class="feat-grid">
+      <div class="feat"><div class="feat-name">Obsidian Vault</div><div class="feat-desc">Daily notes, meetings, people, reviews</div><div class="feat-tags"><span class="f-tag">4 templates</span></div></div>
+      <div class="feat"><div class="feat-name">Quick Task</div><div class="feat-desc">iOS Share Sheet &rarr; Todoist Inbox</div><div class="feat-tags"><span class="f-tag">iOS Shortcut</span></div></div>
+      <div class="feat"><div class="feat-name">Save to KB</div><div class="feat-desc">iOS Share Sheet &rarr; Notion KB Inbox</div><div class="feat-tags"><span class="f-tag">iOS Shortcut</span></div></div>
+    </div>
+  </div>
+
+  <div class="sheet-footer">Personal OS V1 &middot; All 11 components &middot; Page 4</div>
+</div>
+
+</body>
+</html>

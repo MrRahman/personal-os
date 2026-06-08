@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.personalos.otter-sync</string>
+
+	<key>ProgramArguments</key>
+	<array>
+		<string>/bin/bash</string>
+		<string>-lc</string>
+		<string>/Users/sulaimanrahman/projects/personal-os/mcp-servers/otter-sync.sh</string>
+	</array>
+
+	<!-- Hourly 8am–8pm, EVERY day (meetings happen on weekends too; runs are -->
+	<!-- cheap because otter-poll.py gates the Haiku actor — idle hours cost nothing). -->
+	<!-- Opt-in: NOT auto-loaded. Enable on a machine with:                          -->
+	<!--   cp launchd/com.personalos.otter-sync.plist ~/Library/LaunchAgents/        -->
+	<!--   launchctl load ~/Library/LaunchAgents/com.personalos.otter-sync.plist     -->
+	<!-- The mkdir-lock in otter-sync.sh prevents overlapping runs.                  -->
+	<key>StartCalendarInterval</key>
+	<array>
+		<dict><key>Hour</key><integer>8</integer><key>Minute</key><integer>0</integer></dict>
+		<dict><key>Hour</key><integer>9</integer><key>Minute</key><integer>0</integer></dict>
+		<dict><key>Hour</key><integer>10</integer><key>Minute</key><integer>0</integer></dict>
+		<dict><key>Hour</key><integer>11</integer><key>Minute</key><integer>0</integer></dict>
+		<dict><key>Hour</key><integer>12</integer><key>Minute</key><integer>0</integer></dict>
+		<dict><key>Hour</key><integer>13</integer><key>Minute</key><integer>0</integer></dict>
+		<dict><key>Hour</key><integer>14</integer><key>Minute</key><integer>0</integer></dict>
+		<dict><key>Hour</key><integer>15</integer><key>Minute</key><integer>0</integer></dict>
+		<dict><key>Hour</key><integer>16</integer><key>Minute</key><integer>0</integer></dict>
+		<dict><key>Hour</key><integer>17</integer><key>Minute</key><integer>0</integer></dict>
+		<dict><key>Hour</key><integer>18</integer><key>Minute</key><integer>0</integer></dict>
+		<dict><key>Hour</key><integer>19</integer><key>Minute</key><integer>0</integer></dict>
+		<dict><key>Hour</key><integer>20</integer><key>Minute</key><integer>0</integer></dict>
+	</array>
+
+	<key>StandardOutPath</key>
+	<string>/tmp/personalos-otter-sync.log</string>
+	<key>StandardErrorPath</key>
+	<string>/tmp/personalos-otter-sync.log</string>
+</dict>
+</plist>

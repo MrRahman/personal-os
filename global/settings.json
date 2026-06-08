@@ -1,0 +1,48 @@
+{
+  "model": "opus[1m]",
+  "showThinkingSummaries": true,
+  "enabledPlugins": {
+    "course-ta@course-ta-plugin": true,
+    "frontend-design@claude-plugins-official": true,
+    "context7@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true,
+    "github@claude-plugins-official": true,
+    "code-review@claude-plugins-official": true,
+    "ralph-loop@claude-plugins-official": true,
+    "skill-creator@claude-plugins-official": true,
+    "compound-engineering@compound-engineering-plugin": true,
+    "code-simplifier@claude-plugins-official": true,
+    "vercel@claude-plugins-official": true,
+    "auto-redesign@auto-redesign-local": true,
+    "warp@claude-code-warp": true
+  },
+  "extraKnownMarketplaces": {
+    "course-ta-plugin": {
+      "source": {
+        "source": "github",
+        "repo": "EveryInc/course-ta-plugin"
+      }
+    },
+    "compound-engineering-plugin": {
+      "source": {
+        "source": "git",
+        "url": "https://github.com/everyinc/every-marketplace.git"
+      },
+      "autoUpdate": true
+    },
+    "auto-redesign-local": {
+      "source": {
+        "source": "github",
+        "repo": "MrRahman/auto-redesign"
+      }
+    },
+    "claude-code-warp": {
+      "source": {
+        "source": "github",
+        "repo": "warpdotdev/claude-code-warp"
+      }
+    }
+  },
+  "effortLevel": "high",
+  "skipDangerousModePermissionPrompt": true
+}

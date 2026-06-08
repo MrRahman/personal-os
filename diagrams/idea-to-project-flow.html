@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Idea to Project Flow — Personal OS</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, 'Inter', system-ui, sans-serif;
+    background: #0a0a0a;
+    color: #e5e5e5;
+    padding: 48px 24px;
+    line-height: 1.5;
+  }
+  .container { max-width: 1200px; margin: 0 auto; }
+  h1 {
+    font-size: 32px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+    color: #fff;
+  }
+  .subtitle {
+    color: #737373;
+    font-size: 15px;
+    margin-bottom: 48px;
+  }
+
+  /* Flow stages */
+  .flow { display: flex; flex-direction: column; gap: 0; }
+
+  .stage {
+    position: relative;
+    display: grid;
+    grid-template-columns: 200px 1fr 280px;
+    gap: 24px;
+    padding: 32px 0;
+    border-top: 1px solid #1a1a1a;
+  }
+  .stage:last-child { border-bottom: 1px solid #1a1a1a; }
+
+  .stage-label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .stage-number {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #525252;
+  }
+  .stage-name {
+    font-size: 20px;
+    font-weight: 600;
+    color: #fff;
+  }
+  .stage-skill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    color: #a78bfa;
+    background: rgba(167, 139, 250, 0.08);
+    border: 1px solid rgba(167, 139, 250, 0.15);
+    border-radius: 4px;
+    padding: 2px 8px;
+    width: fit-content;
+    margin-top: 6px;
+  }
+
+  .stage-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .stage-desc {
+    font-size: 14px;
+    color: #a3a3a3;
+    max-width: 560px;
+  }
+  .outputs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .output-tag {
+    font-size: 12px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    padding: 3px 10px;
+    border-radius: 4px;
+    border: 1px solid #262626;
+    background: #141414;
+    color: #d4d4d4;
+  }
+  .output-tag.obsidian {
+    border-color: rgba(139, 92, 246, 0.25);
+    background: rgba(139, 92, 246, 0.06);
+    color: #c4b5fd;
+  }
+  .output-tag.code {
+    border-color: rgba(34, 197, 94, 0.25);
+    background: rgba(34, 197, 94, 0.06);
+    color: #86efac;
+  }
+  .output-tag.registry {
+    border-color: rgba(251, 191, 36, 0.25);
+    background: rgba(251, 191, 36, 0.06);
+    color: #fde68a;
+  }
+  .output-tag.agent {
+    border-color: rgba(56, 189, 248, 0.25);
+    background: rgba(56, 189, 248, 0.06);
+    color: #7dd3fc;
+  }
+
+  /* Obsidian panel */
+  .obsidian-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .obsidian-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #525252;
+    margin-bottom: 2px;
+  }
+  .obsidian-item {
+    font-size: 12px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    color: #737373;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .obsidian-item .arrow { color: #525252; }
+  .obsidian-item.reads { color: #c4b5fd; }
+  .obsidian-item.writes { color: #86efac; }
+  .obsidian-item.updates { color: #fde68a; }
+
+  /* Connection lines */
+  .connector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 0;
+  }
+  .connector svg {
+    width: 24px;
+    height: 32px;
+    color: #333;
+  }
+
+  /* Legend */
+  .legend {
+    margin-top: 48px;
+    padding-top: 32px;
+    border-top: 1px solid #1a1a1a;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+  }
+  .legend-section h3 {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #525252;
+    margin-bottom: 12px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    font-size: 13px;
+  }
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  .legend-dot.obsidian { background: #8b5cf6; }
+  .legend-dot.code { background: #22c55e; }
+  .legend-dot.registry { background: #fbbf24; }
+  .legend-dot.agent { background: #38bdf8; }
+  .legend-dot.skill { background: #a78bfa; }
+
+  /* Agent inventory */
+  .inventory {
+    margin-top: 48px;
+    padding-top: 32px;
+    border-top: 1px solid #1a1a1a;
+  }
+  .inventory h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .inventory .subtitle { margin-bottom: 24px; }
+  .inventory-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .inv-card {
+    border: 1px solid #1a1a1a;
+    border-radius: 8px;
+    padding: 20px;
+    background: #111;
+  }
+  .inv-card h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .inv-card .path {
+    font-size: 12px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    color: #525252;
+    margin-bottom: 8px;
+  }
+  .inv-card .desc {
+    font-size: 13px;
+    color: #737373;
+  }
+  .inv-card .tag {
+    display: inline-flex;
+    font-size: 11px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    margin-top: 8px;
+  }
+  .inv-card .tag.skill-tag {
+    border: 1px solid rgba(167, 139, 250, 0.2);
+    color: #a78bfa;
+    background: rgba(167, 139, 250, 0.05);
+  }
+  .inv-card .tag.agent-tag {
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    color: #38bdf8;
+    background: rgba(56, 189, 248, 0.05);
+  }
+  .inv-card .tag.cmd-tag {
+    border: 1px solid rgba(251, 191, 36, 0.2);
+    color: #fbbf24;
+    background: rgba(251, 191, 36, 0.05);
+  }
+
+  @media (max-width: 900px) {
+    .stage { grid-template-columns: 1fr; gap: 12px; }
+    .legend { grid-template-columns: 1fr; }
+    .inventory-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>Idea to Project Flow</h1>
+<p class="subtitle">Personal OS pipeline &mdash; from thought to scaffolded project with context, agents, and Obsidian links</p>
+
+<div class="flow">
+
+  <!-- Stage 1: Capture -->
+  <div class="stage">
+    <div class="stage-label">
+      <span class="stage-number">Stage 1</span>
+      <span class="stage-name">Capture</span>
+      <span class="stage-skill">/idea</span>
+    </div>
+    <div class="stage-content">
+      <p class="stage-desc">Talk about an idea freely. Claude synthesizes it into a structured note with topics, tags, and vault connections. 30 seconds from thought to linked note.</p>
+      <div class="outputs">
+        <span class="output-tag obsidian">Ideas/{slug}.md</span>
+        <span class="output-tag">status: seed</span>
+        <span class="output-tag">topics + tags</span>
+        <span class="output-tag obsidian">vault connections</span>
+      </div>
+    </div>
+    <div class="obsidian-panel">
+      <span class="obsidian-label">Obsidian I/O</span>
+      <span class="obsidian-item reads"><span class="arrow">&larr;</span> Reads: People/, Resources/, Projects/, Meetings/</span>
+      <span class="obsidian-item writes"><span class="arrow">&rarr;</span> Writes: Ideas/{slug}.md</span>
+    </div>
+  </div>
+
+  <!-- Stage 2: Incubate -->
+  <div class="stage">
+    <div class="stage-label">
+      <span class="stage-number">Stage 2</span>
+      <span class="stage-name">Incubate</span>
+      <span class="stage-skill">/weekly-review</span>
+    </div>
+    <div class="stage-content">
+      <p class="stage-desc">Ideas sit as seeds. Weekly review surfaces ideas older than 14 days and asks: promote, archive, or leave? No pressure &mdash; ideas are cheap.</p>
+      <div class="outputs">
+        <span class="output-tag">seed idea surfaced</span>
+        <span class="output-tag">promote / archive / keep</span>
+      </div>
+    </div>
+    <div class="obsidian-panel">
+      <span class="obsidian-label">Obsidian I/O</span>
+      <span class="obsidian-item reads"><span class="arrow">&larr;</span> Reads: Ideas/ (all seed status)</span>
+      <span class="obsidian-item updates"><span class="arrow">&harr;</span> May update: status &rarr; archived</span>
+    </div>
+  </div>
+
+  <!-- Stage 3: Promote -->
+  <div class="stage">
+    <div class="stage-label">
+      <span class="stage-number">Stage 3</span>
+      <span class="stage-name">Promote</span>
+      <span class="stage-skill">/promote</span>
+    </div>
+    <div class="stage-content">
+      <p class="stage-desc">Select an idea to turn into a project. Confirm slug, area, stakeholders, goal link, and whether it needs a code directory.</p>
+      <div class="outputs">
+        <span class="output-tag">project slug confirmed</span>
+        <span class="output-tag">area: work | personal</span>
+        <span class="output-tag">goal linked</span>
+        <span class="output-tag">scaffold decision</span>
+      </div>
+    </div>
+    <div class="obsidian-panel">
+      <span class="obsidian-label">Obsidian I/O</span>
+      <span class="obsidian-item reads"><span class="arrow">&larr;</span> Reads: Ideas/{slug}.md</span>
+      <span class="obsidian-item reads"><span class="arrow">&larr;</span> Reads: Goals/2026-Q2.md</span>
+    </div>
+  </div>
+
+  <!-- Stage 4: Kickoff -->
+  <div class="stage">
+    <div class="stage-label">
+      <span class="stage-number">Stage 4</span>
+      <span class="stage-name">Kickoff</span>
+      <span class="stage-skill">/promote (step 4)</span>
+    </div>
+    <div class="stage-content">
+      <p class="stage-desc">Conversational deep-dive with Claude. Develops scope, architecture, constraints, users, and key decisions. This conversation becomes the CLAUDE.md &mdash; the project's brain.</p>
+      <div class="outputs">
+        <span class="output-tag code">CLAUDE.md (rich, generated)</span>
+        <span class="output-tag">scope defined</span>
+        <span class="output-tag">architecture direction</span>
+        <span class="output-tag">key decisions captured</span>
+      </div>
+    </div>
+    <div class="obsidian-panel">
+      <span class="obsidian-label">Obsidian I/O</span>
+      <span class="obsidian-item reads"><span class="arrow">&larr;</span> Reads: idea Shape + Open Questions</span>
+      <span class="obsidian-item reads"><span class="arrow">&larr;</span> Reads: People/ (stakeholders)</span>
+    </div>
+  </div>
+
+  <!-- Stage 5: Hire Agents -->
+  <div class="stage">
+    <div class="stage-label">
+      <span class="stage-number">Stage 5</span>
+      <span class="stage-name">Hire Agents</span>
+      <span class="stage-skill">/promote (step 5)</span>
+    </div>
+    <div class="stage-content">
+      <p class="stage-desc">Scan all projects for available agents. Present them as a hiring menu. Select existing agents to bring on, or describe new ones to create.</p>
+      <div class="outputs">
+        <span class="output-tag agent">agents/{name}.md (per hire)</span>
+        <span class="output-tag agent">agents/registry.md</span>
+        <span class="output-tag agent">~/.claude/agents/ (if global)</span>
+        <span class="output-tag registry">registry updated</span>
+      </div>
+    </div>
+    <div class="obsidian-panel">
+      <span class="obsidian-label">Registry I/O</span>
+      <span class="obsidian-item reads"><span class="arrow">&larr;</span> Reads: ~/.claude/project-registry.md</span>
+      <span class="obsidian-item reads"><span class="arrow">&larr;</span> Reads: ~/.claude/agents/</span>
+      <span class="obsidian-item reads"><span class="arrow">&larr;</span> Reads: ~/projects/*/agents/</span>
+    </div>
+  </div>
+
+  <!-- Stage 6: Scaffold -->
+  <div class="stage">
+    <div class="stage-label">
+      <span class="stage-number">Stage 6</span>
+      <span class="stage-name">Scaffold</span>
+      <span class="stage-skill">/promote (steps 6-11)</span>
+    </div>
+    <div class="stage-content">
+      <p class="stage-desc">Create everything: Obsidian project note (pre-filled from idea), code directory with CLAUDE.md + agents + git init, update idea status, link goal, update registry.</p>
+      <div class="outputs">
+        <span class="output-tag obsidian">Projects/{slug}.md</span>
+        <span class="output-tag code">~/projects/{slug}/</span>
+        <span class="output-tag code">CLAUDE.md</span>
+        <span class="output-tag code">.claude/skills/</span>
+        <span class="output-tag code">.claude/commands/</span>
+        <span class="output-tag agent">agents/registry.md</span>
+        <span class="output-tag code">.gitignore + README</span>
+        <span class="output-tag registry">project-registry.md</span>
+        <span class="output-tag obsidian">idea status &rarr; project</span>
+        <span class="output-tag obsidian">goal linked</span>
+      </div>
+    </div>
+    <div class="obsidian-panel">
+      <span class="obsidian-label">Obsidian I/O</span>
+      <span class="obsidian-item writes"><span class="arrow">&rarr;</span> Writes: Projects/{slug}.md</span>
+      <span class="obsidian-item updates"><span class="arrow">&harr;</span> Updates: Ideas/{slug}.md (status)</span>
+      <span class="obsidian-item updates"><span class="arrow">&harr;</span> Updates: Goals/2026-Q2.md (link)</span>
+    </div>
+  </div>
+
+  <!-- Stage 7: Build -->
+  <div class="stage">
+    <div class="stage-label">
+      <span class="stage-number">Stage 7</span>
+      <span class="stage-name">Build</span>
+      <span class="stage-skill">cd ~/projects/{slug}/</span>
+    </div>
+    <div class="stage-content">
+      <p class="stage-desc">Open Claude Code in the project. CLAUDE.md gives full context. Agents are available. Skills can be added. Meetings auto-link via Dataview.</p>
+      <div class="outputs">
+        <span class="output-tag code">project code</span>
+        <span class="output-tag">skills added as needed</span>
+        <span class="output-tag agent">agents refined</span>
+      </div>
+    </div>
+    <div class="obsidian-panel">
+      <span class="obsidian-label">Obsidian I/O</span>
+      <span class="obsidian-item reads"><span class="arrow">&larr;</span> Reads: project note (via CLAUDE.md link)</span>
+      <span class="obsidian-item reads"><span class="arrow">&larr;</span> Dataview: auto-surfaces meetings, ideas, people</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- Legend -->
+<div class="legend">
+  <div class="legend-section">
+    <h3>Output Types</h3>
+    <div class="legend-item"><div class="legend-dot obsidian"></div> Obsidian vault file</div>
+    <div class="legend-item"><div class="legend-dot code"></div> Code project file</div>
+    <div class="legend-item"><div class="legend-dot agent"></div> Agent context file</div>
+    <div class="legend-item"><div class="legend-dot registry"></div> Global registry</div>
+  </div>
+  <div class="legend-section">
+    <h3>Skills Used</h3>
+    <div class="legend-item"><div class="legend-dot skill"></div> /idea &mdash; capture seed</div>
+    <div class="legend-item"><div class="legend-dot skill"></div> /promote &mdash; idea &rarr; project</div>
+    <div class="legend-item"><div class="legend-dot skill"></div> /new-project &mdash; skip idea stage</div>
+    <div class="legend-item"><div class="legend-dot skill"></div> /discover &mdash; rebuild registry</div>
+    <div class="legend-item"><div class="legend-dot skill"></div> /weekly-review &mdash; surfaces stale ideas</div>
+  </div>
+  <div class="legend-section">
+    <h3>Key Files</h3>
+    <div class="legend-item" style="font-family: monospace; font-size: 12px; color: #737373;">~/.claude/project-registry.md</div>
+    <div class="legend-item" style="font-family: monospace; font-size: 12px; color: #737373;">~/.claude/agents/ (global)</div>
+    <div class="legend-item" style="font-family: monospace; font-size: 12px; color: #737373;">~/.claude/skills/ (global)</div>
+    <div class="legend-item" style="font-family: monospace; font-size: 12px; color: #737373;">~/Documents/PersonalOS/ (vault)</div>
+  </div>
+</div>
+
+<!-- Discovery Section -->
+<div class="inventory">
+  <h2>Discovery: Finding Skills & Agents</h2>
+  <p class="subtitle">Run <code style="color:#a78bfa">/discover</code> from any project to rebuild the registry. The registry is the single source of truth for what exists where.</p>
+  <div class="inventory-grid">
+    <div class="inv-card">
+      <h4>Global Skills</h4>
+      <div class="path">~/.claude/skills/</div>
+      <div class="desc">Available from every project. /idea, /kb, /promote, /new-project, /discover.</div>
+      <span class="tag skill-tag">5 skills</span>
+    </div>
+    <div class="inv-card">
+      <h4>Global Agents</h4>
+      <div class="path">~/.claude/agents/</div>
+      <div class="desc">Cross-project agents. Created during /promote when an agent should be reusable.</div>
+      <span class="tag agent-tag">0 agents (ready)</span>
+    </div>
+    <div class="inv-card">
+      <h4>Project Skills</h4>
+      <div class="path">{project}/.claude/skills/</div>
+      <div class="desc">Project-specific. personal-os has 10 (morning-plan, reflect, etc). my-app has 10.</div>
+      <span class="tag skill-tag">20+ across projects</span>
+    </div>
+    <div class="inv-card">
+      <h4>Project Agents</h4>
+      <div class="path">{project}/agents/</div>
+      <div class="desc">Project-specific. auto-redesign has 2 (designer, judge). Others empty until /promote.</div>
+      <span class="tag agent-tag">2 across projects</span>
+    </div>
+    <div class="inv-card">
+      <h4>Global Commands</h4>
+      <div class="path">~/.claude/commands/</div>
+      <div class="desc">Thin wrappers for global skills. Type /promote, /discover, /idea from anywhere.</div>
+      <span class="tag cmd-tag">5 commands</span>
+    </div>
+    <div class="inv-card">
+      <h4>Project Registry</h4>
+      <div class="path">~/.claude/project-registry.md</div>
+      <div class="desc">Master index. Lists all projects, their paths, skills, agents, and Obsidian links. Rebuilt by /discover.</div>
+      <span class="tag cmd-tag">15 projects indexed</span>
+    </div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

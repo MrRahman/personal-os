@@ -1,0 +1,61 @@
+{
+  "mcpServers": {
+    "todoist-local": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote@0.1.38",
+        "https://ai.todoist.net/mcp"
+      ],
+      "env": {
+        "NPM_CONFIG_REGISTRY": "https://registry.npmjs.org"
+      }
+    },
+    "notion-local": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@notionhq/notion-mcp-server"
+      ],
+      "env": {
+        "OPENAPI_MCP_HEADERS": "{\"Authorization\":\"Bearer YOUR_NOTION_TOKEN\",\"Notion-Version\":\"2025-09-03\"}",
+        "NPM_CONFIG_REGISTRY": "https://registry.npmjs.org"
+      }
+    },
+    "readwise": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote@0.1.38",
+        "https://mcp2.readwise.io/mcp"
+      ],
+      "env": {
+        "NPM_CONFIG_REGISTRY": "https://registry.npmjs.org"
+      }
+    },
+    "otter": {
+      "type": "stdio",
+      "command": "./mcp-servers/otter-wrapper.sh",
+      "args": [],
+      "env": {
+        "OTTER_SESSION_COOKIE": "YOUR_OTTER_SESSION_COOKIE"
+      }
+    },
+    "google-personal": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@aaronsb/google-workspace-mcp"
+      ],
+      "env": {
+        "GOOGLE_CLIENT_ID": "YOUR_GOOGLE_CLIENT_ID",
+        "GOOGLE_CLIENT_SECRET": "YOUR_GOOGLE_CLIENT_SECRET",
+        "NPM_CONFIG_REGISTRY": "https://registry.npmjs.org"
+      }
+    }
+  }
+}
